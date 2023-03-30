@@ -3,15 +3,15 @@ project(hello-world-hw)
 add_subdirectory(lib)
 
 add_executable(
-    hello-static
+    hello-world-static
     src/main.cpp
 )
 
 add_executable(
-    hello-shared
+    hello-world-shared
     src/main.cpp
 )
 
-target_link_libraries(hello-static LINK_PUBLIC hello_a)
+target_link_libraries(hello-world-static LINK_PUBLIC hello_a)
 
-target_link_libraries(hello-shared LINK_PUBLIC hello_so)
+target_link_libraries(hello-world-shared LINK_PUBLIC hello_so)
