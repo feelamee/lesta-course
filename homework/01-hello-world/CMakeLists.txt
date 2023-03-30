@@ -12,5 +12,6 @@ add_executable(
     src/main.cpp
 )
 
-target_link_libraries(hello-static LINK_PUBLIC libhello-static)
-target_link_libraries(hello-shared LINK_PUBLIC libhello-shared)
+target_link_libraries(hello-static LINK_PUBLIC hello_a)
+
+target_link_libraries(hello-shared LINK_PUBLIC hello_so)

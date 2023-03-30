@@ -2,16 +2,16 @@ project(hello-world-lib)
 
 
 add_library(
-    libhello-static STATIC
+    hello_a STATIC
     include/hello.hpp
     src/hello.cpp
 )
 
 add_library(
-    libhello-shared SHARED
+    hello_so SHARED
     include/hello.hpp
     src/hello.cpp
 )
 
-target_include_directories(libhello-static PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(libhello-shared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(hello_a PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(hello_so PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
