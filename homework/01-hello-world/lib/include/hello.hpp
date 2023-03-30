@@ -1,15 +1,21 @@
 #ifndef HELLO_HPP
 #define HELLO_HPP
 
-namespace hw /* hello world */ {
+#ifdef WIN32
+    #define LIB_API __declspec(dllexport)
+#else
+    #define LIB_API
+#endif
+namespace hw /* hello world */
+{
 
 /**
  * @brief print greeting
- * 
+ *
  * @return int
  */
-int hello();
+LIB_API int hello();
 
-}
+} // namespace hw
 
-#endif //HELLO_HPP
+#endif // HELLO_HPP
