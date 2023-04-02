@@ -1,3 +1,6 @@
-### lesta-course
+#### lesta-course
 
-![builds on](https://github.com/hiebyshek/lesta-course/actions/workflows/build.yml/badge.svg)
+###### built on:
+- ![builds on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-ubuntu.yml/badge.svg)
+- ![builds on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-macos.yml/badge.svg)
+- ![builds on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-windows.yml/badge.svg)

@@ -1,0 +1,26 @@
+name: windows
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-windows:
+    name: build and run on windows
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@master
+    
+    - name: build project
+      run: |
+        cd ${{ github.workspace }}
+        mkdir build
+        cmake -S . -B build/
+        cmake --build build/
+    - name: run with static linking
+      run: build\homework\01-hello-world\2-hello-lib\Debug\hello-world-static.exe
+    - name: run with shared linking
+      run: build\Debug\hello-world-shared.exe

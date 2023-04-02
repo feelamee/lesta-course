@@ -1,0 +1,26 @@
+name: ubuntu
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-ubuntu:
+    name: build and run on ubuntu
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@master
+    - name: build project
+      run: |
+        cd ${{ github.workspace }}
+        mkdir build
+        cd build
+        cmake ..
+        cmake --build .
+    - name: run with static linking
+      run: ./build/homework/01-hello-world/2-hello-lib/hello-world-static
+    - name: run with shared linking
+      run: ./build/homework/01-hello-world/2-hello-lib/hello-world-shared
