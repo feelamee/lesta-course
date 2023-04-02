@@ -1,0 +1,10 @@
+FROM archlinux:latest
+
+WORKDIR /app
+
+RUN yes | pacman -Sy git cmake ninja gcc
+
+ADD ./ /app/
+RUN mkdir /app/build  && \
+    cd /app/build     && \
+    cmake .. -G Ninja

@@ -1,0 +1,28 @@
+version: "0.1"
+services:
+  hello-world-base:
+    image: hello-world-base
+    build:
+      dockerfile: ./Dockerfile-base
+
+  hello-world:
+    image: hello-world
+    build:
+      dockerfile: ./1-hello-world/Dockerfile
+    depends_on:
+      - hello-world-base
+
+  hello-world-shared:
+    image: hello-world-shared
+    build:
+      dockerfile: ./2-hello-lib/Dockerfiles/Dockerfile-shared
+    depends_on:
+      - hello-world-base
+      
+  hello-world-static:
+    image: hello-world-static
+    build:
+      dockerfile: ./2-hello-lib/Dockerfiles/Dockerfile-static
+    depends_on:
+      - hello-world-base
+

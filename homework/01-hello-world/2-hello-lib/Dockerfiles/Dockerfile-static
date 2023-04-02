@@ -1,0 +1,7 @@
+FROM hello-world-base:latest
+
+WORKDIR /app
+RUN cd /app/build && \
+    cmake --build . --target hello-world-static
+
+CMD ["/app/build/2-hello-lib/hello-world-static"]
