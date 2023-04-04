@@ -1,6 +1,10 @@
 #### lesta-course
 
 ###### built on:
-- ![builds on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-ubuntu.yml/badge.svg)
-- ![builds on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-macos.yml/badge.svg)
-- ![builds on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-windows.yml/badge.svg)
+- [![build on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-ubuntu.yml/badge.svg)](https://github.com/hiebyshek/lesta-course/actions/workflows/build-ubuntu.yml)
+- [![build on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-macos.yml/badge.svg)](https://github.com/hiebyshek/lesta-course/actions/workflows/build-macos.yml)
+- [![build on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-windows.yml/badge.svg)](https://github.com/hiebyshek/lesta-course/actions/workflows/build-windows.yml)
+
+###### to build docker:
+    ./docker-build --target howmework-dir
+    ./docker-build --help to see help page
