@@ -1,13 +1,16 @@
-#include <iostream>
 #include <cstdlib>
 #include <hello.hpp>
+#include <iostream>
 
-namespace hw {
+namespace hw
+{
 
 int hello()
 {
-    std::cout << "Hello, World!" << std::endl;
+    if (!std::cout.fail())
+        std::cout << "Hello, World!" << std::endl;
+
     return std::cout.good() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-}
+} // namespace hw
