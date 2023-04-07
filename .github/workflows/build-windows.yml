@@ -2,6 +2,8 @@ name: windows
 
 on:
   push:
+    paths:
+      - homework/01-hello-world/*
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
