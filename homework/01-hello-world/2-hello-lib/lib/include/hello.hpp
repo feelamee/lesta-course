@@ -2,9 +2,9 @@
 #define HELLO_HPP
 
 #ifdef WIN32
-    #define LIB_API __declspec(dllexport)
+#define LIB_API __declspec(dllexport)
 #else
-    #define LIB_API
+#define LIB_API
 #endif
 namespace hw /* hello world */
 {
