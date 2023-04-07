@@ -1,0 +1,8 @@
+find homework/              \
+     -type f                \
+     -wholename */src/*     \
+     -or                    \
+     -wholename */include/* \
+   | xargs clang-format -i
+
+exit $?
