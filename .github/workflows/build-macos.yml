@@ -18,7 +18,7 @@ jobs:
         cd ${{ github.workspace }}
         mkdir build
         cd build
-        cmake ..
+        cmake -DBUILD_01_HELLO_WORLD=ON ..
         cmake --build .
     - name: run with static linking
       run: ./build/homework/01-hello-world/2-hello-lib/hello-world-static
