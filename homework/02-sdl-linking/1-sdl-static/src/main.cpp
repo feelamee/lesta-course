@@ -23,5 +23,5 @@ int main()
 
     SDL_errorcode exit_code{};
     SDL_Error(exit_code);
-    return exit_code;
+    return exit_code | !std::cout.good();
 }
