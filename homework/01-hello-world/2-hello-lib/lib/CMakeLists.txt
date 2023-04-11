@@ -7,12 +7,14 @@ add_library(
     src/hello.cpp
 )
 target_include_directories(hello_a PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_compile_features(hello_a PRIVATE cxx_std_20)
 
 add_library(
     hello_so SHARED
     include/hello.hpp
     src/hello.cpp
 )
+target_compile_features(hello_so PRIVATE cxx_std_20)
 target_include_directories(hello_so PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(WIN32)

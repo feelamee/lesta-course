@@ -1,4 +1,5 @@
 #include <SDL3/SDL.h>
+
 #include <iostream>
 
 std::ostream& operator<<(std::ostream& out, const SDL_version& v)

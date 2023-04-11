@@ -3,6 +3,6 @@ find homework/              \
      -wholename */src/*     \
      -or                    \
      -wholename */include/* \
-   | xargs clang-format -i
+   | xargs clang-format --style=file -i
 
 exit $?

@@ -1,5 +1,4 @@
-#include <SDL3/SDL.h>
-
+#include <SDL2/SDL.h>
 #include <iostream>
 
 std::ostream& operator<<(std::ostream& out, const SDL_version& v)
@@ -12,6 +11,7 @@ std::ostream& operator<<(std::ostream& out, const SDL_version& v)
 
 int main()
 {
+    SDL_Init(0);
     SDL_version compiled = {};
     SDL_version linked   = {};
 
