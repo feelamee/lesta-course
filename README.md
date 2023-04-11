@@ -6,5 +6,5 @@
 - [![build on](https://github.com/hiebyshek/lesta-course/actions/workflows/build-windows.yml/badge.svg)](https://github.com/hiebyshek/lesta-course/actions/workflows/build-windows.yml)
 
 ###### to build docker:
-    scripts/docker-build --target howmework-dir
-    scripts/docker-build --help to see help page
+    ./scripts/docker-build --target howmework-dir
+    ./scripts/docker-build --help to see help page
