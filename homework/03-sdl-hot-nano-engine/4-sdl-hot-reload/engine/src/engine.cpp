@@ -39,10 +39,20 @@ int engine::initialize(fs::path libgame, fs::path tmp_libgame)
 
 int engine::hot_reload()
 {
-    if (!fs::copy_file(
-            libgame, tmp_libgame, fs::copy_options::update_existing) and
-        libgame_handle)
-        return EXIT_SUCCESS;
+    try
+    {
+        if (fs::exists(tmp_libgame) and
+            fs::last_write_time(libgame) < fs::last_write_time(tmp_libgame))
+            return EXIT_SUCCESS;
+
+        fs::remove(tmp_libgame);
+        fs::copy_file(libgame, tmp_libgame);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+        return EXIT_FAILURE;
+    }
 
     std::this_thread::sleep_for(100ms);
 
