@@ -1,6 +1,3 @@
 project(04-render-basics)
 
-add_executable(
-    test_canvas
-    src/main_canvas.cpp
-)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/1-render-primitives)

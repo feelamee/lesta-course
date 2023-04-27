@@ -1,8 +1,8 @@
-find homework/              \
+find ../homework/           \
      -type f                \
      -wholename */src/*     \
      -or                    \
      -wholename */include/* \
-   | xargs clang-format --style=file -i
+   | xargs clang-format --style=$1 -i
 
 exit $?
