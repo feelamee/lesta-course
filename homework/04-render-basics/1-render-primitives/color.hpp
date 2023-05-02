@@ -3,44 +3,52 @@
 
 #include <concepts>
 #include <cstdint>
+#include <limits>
+#include <numeric>
+#include <ostream>
 
-#pragma pack(push, 1)
 template <typename compT = uint8_t>
-    requires std::is_same_v<uint8_t, compT>
-    or std::is_same_v<uint16_t, compT> struct color
+    requires std::is_same_v<uint8_t, compT> or std::is_same_v<uint16_t, compT>
+using color_channel_t = compT;
+
+; // trick to disable incorrect warning in clangd
+#pragma pack(push, 1)
+struct color
 {
-  union
-  {
-    struct
+    union
     {
-      compT r = 0;
-      compT g = 0;
-      compT b = 0;
+        struct
+        {
+            color_channel_t<> r = 0;
+            color_channel_t<> g = 0;
+            color_channel_t<> b = 0;
+        };
+        char components[3 * sizeof(color_channel_t<>)];
     };
-    char components[3 * sizeof (compT)];
-  };
 
-  friend bool
-  operator== (const color &l, const color &r)
-  {
-    return l.r == r.r && l.g == r.g && l.b == r.b;
-  }
+    friend bool operator==(const color& l, const color& r)
+    {
+        return l.r == r.r && l.g == r.g && l.b == r.b;
+    }
 
-  friend std::ostream &
-  operator<< (std::ostream &os, color<compT> color_)
-  {
-    auto tmp = static_cast<color<uint16_t> > (color_);
-    return os << "[" << tmp.r << " " << tmp.g << " " << tmp.b << "]";
-  }
-
-  operator color<uint16_t> () const
-  {
-    return { static_cast<uint16_t> (r), static_cast<uint16_t> (g),
-             static_cast<uint16_t> (b) };
-  }
+    friend std::ostream& operator<<(std::ostream& os, color color_)
+    {
+        auto tmp = static_cast<color>(color_);
+        return os << "[" << tmp.r << " " << tmp.g << " " << tmp.b << "]";
+    }
 };
 #pragma pack(pop)
 
-constexpr color<uint8_t> color_black = { 0, 0, 0 };
+namespace colors
+{
+constexpr auto min = std::numeric_limits<color_channel_t<>>::min();
+constexpr auto max = std::numeric_limits<color_channel_t<>>::max();
+
+constexpr color black{ min, min, min };
+constexpr color white{ max, max, max };
+constexpr color red{ max, min, min };
+constexpr color green{ min, max, min };
+constexpr color blue{ min, min, max };
+} // namespace colors
 
 #endif // COLOR_HPP

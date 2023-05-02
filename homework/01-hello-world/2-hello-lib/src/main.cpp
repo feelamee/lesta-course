@@ -1,7 +1,6 @@
 #include <hello.hpp>
 
-int
-main ()
+int main()
 {
-  return hw::hello ();
+    return hw::hello();
 }

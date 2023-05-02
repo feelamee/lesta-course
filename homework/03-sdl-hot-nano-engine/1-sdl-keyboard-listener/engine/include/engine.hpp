@@ -8,22 +8,22 @@ namespace nano
 
 class iengine
 {
-  iengine () {}
+    iengine() {}
 
-  SDL_Window *window;
+    SDL_Window* window;
 
 public:
-  static iengine &instance ();
+    static iengine& instance();
 
-  iengine (const iengine &) = delete;
-  iengine (iengine &&) = delete;
-  iengine &operator= (const iengine &) = delete;
-  iengine &operator= (iengine &&) = delete;
+    iengine(const iengine&)            = delete;
+    iengine(iengine&&)                 = delete;
+    iengine& operator=(const iengine&) = delete;
+    iengine& operator=(iengine&&)      = delete;
 
-  ~iengine () {}
-  int initialize ();
-  void finalize ();
-  void run ();
+    ~iengine() {}
+    int  initialize();
+    void finalize();
+    void run();
 };
 
 } // namespace nano

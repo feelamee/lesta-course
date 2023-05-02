@@ -12,35 +12,35 @@ namespace nano
 
 enum
 {
-  EVENT_KEY_DOWN,
-  EVENT_KEY_UP,
+    EVENT_KEY_DOWN,
+    EVENT_KEY_UP,
 
-  EVENT_QUIT,
-  EVENT_WINDOW_CLOSE_REQUESTED,
+    EVENT_QUIT,
+    EVENT_WINDOW_CLOSE_REQUESTED,
 } event_t;
 
 struct kb_event
 {
-  std::uint32_t type; /**< ::EVENT_KEY_DOWN or ::EVENT_KEY_UP */
-  timestamp_t timestamp;
-  bool repeat;
-  SDL_Keysym keysym; /**< The key that was pressed or released */
+    std::uint32_t type; /**< ::EVENT_KEY_DOWN or ::EVENT_KEY_UP */
+    timestamp_t   timestamp;
+    bool          repeat;
+    SDL_Keysym    keysym; /**< The key that was pressed or released */
 };
 
 struct quit_event
 {
-  std::uint32_t type; /**< EVENT_QUIT */
-  timestamp_t timestamp;
+    std::uint32_t type; /**< EVENT_QUIT */
+    timestamp_t   timestamp;
 };
 
 union event
 {
-  std::uint32_t type;
-  kb_event key;
-  quit_event quit;
+    std::uint32_t type;
+    kb_event      key;
+    quit_event    quit;
 };
 
-int poll_event (event *ev);
+int poll_event(event* ev);
 
 } // namespace nano
 

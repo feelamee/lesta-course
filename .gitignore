@@ -3,3 +3,4 @@ build/
 tok-30d
 scripts/rm-images
 bak/
+CMakeLists.txt.user

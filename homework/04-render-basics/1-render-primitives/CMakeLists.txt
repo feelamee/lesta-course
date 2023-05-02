@@ -1,42 +1,39 @@
 project(1-render-primitives)
 
-set(SRC_GEN
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/04-0-output-images)
+
+set(SRC
     image_loader.hpp
     canvas.hpp
     color.hpp
+    vertex.cpp
+    vertex.hpp
     render.hpp
-)
-
-set(1-target 04-0-load-dump-ppm)
-add_executable(
-    ${1-target}
-    main_canvas.cpp
-    ${SRC_GEN}
-)
-target_compile_features(${1-target} PUBLIC cxx_std_20)
-target_compile_options(${1-target} PUBLIC "-Wall")
-
-set(2-target 04-0-line-render)
-add_executable(
-    ${2-target}
-    main_line_render.cpp
     line_render.hpp
-    ${SRC_GEN}
-)
-target_compile_features(${2-target} PUBLIC cxx_std_20)
-target_compile_options(${2-target} PUBLIC "-Wall")
-
-
-set(3-target 04-0-triangle-render)
-add_executable(
-    ${3-target}
-    main_triangle_render.cpp
-    line_render.hpp
+    line_render.cpp
     triangle_render.hpp
-    ${SRC_GEN}
+    triangle_render.cpp
+    shader.hpp
+    shader.cpp
 )
-target_compile_features(${3-target} PUBLIC cxx_std_20)
-target_compile_options(${3-target} PUBLIC "-Wall")
+add_executable(
+    main
+    main.cpp
+    ${SRC}
+)
+target_compile_features(main PUBLIC cxx_std_20)
+# target_compile_options(main PUBLIC "-Wall")
+
+add_executable(
+    incredible_shader
+    incredible_shader.cpp
+    ${SRC}
+)
+target_compile_features(incredible_shader PUBLIC cxx_std_20)
+target_compile_options(incredible_shader PUBLIC "-g3")
+find_package(SDL3 REQUIRED)
+target_link_libraries(incredible_shader PUBLIC SDL3-shared)
+
 
 find_package(Boost REQUIRED)
 if (NOT Boost_FOUND)
