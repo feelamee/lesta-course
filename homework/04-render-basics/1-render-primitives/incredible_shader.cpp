@@ -1,4 +1,7 @@
 #include "SDL_events.h"
+#include "SDL_keyboard.h"
+#include "SDL_keycode.h"
+#include "SDL_render.h"
 #include "color.hpp"
 #include "shader.hpp"
 #include "triangle_render.hpp"
@@ -44,56 +47,6 @@ public:
         }                                                                      \
     }
 
-struct lupa : shader
-{
-    struct
-    {
-        float mouse_x;
-        float mouse_y;
-        float scale = 2;
-        float radius = 30;
-        canvas* buf = nullptr;
-    } uniform;
-
-    ublas::matrix<color, ublas::column_major> buf;
-
-    vertex
-    vertex_shader(const vertex& v) override
-    {
-        vertex result{ v };
-        auto dx = v.x - uniform.mouse_x;
-        auto dy = v.y - uniform.mouse_y;
-        auto len = std::sqrt(dx * dx + dy * dy);
-        if (len < uniform.radius)
-        {
-            result.x += 10 * dx / uniform.scale;
-            result.y += 10 * dy / uniform.scale;
-        }
-
-        return result;
-    }
-
-    color
-    fragment_shader(const vertex& v) override
-    {
-        auto width = (*uniform.buf).width() - 1;
-        auto height = (*uniform.buf).height() - 1;
-        float pos_x = width * v.tx;
-        float pos_y = height * v.ty;
-
-        float dx = v.x - uniform.mouse_x;
-        float dy = v.y - uniform.mouse_y;
-        float len = std::sqrt(dx * dx + dy * dy);
-        if (std::abs(len - uniform.radius) < 0.5)
-            return { 0, 0, 0 };
-
-        color result = (*uniform.buf)(static_cast<position_t>(pos_x),
-                                      static_cast<position_t>(pos_y));
-
-        return result;
-    }
-};
-
 namespace std
 {
 template <typename T>
@@ -107,8 +60,7 @@ main()
                                      SDL_Quit);
     ASSERT_SDL_ERROR(EXIT_SUCCESS == sdl_init.constr_returned_v);
 
-    // constexpr size_t width = 747, height = 1328;
-    constexpr size_t width = 370, height = 664;
+    constexpr size_t width = 375, height = 665;
 
     std::shared_ptr window(
         SDL_CreateWindow("Paint", width, height, SDL_WINDOW_OPENGL),
@@ -120,24 +72,37 @@ main()
         SDL_DestroyRenderer);
     ASSERT_SDL_ERROR(nullptr != sdl_renderer);
 
-    std::fstream src("./04-0-input-images/leo.ppm", std::ios::in);
+    std::fstream src("./04-0-input-images/leo.ppm");
     canvas texture;
     ppm::load(src, texture);
 
     canvas img(width, height);
     triangle_render my_renderer(img);
-    my_renderer.program = std::make_shared<lupa>();
 
-    auto brush = dynamic_cast<lupa*>(my_renderer.program.get());
+    my_renderer.program = std::make_shared<blur>();
+    auto brush = std::dynamic_pointer_cast<blur>(my_renderer.program);
+
     brush->uniform.buf = &texture;
+    std::vector<vertex> rectangle;
+    std::vector<size_t> indices;
 
-    std::vector<vertex> rectangle = {
-        { 0, 0, 1, 1, 1, 0, 0 },
-        { width - 1, 0, 1, 1, 1, 1, 0 },
-        { 0, height - 1, 1, 1, 1, 0, 1 },
-        { width - 1, height - 1, 1, 1, 1, 1, 1 }
-    };
-    std::vector<size_t> indices = { 0, 1, 3, 0, 2, 3 };
+    // clang-format off
+    //                 x           y       r  g  b  tx ty
+    rectangle = { { 0,         0,          0, 0, 0, 0, 0 },
+                  { width - 1, 0,          1, 1, 1, 1, 0 },
+                  { 0,         height - 1, 1, 1, 1, 0, 1 },
+                  { width - 1, height - 1, 1, 1, 1, 1, 1 } };
+    indices = { 0, 1, 3, 0, 2, 3 };
+    // clang-format on
+
+    std::shared_ptr sdl_surface(
+        SDL_CreateSurfaceFrom(reinterpret_cast<void*>(&img(0, 0)),
+                              width,
+                              height,
+                              width * sizeof(color),
+                              SDL_PIXELFORMAT_RGB24),
+        SDL_DestroySurface);
+    ASSERT_SDL_ERROR(nullptr != sdl_surface);
 
     SDL_Event ev;
     bool is_running{ true };
@@ -155,28 +120,37 @@ main()
                 brush->uniform.mouse_x = ev.motion.x;
                 brush->uniform.mouse_y = ev.motion.y;
                 break;
+
+            case SDL_EVENT_MOUSE_WHEEL:
+                brush->uniform.radius += 2 * ev.wheel.y;
+                break;
+
+            case SDL_EVENT_KEY_DOWN:
+                switch (ev.key.keysym.sym)
+                {
+                case SDLK_i: // increase
+                    brush->uniform.strength += 1;
+                    break;
+                case SDLK_d: // decrease
+                    if (brush->uniform.strength > 1)
+                        brush->uniform.strength -= 1;
+                    break;
+                }
+                break;
             }
         }
 
-        my_renderer.rasterize(rectangle);
-        std::shared_ptr surface(
-            SDL_CreateSurfaceFrom(
-                reinterpret_cast<void*>(&img.data().data()[0]),
-                width,
-                height,
-                width * sizeof(color),
-                SDL_PIXELFORMAT_RGB24),
-            SDL_DestroySurface);
-        ASSERT_SDL_ERROR(nullptr != surface);
+        my_renderer.rasterize(rectangle, indices);
 
-        std::shared_ptr texture(
-            SDL_CreateTextureFromSurface(sdl_renderer.get(), surface.get()),
-            SDL_DestroyTexture);
-        ASSERT_SDL_ERROR(nullptr != texture);
+        auto sdl_texture =
+            SDL_CreateTextureFromSurface(sdl_renderer.get(), sdl_surface.get());
+        ASSERT_SDL_ERROR(nullptr != sdl_texture);
 
         SDL_RenderClear(sdl_renderer.get());
-        SDL_RenderTexture(sdl_renderer.get(), texture.get(), nullptr, nullptr);
+        SDL_RenderTexture(sdl_renderer.get(), sdl_texture, nullptr, nullptr);
         SDL_RenderPresent(sdl_renderer.get());
+
+        SDL_DestroyTexture(sdl_texture);
     }
     return EXIT_SUCCESS;
 }

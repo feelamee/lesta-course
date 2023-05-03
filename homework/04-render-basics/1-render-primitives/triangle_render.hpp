@@ -17,37 +17,37 @@ public:
     {
     }
 
-    virtual std::vector<position> polyline(position p1,
-                                           position p2,
-                                           position p3);
+    virtual std::vector<position>
+    polyline(position p1, position p2, position p3);
 
     using line_render::draw;
 
-    void draw(const std::vector<position>& vertices, color color_);
+    void
+    draw(const std::vector<position>&, color);
 
-    void draw(const std::vector<position>& vertices,
-              std::vector<size_t>          indexes,
-              color                        color_);
+    void
+    draw(const std::vector<position>&, const std::vector<size_t>&, color);
 
     using line_render::line;
 
-    void rasterize_bresenham_stupid(const std::vector<position>& vertices,
-                                    color                        color_);
+    void
+    rasterize_bresenham_stupid(const std::vector<position>&, color);
 
-    static position interpolate(const position& p1,
-                                const position& p2,
-                                float           t);
+    void
+    rasterize(const vertex&, const vertex&);
 
-    static vertex interpolate(const vertex& p1, const vertex& p2, float t);
+    void
+    rasterize(const std::vector<vertex>&);
 
-    void rasterize(const vertex& v1, const vertex& v2);
-
-    void rasterize(std::vector<vertex>& vertices);
-    void rasterize(const std::vector<vertex>& vertices,
-                   std::vector<size_t>        indices);
+    void
+    rasterize(const std::vector<vertex>&, const std::vector<size_t>&);
 
     // TODO: rewrite to integers (triangle borders looks terrible)
-    void rasterize(const vertex& v1, const vertex& v2, const vertex& v3);
+    void
+    rasterize(const vertex&, const vertex&, const vertex&);
+
+    std::vector<vertex>
+    get_triangle_vertices(const vertex& v1, const vertex& v2, const vertex& v3);
 };
 
 #endif // TRIANGLE_RENDER_HPP

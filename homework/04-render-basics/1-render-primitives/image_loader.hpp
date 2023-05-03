@@ -22,7 +22,7 @@ enum class fmt
 
 enum limits
 {
-    MAX_IMAGE_SIZE  = 1U << 12,
+    MAX_IMAGE_SIZE = 1U << 12,
     MAX_COLOR_VALUE = (1U << 16) - 1,
 };
 
@@ -33,9 +33,9 @@ load(std::istream& src, canvas& img)
         return EXIT_FAILURE;
 
     std::string fmt;
-    size_t      width = 0, height = 0;
-    size_t      max_color_val = 0;
-    char        sep           = '\0';
+    size_t width = 0, height = 0;
+    size_t max_color_val = 0;
+    char sep = '\0';
 
     src >> fmt >> width >> height >> max_color_val;
     sep = src.get();

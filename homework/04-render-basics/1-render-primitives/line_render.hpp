@@ -24,20 +24,26 @@ public:
     {
     }
 
-    void
-    clear(color color_ = colors::black) override;
+    void clear(color = colors::black) override;
 
     canvas&
     data() override;
 
-    std::vector<position>
-    line(position p1, position p2) override;
+    std::vector<position> line(position, position) override;
+
+    std::vector<vertex>
+    line(const vertex& v1, const vertex& v2);
+
+    void draw(position, position, color) override;
 
     void
-    draw(position p1, position p2, color p_color) override;
+    draw(const std::vector<vertex>&);
 
-    void
-    draw(const std::vector<vertex>& vertices);
+    static position
+    interpolate(const position&, const position&, float);
+
+    static vertex
+    interpolate(const vertex&, const vertex&, float);
 };
 
 #endif // LINE_RENDER_HPP

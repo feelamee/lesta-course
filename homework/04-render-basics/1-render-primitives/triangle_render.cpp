@@ -1,5 +1,6 @@
 #include "triangle_render.hpp"
 #include <array>
+#include <bits/ranges_algobase.h>
 
 std::vector<position>
 triangle_render::polyline(position p1, position p2, position p3)
@@ -11,9 +12,9 @@ triangle_render::polyline(position p1, position p2, position p3)
     std::vector<position> result(line1.size() + line2.size() + line3.size());
 
     using std::ranges::move_backward;
-    move_backward(line1, result.begin());
-    move_backward(line2, result.begin() + line1.size());
-    move_backward(line3, result.begin() + line1.size() + line2.size());
+    move_backward(line1, result.end());
+    move_backward(line2, result.end());
+    move_backward(line3, result.end());
 
     return result;
 }
@@ -40,7 +41,7 @@ triangle_render::draw(const std::vector<position>& vertices, color color_)
 
 void
 triangle_render::draw(const std::vector<position>& vertices,
-                      std::vector<size_t> indexes,
+                      const std::vector<size_t>& indexes,
                       color color_)
 {
     size_t size = indexes.size();
@@ -73,54 +74,11 @@ triangle_render::rasterize_bresenham_stupid(
         draw(line(vertices[1], pos), color_);
 }
 
-position
-triangle_render::interpolate(const position& p1, const position& p2, float t)
-{
-    return {
-        static_cast<position_t>(std::lerp(p1.x, p2.x, t)),
-        static_cast<position_t>(std::lerp(p1.y, p2.y, t)),
-    };
-}
-
-vertex
-triangle_render::interpolate(const vertex& p1, const vertex& p2, float t)
-{
-    using std::lerp;
-    return {
-        lerp(p1.x, p2.x, t),   lerp(p1.y, p2.y, t), lerp(p1.r, p2.r, t),
-        lerp(p1.g, p2.g, t),   lerp(p1.b, p2.b, t), lerp(p1.tx, p2.tx, t),
-        lerp(p1.ty, p2.ty, t),
-    };
-}
-
 void
-triangle_render::rasterize(const vertex& v1, const vertex& v2)
+triangle_render::rasterize(const std::vector<vertex>& vertices)
 {
-    std::vector<vertex> result;
-    auto p_count{ std::abs(v2.x - v1.x) };
-    if (p_count < 1.f)
-        return;
-
-    result.reserve(p_count + 1);
-    const auto t{ 1.f / (p_count + 1) };
-
-    float ti{};
-    for (size_t p{}; p < p_count + 1; ++p)
-    {
-        result.push_back(interpolate(v1, v2, ti));
-        ti += t;
-    }
-    draw(result);
-}
-
-void
-triangle_render::rasterize(std::vector<vertex>& vertices)
-{
-    if (vertices.size() % 3 != 0)
-        return;
-
     size_t i{ 0 }, j{ 1 }, k{ 2 };
-    for (; k < vertices.size();)
+    while (k < vertices.size())
     {
         rasterize(vertices[i], vertices[j], vertices[k]);
         i += 3, j += 3, k += 3;
@@ -129,16 +87,16 @@ triangle_render::rasterize(std::vector<vertex>& vertices)
 
 void
 triangle_render::rasterize(const std::vector<vertex>& vertices,
-                           std::vector<size_t> indices)
+                           const std::vector<size_t>& indices)
 {
     size_t size = indices.size();
 
     size_t i = 0, j = 1, k = 2;
     while (k < size)
     {
-        vertex a = vertices.at(indices[i]);
-        vertex b = vertices.at(indices[j]);
-        vertex c = vertices.at(indices[k]);
+        vertex a = vertices[indices[i]];
+        vertex b = vertices[indices[j]];
+        vertex c = vertices[indices[k]];
         rasterize(program->vertex_shader(a),
                   program->vertex_shader(b),
                   program->vertex_shader(c));
@@ -164,17 +122,17 @@ triangle_render::rasterize(const vertex& v1, const vertex& v2, const vertex& v3)
 
     if (std::isinf(part20))
     {
-        rasterize(v_ymin, v_ymid);
-        rasterize(v_ymid, v_ymax);
-        rasterize(v_ymin, v_ymax);
+        draw(line(v_ymin, v_ymid));
+        draw(line(v_ymid, v_ymax));
+        draw(line(v_ymin, v_ymax));
         return;
     }
 
     float t1{}, t2{};
     while (t1 < 1.)
     {
-        rasterize(interpolate(v_ymax, v_ymid, t1),
-                  interpolate(v_ymax, v_ymin, t2));
+        draw(line(interpolate(v_ymax, v_ymid, t1),
+                  interpolate(v_ymax, v_ymin, t2)));
         t1 += part21;
         t2 += part20;
     }
@@ -182,9 +140,55 @@ triangle_render::rasterize(const vertex& v1, const vertex& v2, const vertex& v3)
     t1 = 0;
     while (t1 < 1.)
     {
-        rasterize(interpolate(v_ymid, v_ymin, t1),
-                  interpolate(v_ymax, v_ymin, t2));
+        draw(line(interpolate(v_ymid, v_ymin, t1),
+                  interpolate(v_ymax, v_ymin, t2)));
         t1 += part10;
         t2 += part20;
     }
+}
+
+std::vector<vertex>
+triangle_render::get_triangle_vertices(const vertex& v1,
+                                       const vertex& v2,
+                                       const vertex& v3)
+{
+    using namespace std::ranges;
+
+    const auto& [v12min, v12max] = minmax(v1, v2, {}, &vertex::y);
+    const auto& [v12maxv3_min, v_ymax] = minmax(v12max, v3, {}, &vertex::y);
+    const auto& [v_ymin, v_ymid] = minmax(v12min, v12maxv3_min, {}, &vertex::y);
+
+    float part21 = 1. / (v_ymax.y - v_ymid.y);
+    float part20 = 1. / (v_ymax.y - v_ymin.y);
+    float part10 = 1. / (v_ymid.y - v_ymin.y);
+
+    std::vector<vertex> vertices;
+    if (std::isinf(part20))
+    {
+        move_backward(line(v_ymin, v_ymid), vertices.end());
+        move_backward(line(v_ymid, v_ymax), vertices.end());
+        move_backward(line(v_ymin, v_ymax), vertices.end());
+        return vertices;
+    }
+
+    float t1{}, t2{};
+    while (t1 < 1.)
+    {
+        move_backward(line(interpolate(v_ymax, v_ymid, t1),
+                           interpolate(v_ymax, v_ymin, t2)),
+                      vertices.end());
+        t1 += part21;
+        t2 += part20;
+    }
+
+    t1 = 0;
+    while (t1 < 1.)
+    {
+        move_backward(line(interpolate(v_ymid, v_ymin, t1),
+                           interpolate(v_ymax, v_ymin, t2)),
+                      vertices.end());
+        t1 += part10;
+        t2 += part20;
+    }
+    return vertices;
 }

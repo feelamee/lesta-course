@@ -22,7 +22,7 @@ add_executable(
     ${SRC}
 )
 target_compile_features(main PUBLIC cxx_std_20)
-# target_compile_options(main PUBLIC "-Wall")
+# target_compile_options(main PUBLIC "-g3")
 
 add_executable(
     incredible_shader
@@ -30,7 +30,7 @@ add_executable(
     ${SRC}
 )
 target_compile_features(incredible_shader PUBLIC cxx_std_20)
-target_compile_options(incredible_shader PUBLIC "-g3")
+target_compile_options(incredible_shader PUBLIC "-O3")
 find_package(SDL3 REQUIRED)
 target_link_libraries(incredible_shader PUBLIC SDL3-shared)
 
