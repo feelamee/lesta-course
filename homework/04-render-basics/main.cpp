@@ -8,15 +8,14 @@
 #include <numbers>
 #include <numeric>
 
-#include "canvas.hpp"
-#include "color.hpp"
-#include "image_loader.hpp"
-#include "triangle_render.hpp"
-#include "vertex.hpp"
+#include <canvas.hpp>
+#include <color.hpp>
+#include <image_loader.hpp>
+#include <triangle_render.hpp>
+#include <vertex.hpp>
 
 void
 lets_fun();
-
 int
 dump_load_compare();
 void
@@ -51,15 +50,15 @@ main()
 void
 lets_fun()
 {
-    // if (dump_load_compare() == EXIT_FAILURE)
-    //     std::cout << "dump_load_compare FAIL" << std::endl;
+    if (dump_load_compare() == EXIT_FAILURE)
+        std::cout << "dump_load_compare FAIL" << std::endl;
 
-    // draw_lines();
-    // draw_triangle();
-    // draw_triangle_with_indices();
-    // rasterize_triangle();
-    // rasterize_triangles();
-    // rasterize_indexed_triangles();
+    draw_lines();
+    draw_triangle();
+    draw_triangle_with_indices();
+    rasterize_triangle();
+    rasterize_triangles();
+    rasterize_indexed_triangles();
     black_white_triangle();
 }
 
@@ -215,7 +214,7 @@ rasterize_triangles()
 {
     std::fstream dst("04-0-output-images/triangles-rasterize-2.ppm",
                      std::ios::out);
-    constexpr size_t w = 1980, h = 1080;
+    constexpr size_t w = 1080, h = 1080;
 
     canvas img(w, h);
     triangle_render render(img);
@@ -230,10 +229,10 @@ rasterize_triangles()
     constexpr auto max_color_val =
         std::numeric_limits<color_channel_t<>>::max();
 
-    float angle_max = pi * 15;
+    float angle_max = pi * 12;
     float angle_step = pi / 16;
     size_t radius = radius_max * 9 / 10;
-    int radius_step = 3;
+    int radius_step = 2;
 
     triangles.reserve(angle_max / angle_step * 3 + 1);
     assert(angle_max / angle_step < (float)radius / radius_step);

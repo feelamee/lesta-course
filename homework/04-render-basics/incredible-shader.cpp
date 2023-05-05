@@ -1,12 +1,8 @@
-#include "SDL_events.h"
-#include "SDL_keyboard.h"
-#include "SDL_keycode.h"
-#include "SDL_render.h"
-#include "color.hpp"
-#include "shader.hpp"
-#include "triangle_render.hpp"
+#include <color.hpp>
+#include <image_loader.hpp>
+#include <shader.hpp>
+#include <triangle_render.hpp>
 
-#include "image_loader.hpp"
 #include <SDL3/SDL.h>
 #include <fstream>
 #include <functional>
