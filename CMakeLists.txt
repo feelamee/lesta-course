@@ -7,3 +7,6 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/homework)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/SDL
                  ${CMAKE_BINARY_DIR}/lib/SDL)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/glad
+                 ${CMAKE_BINARY_DIR}/lib/glad)
