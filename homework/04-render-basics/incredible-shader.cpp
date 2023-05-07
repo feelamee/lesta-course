@@ -1,9 +1,11 @@
 #include <color.hpp>
+#include <cstdlib>
 #include <image_loader.hpp>
 #include <shader.hpp>
 #include <triangle_render.hpp>
 
 #include <SDL3/SDL.h>
+#include <filesystem>
 #include <fstream>
 #include <functional>
 #include <limits>
@@ -68,7 +70,13 @@ main()
         SDL_DestroyRenderer);
     ASSERT_SDL_ERROR(nullptr != sdl_renderer);
 
-    std::fstream src("./04-0-input-images/leo.ppm");
+    auto img_path = "./04-0-input-images/leo.ppm";
+    if (!std::filesystem::exists(img_path))
+    {
+        std::cerr << "image " << img_path << " does not exist" << std::endl;
+        return EXIT_FAILURE;
+    }
+    std::fstream src(img_path, std::ios::in);
     canvas texture;
     ppm::load(src, texture);
 
