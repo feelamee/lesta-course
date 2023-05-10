@@ -7,11 +7,9 @@
 
 #include "raii_wrapper.hpp"
 
-#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
-#include <ranges>
 
 #define ASSERT_SDL_ERROR(expr)                                                 \
     {                                                                          \

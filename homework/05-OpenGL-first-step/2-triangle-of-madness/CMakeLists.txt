@@ -1,4 +1,4 @@
-project(1-hopeful-sky)
+project(2-triangle-of-madness)
 
 find_package(OpenGL REQUIRED)
 find_package(SDL3 REQUIRED)
