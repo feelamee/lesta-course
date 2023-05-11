@@ -14,7 +14,8 @@ namespace hw /* hello world */
  *
  * @return int
  */
-LIB_API int hello();
+LIB_API int
+hello();
 
 } // namespace hw
 

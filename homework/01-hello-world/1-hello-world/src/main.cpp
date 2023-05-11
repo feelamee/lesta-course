@@ -1,6 +1,7 @@
 #include <iostream>
 
-int main()
+int
+main()
 {
     if (std::cout.bad())
         return EXIT_FAILURE;

@@ -1,7 +1,8 @@
 #include <engine.hpp>
 #include <iostream>
 
-int main(int argc, char const* argv[])
+int
+main(int argc, char const* argv[])
 {
     nano::iengine& nano = nano::engine_instance();
 

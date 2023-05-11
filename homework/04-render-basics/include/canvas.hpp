@@ -15,8 +15,8 @@ using namespace boost::numeric;
 class canvas
 {
 public:
-    canvas(size_t       p_width,
-           size_t       p_height,
+    canvas(size_t p_width,
+           size_t p_height,
            const color& p_color = colors::black)
         : buf(p_width, p_height, p_color)
     {

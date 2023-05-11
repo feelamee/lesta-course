@@ -5,7 +5,8 @@
 namespace hw
 {
 
-int hello()
+int
+hello()
 {
     if (std::cout.bad())
         return EXIT_FAILURE;

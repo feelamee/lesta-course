@@ -10,13 +10,15 @@
 namespace nano
 {
 
-iengine& iengine::instance()
+iengine&
+iengine::instance()
 {
     static iengine alo_engine;
     return alo_engine;
 }
 
-int iengine::initialize()
+int
+iengine::initialize()
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != EXIT_SUCCESS)
     {
@@ -35,13 +37,15 @@ int iengine::initialize()
     return EXIT_SUCCESS;
 }
 
-void iengine::finalize()
+void
+iengine::finalize()
 {
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
 
-void iengine::run()
+void
+iengine::run()
 {
     using std::chrono::duration;
     using std::chrono::duration_cast;
@@ -55,30 +59,28 @@ void iengine::run()
         {
             switch (ev.type)
             {
-                case EVENT_KEY_DOWN:
-                case EVENT_KEY_UP:
-                    std::cout
-                        << "["
-                        << duration_cast<milliseconds>(
-                               duration<std::uint64_t, std::nano>(
-                                   ev.key.timestamp))
-                        << (ev.type == EVENT_KEY_DOWN ? "] EVENT_KEY_DOWN: "
-                                                      : "] EVENT_KEY_UP: ")
-                        << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
+            case EVENT_KEY_DOWN:
+            case EVENT_KEY_UP:
+                std::cout << "["
+                          << duration_cast<milliseconds>(
+                                 duration<std::uint64_t, std::nano>(
+                                     ev.key.timestamp))
+                          << (ev.type == EVENT_KEY_DOWN ? "] EVENT_KEY_DOWN: "
+                                                        : "] EVENT_KEY_UP: ")
+                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
 
-                    if (ev.key.keysym.sym == SDLK_q)
-                        is_running = false;
-                    break;
-
-                case EVENT_QUIT:
-                case EVENT_WINDOW_CLOSE_REQUESTED:
-                    std::cout << "[" << ev.key.timestamp << "]"
-                              << (ev.type == EVENT_QUIT
-                                      ? " EVENT_QUIT: "
-                                      : " EVENT_WINDOW_CLOSE_REQUESTED: ")
-                              << std::endl;
+                if (ev.key.keysym.sym == SDLK_q)
                     is_running = false;
-                    break;
+                break;
+
+            case EVENT_QUIT:
+                std::cout << "[" << ev.key.timestamp << "]"
+                          << (ev.type == EVENT_QUIT
+                                  ? " EVENT_QUIT: "
+                                  : " EVENT_WINDOW_CLOSE_REQUESTED: ")
+                          << std::endl;
+                is_running = false;
+                break;
             }
         }
     }

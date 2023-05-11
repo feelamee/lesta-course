@@ -13,9 +13,12 @@ namespace nano
 class engine : public iengine
 {
 public:
-    int  initialize() override;
-    void finalize() override;
-    void run() override;
+    int
+    initialize() override;
+    void
+    finalize() override;
+    void
+    run() override;
     engine()
         : iengine()
     {
@@ -25,7 +28,8 @@ private:
     SDL_Window* window = nullptr;
 };
 
-int engine::initialize()
+int
+engine::initialize()
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != EXIT_SUCCESS)
     {
@@ -44,13 +48,15 @@ int engine::initialize()
     return EXIT_SUCCESS;
 }
 
-void engine::finalize()
+void
+engine::finalize()
 {
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
 
-void engine::run()
+void
+engine::run()
 {
     using std::chrono::duration;
     using std::chrono::duration_cast;
@@ -64,39 +70,39 @@ void engine::run()
         {
             switch (ev.type)
             {
-                case EVENT_KEY_DOWN:
-                case EVENT_KEY_UP:
-                    std::cout
-                        << "["
-                        << duration_cast<milliseconds>(
-                               duration<std::uint64_t, std::nano>(
-                                   ev.key.timestamp))
-                        << (ev.type == EVENT_KEY_DOWN ? "] EVENT_KEY_DOWN: "
-                                                      : "] EVENT_KEY_UP: ")
-                        << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
+            case EVENT_KEY_DOWN:
+            case EVENT_KEY_UP:
+                std::cout << "["
+                          << duration_cast<milliseconds>(
+                                 duration<std::uint64_t, std::nano>(
+                                     ev.key.timestamp))
+                          << (ev.type == EVENT_KEY_DOWN ? "] EVENT_KEY_DOWN: "
+                                                        : "] EVENT_KEY_UP: ")
+                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
 
-                    if (ev.key.keysym.sym == SDLK_q)
-                        is_running = false;
-                    break;
-
-                case EVENT_QUIT:
-                case EVENT_WINDOW_CLOSE_REQUESTED:
-                    std::cout << "[" << ev.key.timestamp << "]"
-                              << (ev.type == EVENT_QUIT
-                                      ? " EVENT_QUIT: "
-                                      : " EVENT_WINDOW_CLOSE_REQUESTED: ")
-                              << std::endl;
+                if (ev.key.keysym.sym == SDLK_q)
                     is_running = false;
-                    break;
+                break;
+
+            case EVENT_QUIT:
+            case EVENT_WINDOW_CLOSE_REQUESTED:
+                std::cout << "[" << ev.key.timestamp << "]"
+                          << (ev.type == EVENT_QUIT
+                                  ? " EVENT_QUIT: "
+                                  : " EVENT_WINDOW_CLOSE_REQUESTED: ")
+                          << std::endl;
+                is_running = false;
+                break;
             }
         }
     }
 }
 
-iengine& engine_instance()
+iengine&
+engine_instance()
 {
     static engine nano{};
-    iengine&      inano = nano;
+    iengine& inano = nano;
     return inano;
 }
 

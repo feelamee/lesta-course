@@ -1,4 +1,4 @@
-find homework/   \
+find ./          \
     -type f      \
     -name *.hpp  \
         -or      \

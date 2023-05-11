@@ -26,12 +26,14 @@ struct color
         char components[3 * sizeof(color_channel_t<>)];
     };
 
-    friend bool operator==(const color& l, const color& r)
+    friend bool
+    operator==(const color& l, const color& r)
     {
         return l.r == r.r && l.g == r.g && l.b == r.b;
     }
 
-    friend std::ostream& operator<<(std::ostream& os, color color_)
+    friend std::ostream&
+    operator<<(std::ostream& os, color color_)
     {
         auto tmp = static_cast<color>(color_);
         return os << "[" << tmp.r << " " << tmp.g << " " << tmp.b << "]";

@@ -1,7 +1,8 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const SDL_version& v)
+std::ostream&
+operator<<(std::ostream& out, const SDL_version& v)
 {
     out << static_cast<int>(v.major) << '.';
     out << static_cast<int>(v.minor) << '.';
@@ -9,10 +10,11 @@ std::ostream& operator<<(std::ostream& out, const SDL_version& v)
     return out;
 }
 
-int main()
+int
+main()
 {
     SDL_version compiled = {};
-    SDL_version linked   = {};
+    SDL_version linked = {};
 
     SDL_VERSION(&compiled);
     SDL_GetVersion(&linked);

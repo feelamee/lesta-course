@@ -12,7 +12,8 @@ using namespace std::literals::chrono_literals;
 namespace nano
 {
 
-int engine::initialize(fs::path libgame, fs::path tmp_libgame)
+int
+engine::initialize(fs::path libgame, fs::path tmp_libgame)
 {
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != EXIT_SUCCESS)
     {
@@ -29,7 +30,7 @@ int engine::initialize(fs::path libgame, fs::path tmp_libgame)
         return EXIT_FAILURE;
     }
 
-    this->libgame     = libgame;
+    this->libgame = libgame;
     this->tmp_libgame = tmp_libgame;
     if (hot_reload() == EXIT_FAILURE)
         return EXIT_FAILURE;
@@ -37,7 +38,8 @@ int engine::initialize(fs::path libgame, fs::path tmp_libgame)
     return EXIT_SUCCESS;
 }
 
-int engine::hot_reload()
+int
+engine::hot_reload()
 {
     try
     {
@@ -61,8 +63,8 @@ int engine::hot_reload()
         finalize_game();
 
         SDL_UnloadObject(libgame_handle);
-        libgame_handle  = nullptr;
-        finalize_game   = nullptr;
+        libgame_handle = nullptr;
+        finalize_game = nullptr;
         initialize_game = nullptr;
     }
 
@@ -75,7 +77,7 @@ int engine::hot_reload()
         return EXIT_FAILURE;
     }
 
-    libgame_handle  = new_libgame_handle;
+    libgame_handle = new_libgame_handle;
     initialize_game = reinterpret_cast<decltype(initialize_game)>(
         SDL_LoadFunction(libgame_handle, initialize_game_fname.c_str()));
     finalize_game = reinterpret_cast<decltype(finalize_game)>(
@@ -88,8 +90,8 @@ int engine::hot_reload()
                   << " from shared object " << tmp_libgame.native()
                   << std::endl;
         SDL_UnloadObject(libgame_handle);
-        libgame_handle  = nullptr;
-        finalize_game   = nullptr;
+        libgame_handle = nullptr;
+        finalize_game = nullptr;
         initialize_game = nullptr;
         return EXIT_FAILURE;
     }
@@ -98,19 +100,21 @@ int engine::hot_reload()
     return EXIT_SUCCESS;
 }
 
-void engine::finalize()
+void
+engine::finalize()
 {
     finalize_game();
     SDL_UnloadObject(libgame_handle);
-    libgame_handle  = nullptr;
-    finalize_game   = nullptr;
+    libgame_handle = nullptr;
+    finalize_game = nullptr;
     initialize_game = nullptr;
 
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
 
-void engine::run()
+void
+engine::run()
 {
     using std::chrono::duration;
     using std::chrono::duration_cast;
@@ -126,47 +130,49 @@ void engine::run()
                       << "]";
             switch (ev.type)
             {
-                case EVENT_KEY_DOWN:
-                    std::cout << " EVENT_KEY_DOWN: "
-                              << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
-                    break;
+            case EVENT_KEY_DOWN:
+                std::cout << " EVENT_KEY_DOWN: "
+                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
+                break;
 
-                case EVENT_KEY_UP:
-                    std::cout << " EVENT_KEY_UP: "
-                              << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
+            case EVENT_KEY_UP:
+                std::cout << " EVENT_KEY_UP: "
+                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
 
-                    if (ev.key.keysym.sym == SDLK_q)
-                        is_running = false;
-
-                    if (ev.key.keysym.sym == SDLK_r)
-                        hot_reload();
-
-                    break;
-
-                case EVENT_QUIT:
-                    std::cout << " EVENT_QUIT: " << std::endl;
+                if (ev.key.keysym.sym == SDLK_q)
                     is_running = false;
-                    break;
 
-                case EVENT_WINDOW_CLOSE_REQUESTED:
-                    std::cout << " EVENT_WINDOW_CLOSE_REQUESTED: " << std::endl;
-                    is_running = false;
-                    break;
+                if (ev.key.keysym.sym == SDLK_r)
+                    hot_reload();
+
+                break;
+
+            case EVENT_QUIT:
+                std::cout << " EVENT_QUIT: " << std::endl;
+                is_running = false;
+                break;
+
+            case EVENT_WINDOW_CLOSE_REQUESTED:
+                std::cout << " EVENT_WINDOW_CLOSE_REQUESTED: " << std::endl;
+                is_running = false;
+                break;
             }
         }
     }
 }
 
-iengine& engine_instance()
+iengine&
+engine_instance()
 {
     static engine nano{};
-    iengine&      inano = nano;
+    iengine& inano = nano;
     return inano;
 }
 
 } // namespace nano
 
-int main(int argc, char const* argv[])
+int
+main(int argc, char const* argv[])
 {
     nano::iengine& nano = nano::engine_instance();
 

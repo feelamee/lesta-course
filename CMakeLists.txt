@@ -10,3 +10,5 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/external/SDL
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/glad
                  ${CMAKE_BINARY_DIR}/lib/glad)
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/engine)
