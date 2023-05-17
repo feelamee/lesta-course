@@ -43,14 +43,16 @@ struct color
 
 namespace colors
 {
-constexpr auto min = std::numeric_limits<color_channel_t<>>::min();
-constexpr auto max = std::numeric_limits<color_channel_t<>>::max();
+inline static constexpr auto min =
+    std::numeric_limits<color_channel_t<>>::min();
+inline static constexpr auto max =
+    std::numeric_limits<color_channel_t<>>::max();
 
-constexpr color black{ min, min, min };
-constexpr color white{ max, max, max };
-constexpr color red{ max, min, min };
-constexpr color green{ min, max, min };
-constexpr color blue{ min, min, max };
+inline constexpr color black{ min, min, min };
+inline constexpr color white{ max, max, max };
+inline constexpr color red{ max, min, min };
+inline constexpr color green{ min, max, min };
+inline constexpr color blue{ min, min, max };
 } // namespace colors
 
 #endif // COLOR_HPP

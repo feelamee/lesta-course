@@ -41,8 +41,7 @@ union event
     quit_event quit;
 };
 
-int
-poll_event(event* ev);
+int poll_event(event* ev);
 
 } // namespace nano
 

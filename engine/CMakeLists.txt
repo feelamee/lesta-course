@@ -9,10 +9,23 @@ add_library(
     src/raii_wrapper.hpp
     src/shader.cpp
     src/vertex.cpp
+    src/transform.cpp
+    src/vec.cpp
+    src/vertbuf.cpp
+    src/texture.cpp
+
+    include/canvas.hpp
+    include/image_loader.hpp
+    include/texture.hpp
+    include/shape.hpp
+    include/vertbuf.hpp
+    include/rect.hpp
+    include/vec.hpp
     include/vertex.hpp
     include/color.hpp
     include/iengine.hpp
     include/event.hpp
+    include/transform.hpp
 )
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(${TARGET} PUBLIC cxx_std_20)

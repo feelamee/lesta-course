@@ -37,8 +37,7 @@ template <typename T, typename retT>
 shared_ptr(T* res, retT (*)(T*)) -> shared_ptr<T>;
 } // namespace std
 
-GLuint
-create_shader(GLenum, const char*, char*, GLuint);
+GLuint create_shader(GLenum, const char*, char*, GLuint);
 
 int
 main()

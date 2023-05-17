@@ -6,23 +6,14 @@
 #include <glad/glad.h>
 #include <iengine.hpp>
 #include <vector>
+#include <vertbuf.hpp>
 
 struct SDL_Window;
-struct vertex;
-
-enum class primitive_t
-{
-    points = GL_POINTS,
-    lines = GL_LINES,
-    line_loop = GL_LINE_LOOP,
-    line_strip = GL_LINE_STRIP,
-    triangles = GL_TRIANGLES,
-    triangle_strip = GL_TRIANGLE_STRIP,
-    triangle_fan = GL_TRIANGLE_FAN,
-};
 
 namespace nano
 {
+
+struct vertex;
 
 class engine final : public iengine
 {
@@ -35,6 +26,7 @@ public:
 
     template <primitive_t primitive>
     static void render(const std::vector<vertex>&);
+
     int swap_buffers();
 
     engine()

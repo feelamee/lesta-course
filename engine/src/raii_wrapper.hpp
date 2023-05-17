@@ -14,6 +14,7 @@ struct raii_wrapper
 private:
     std::function<destructor_ret_t(destructor_args_t...)> destructor;
     std::tuple<destructor_args_t...> destructor_args_v;
+
     using self_type =
         raii_wrapper<constructor_ret_t, destructor_ret_t, destructor_args_t...>;
 
@@ -65,7 +66,11 @@ public:
     operator=(self_type other)
     {
         finalize();
-        std::swap(*this, other);
+
+        using std::swap;
+        swap(destructor, other.destructor);
+        swap(constructor_ret_v, other.constructor_ret_v);
+        swap(destructor_args_v, other.destructor_args_v);
         return *this;
     }
 

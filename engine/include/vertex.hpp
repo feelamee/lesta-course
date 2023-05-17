@@ -2,36 +2,25 @@
 #define VERTEX_HPP
 
 #include "color.hpp"
+
+#include <vec.hpp>
+
 #include <cmath>
 #include <initializer_list>
 
-using position_t = int;
-
-struct vertex;
-struct position
+namespace nano
 {
-    position_t x;
-    position_t y;
-
-    operator vertex();
-};
-
-using coordinate_t = double;
 
 struct vertex
 {
-    coordinate_t x;
-    coordinate_t y;
+    vec2f pos;
+    vec3f color;
+    vec2f tpos;
 
-    float r;
-    float g;
-    float b;
-
-    float tx;
-    float ty;
-
-    operator position() const;
-    operator color() const;
+    operator vec2i() const;
+    operator struct color() const;
 };
+
+} // namespace nano
 
 #endif // VERTEX_HPP

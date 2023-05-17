@@ -14,24 +14,15 @@
 #include <triangle_render.hpp>
 #include <vertex.hpp>
 
-void
-lets_fun();
-int
-dump_load_compare();
-void
-draw_lines();
-void
-draw_triangle();
-void
-draw_triangle_with_indices();
-void
-rasterize_triangle();
-void
-rasterize_triangles();
-void
-rasterize_indexed_triangles();
-void
-black_white_triangle();
+void lets_fun();
+int dump_load_compare();
+void draw_lines();
+void draw_triangle();
+void draw_triangle_with_indices();
+void rasterize_triangle();
+void rasterize_triangles();
+void rasterize_indexed_triangles();
+void black_white_triangle();
 
 int
 main()
@@ -270,7 +261,7 @@ rasterize_triangles()
     }
 
     render.rasterize(triangles);
-    ppm::dump<ppm::fmt::P6>(dst, img);
+    ppm::dump<ppm::fmt::P3>(dst, img);
 }
 
 void

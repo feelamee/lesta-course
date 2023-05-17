@@ -2,22 +2,23 @@
 #include "color.hpp"
 #include <limits>
 
-vertex::operator position() const
+namespace nano
 {
-    return { .x = static_cast<position_t>(std::round(this->x)),
-             .y = static_cast<position_t>(std::round(this->y)) };
+
+vertex::operator vec2i() const
+{
+    return { static_cast<vec2i::type>(std::round(this->pos.fst)),
+             static_cast<vec2i::type>(std::round(this->pos.snd)) };
 }
 
-vertex::operator color() const
+vertex::operator struct color() const
 {
     constexpr auto max = std::numeric_limits<color_channel_t<>>::max();
-    return { .r = static_cast<color_channel_t<>>(std::round(max * this->r)),
-             .g = static_cast<color_channel_t<>>(std::round(max * this->g)),
-             .b = static_cast<color_channel_t<>>(std::round(max * this->b)) };
+    return {
+        .r = static_cast<color_channel_t<>>(std::round(max * this->color.fst)),
+        .g = static_cast<color_channel_t<>>(std::round(max * this->color.snd)),
+        .b = static_cast<color_channel_t<>>(std::round(max * this->color.thd))
+    };
 }
 
-position::operator vertex()
-{
-    return { .x = static_cast<coordinate_t>(std::round(this->x)),
-             .y = static_cast<coordinate_t>(round(this->y)) };
-}
+} // namespace nano

@@ -6,12 +6,12 @@
 
 #include <boost/numeric/ublas/storage.hpp>
 #include <cstdint>
+#include <limits>
 #include <ranges>
 #include <string>
 
-namespace ppm
+namespace nano::ppm
 {
-
 namespace vs = std::views;
 
 enum class fmt
@@ -50,12 +50,13 @@ load(std::istream& src, canvas& img)
 
     if (fmt == "P6")
     {
-        src.read(reinterpret_cast<char*>(img.data().data().begin()),
+        src.read(reinterpret_cast<char*>(img.data().begin()),
                  img.width() * img.height() * sizeof(color));
     }
     else
     {
         size_t r, g, b;
+        auto max = std::numeric_limits<color_channel_t<>>::max();
         for (auto i : vs::iota(0UL, img.width()))
             for (auto j : vs::iota(0UL, img.height()))
             {
@@ -93,13 +94,13 @@ dump(std::ostream& dst, const canvas& img)
     }
     else // fmt == fmt::P6
     {
-        dst.write(reinterpret_cast<const char*>(img.data().data().begin()),
+        dst.write(reinterpret_cast<const char*>(&img(0, 0)),
                   img.width() * img.height() * sizeof(color));
     }
 
     return dst ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-} // namespace ppm
+} // namespace nano::ppm
 
 #endif // LOAD_HPP
