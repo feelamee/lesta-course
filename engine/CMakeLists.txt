@@ -31,6 +31,7 @@ add_library(
     include/iengine.hpp
     include/event.hpp
     include/transform.hpp
+    include/errors.hpp
 )
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(${TARGET} PUBLIC cxx_std_20)

@@ -1,35 +1,7 @@
 #include "vec.hpp"
+#include <errors.hpp>
 #include <glad/glad.h>
 #include <texture.hpp>
-
-#define OM_GL_CHECK()                                                          \
-    {                                                                          \
-        const unsigned int err = glGetError();                                 \
-        if (err != GL_NO_ERROR)                                                \
-        {                                                                      \
-            switch (err)                                                       \
-            {                                                                  \
-            case GL_INVALID_ENUM:                                              \
-                std::cerr << "GL_INVALID_ENUM" << std::endl;                   \
-                break;                                                         \
-            case GL_INVALID_VALUE:                                             \
-                std::cerr << "GL_INVALID_VALUE" << std::endl;                  \
-                break;                                                         \
-            case GL_INVALID_OPERATION:                                         \
-                std::cerr << "GL_INVALID_OPERATION" << std::endl;              \
-                break;                                                         \
-            case GL_INVALID_FRAMEBUFFER_OPERATION:                             \
-                std::cerr << "GL_INVALID_FRAMEBUFFER_OPERATION" << std::endl;  \
-                break;                                                         \
-            case GL_OUT_OF_MEMORY:                                             \
-                std::cerr << "GL_OUT_OF_MEMORY" << std::endl;                  \
-                break;                                                         \
-            default:                                                           \
-                std::cerr << "Unknown error" << std::endl;                     \
-            }                                                                  \
-            assert(false);                                                     \
-        }                                                                      \
-    }
 
 namespace nano
 {
@@ -50,6 +22,12 @@ texture::size() const
     return m_size;
 }
 
+std::uint32_t
+texture::get_handle() const
+{
+    return handle;
+}
+
 void
 texture::set_size(vec2i new_size)
 {
@@ -66,17 +44,18 @@ texture::load(const canvas& image)
         { static_cast<int>(image.width()), static_cast<int>(image.height()) });
     glTexImage2D(GL_TEXTURE_2D,
                  0,
-                 GL_RGB8UI,
+                 GL_RGB,
                  size().snd,
                  size().fst,
                  0,
-                 GL_RGB_INTEGER,
+                 GL_RGB,
                  GL_UNSIGNED_BYTE,
                  &image(0, 0));
     OM_GL_CHECK();
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    OM_GL_CHECK();
 
     return EXIT_SUCCESS;
 }

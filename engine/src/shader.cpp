@@ -5,6 +5,7 @@
 #include <iostream>
 #include <memory>
 
+#include <errors.hpp>
 #include <shader.hpp>
 
 namespace nano
@@ -88,9 +89,11 @@ setup_shaders(const char* vertex_shader_src_path,
     assert(0 != program && "Failed to create GLES program");
 
     glAttachShader(program, vertex_shader);
+    OM_GL_CHECK();
     glAttachShader(program, fragment_shader);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
+    OM_GL_CHECK();
+    // glDeleteShader(vertex_shader);
+    // glDeleteShader(fragment_shader);
 
     return program;
 }

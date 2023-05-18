@@ -47,7 +47,10 @@ void
 engine::set_program(uint p_program)
 {
     if (!glIsProgram(p_program))
+    {
+        std::cerr << "Such program isn't exist" << std::endl;
         return;
+    }
 
     program = p_program;
 
@@ -165,9 +168,9 @@ engine::initialize()
 
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
 
-    program = prepare_default_gl();
-    if (0 == program)
-        return EXIT_FAILURE;
+    // program = prepare_default_gl();
+    // if (0 == program)
+    //     return EXIT_FAILURE;
 
     return EXIT_SUCCESS;
 }
@@ -197,16 +200,17 @@ void
 engine::set_uniform(const std::string& name, const texture* p_texture)
 {
     assert(p_texture != nullptr);
-    const int location = glGetUniformLocation(program, name.data());
+    const int location = glGetUniformLocation(program, name.c_str());
     if (location == -1)
     {
         std::cerr << "can't get uniform location from shader\n";
         throw std::runtime_error("can't get uniform location");
     }
 
-    uint texture_unit = 0;
-    glActiveTexture(GL_TEXTURE0 + texture_unit);
-    glUniform1i(location, static_cast<int>(0 + texture_unit));
+    glBindTexture(GL_TEXTURE_2D, p_texture->get_handle());
+    glActiveTexture(GL_TEXTURE0);
+
+    glUniform1i(location, 0);
 }
 
 } // namespace nano
