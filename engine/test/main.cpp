@@ -24,21 +24,25 @@ main()
     // clang-format off
     nano::vertbuf buf(
         nano::primitive_t::triangle_strip,
-        { { -.5,  .5,    1, 1, 1,    0, 1},
-          { -.5, -.5,    1, 1, 1,    0, 0},
-          {  .5,  .5,    1, 1, 1,    1, 1},
-          {  .5, -.5,    1, 1, 1,    1, 0},
+        { { 1,  -1,    0, 0, 0,    0, 1},
+          { 1,  1,    0, 0, 0,    0, 0},
+          { 1,  0,    0, 0, 0,    1, 1},
+          { 0,  1,    0, 0, 0,    1, 0},
           });
     // clang-format on
 
-    std::ifstream FILE("../engine/test/leo.ppm");
-    std::ofstream of("./test_dump_load.ppm");
+    std::ifstream FILE("/home/bella/code/lesta-course/engine/test/leo.ppm");
     nano::canvas img;
     nano::ppm::load(FILE, img);
-    nano::shape tmp(buf, nano::texture(img));
+    nano::texture tex(img);
+    nano::shape tmp(buf, tex);
 
-    auto program = nano::setup_shaders("../engine/test/vertex-shader.vert",
-                                       "../engine/test/fragment-shader.frag");
+    // auto program = nano::setup_shaders("../engine/test/vertex-shader.vert",
+    //                                    "../engine/test/fragment-shader.frag");
+
+    auto program = nano::setup_shaders(
+        "/home/bella/code/lesta-course/engine/test/vertex-shader.vert",
+        "/home/bella/code/lesta-course/engine/test/fragment-shader.frag");
     if (-1 == program)
     {
         eng.finalize();

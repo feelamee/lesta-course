@@ -13,6 +13,7 @@ class texture
 public:
     texture() = default;
     texture(const canvas&);
+
     int load(const canvas&);
     vec2i size() const;
     void set_size(vec2i);

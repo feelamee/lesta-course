@@ -132,8 +132,7 @@ int
 engine::initialize()
 {
 
-    sdl_init = raii_wrapper<int, void>(
-        SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS), SDL_Quit);
+    sdl_init = raii_wrapper<int, void>(SDL_Init(SDL_INIT_EVERYTHING), SDL_Quit);
     ASSERT_SDL_ERROR(EXIT_SUCCESS == sdl_init.constructor_ret_v);
 
     // TODO: extract such values to config

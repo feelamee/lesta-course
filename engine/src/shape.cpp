@@ -89,7 +89,7 @@ void
 render(const shape& p_shape)
 {
     auto tex = p_shape.get_texture();
-    // engine_instance().set_uniform("p_texture", tex);
+    engine_instance().set_uniform("p_texture", tex);
     glVertexAttribPointer(
         0, 2, GL_FLOAT, GL_FALSE, sizeof(nano::vertex), &p_shape.data()->pos);
     glEnableVertexAttribArray(0);
