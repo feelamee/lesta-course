@@ -3,7 +3,7 @@
 #include <vec.hpp>
 
 #include <cmath>
-
+#include <cstring>
 #include <type_traits>
 
 namespace nano
@@ -18,6 +18,11 @@ transform::transform(float m_00, float m_01, float m_02,
           m_20, m_21, m_22,}
 {}
 // clang-format on
+
+transform::transform()
+    : mat{ 0 }
+{
+}
 
 inline float*
 transform::data()

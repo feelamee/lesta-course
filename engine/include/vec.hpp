@@ -23,7 +23,7 @@ struct vec2
         T vec[2];
     };
 
-    operator vertex();
+    // operator vertex();
 };
 using vec2f = vec2<float>;
 using vec2i = vec2<int>;

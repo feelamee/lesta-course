@@ -34,13 +34,13 @@ mult(const T& lhs, const T& rhs, Proj func) -> T
     return ret;
 }
 
-template <>
-vec2i::operator vertex()
-{
-    vertex ret;
-    using pos_t = decltype(ret.pos)::type;
-    ret.pos = { static_cast<pos_t>(this->fst), static_cast<pos_t>(this->snd) };
-    return ret;
-}
+// template <>
+// vec2i::operator vertex()
+// {
+//     vertex ret;
+//     using pos_t = decltype(ret.pos)::type;
+//     ret.pos = { static_cast<pos_t>(this->fst), static_cast<pos_t>(this->snd)
+//     }; return ret;
+// }
 
 } // namespace nano

@@ -1,12 +1,8 @@
 #ifndef VERTEX_HPP
 #define VERTEX_HPP
 
-#include "color.hpp"
-
+#include <color.hpp>
 #include <vec.hpp>
-
-#include <cmath>
-#include <initializer_list>
 
 namespace nano
 {
@@ -17,8 +13,8 @@ struct vertex
     vec3f color;
     vec2f tpos;
 
-    operator vec2i() const;
-    operator struct color() const;
+    // operator vec2i() const;
+    // operator struct color() const;
 };
 
 } // namespace nano

@@ -13,7 +13,12 @@ add_library(
     src/vec.cpp
     src/vertbuf.cpp
     src/texture.cpp
+    src/shader.cpp
+    src/shape.cpp
 
+    include/vertbuf.hpp
+    include/shape.hpp
+    include/shader.hpp
     include/canvas.hpp
     include/image_loader.hpp
     include/texture.hpp
@@ -35,3 +40,5 @@ target_link_libraries(${TARGET} PUBLIC SDL3-shared)
 
 find_library(FIND_GLAD_RESULT glad)
 target_link_libraries(${TARGET} PUBLIC glad)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)

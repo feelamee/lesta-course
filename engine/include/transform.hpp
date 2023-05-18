@@ -9,6 +9,7 @@ namespace nano
 
 class transform
 {
+public:
     /**
      * @brief m_01, where 0 is column and 1 is row (like x and y)
      */
@@ -17,6 +18,7 @@ class transform
               float m_10, float m_11, float m_12,
               float m_20, float m_21, float m_22);
     // clang-format on
+    transform();
 
     inline float* data();
 

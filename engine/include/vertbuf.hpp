@@ -21,15 +21,19 @@ enum class primitive_t
 
 class vertbuf
 {
-    vec2i size();
-    primitive_t primitive_type();
+public:
+    vertbuf(primitive_t p_type, const std::vector<vertex>& p_vertices);
+    std::size_t size() const;
+    primitive_t primitive_type() const;
     vertex* data();
+    const vertex* data() const;
 
 private:
     std::vector<vertex> vertices;
-    vec2i m_size;
     primitive_t type;
 };
+
+void render(const vertbuf&);
 
 } // namespace nano
 

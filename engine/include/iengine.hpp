@@ -2,20 +2,18 @@
 #define IENGINE_HPP
 
 #include <filesystem>
+#include <string>
+#include <vertbuf.hpp>
 
 namespace nano
 {
 
-namespace fs = std::filesystem;
+class engine;
+struct texture;
 
 class iengine
 {
 public:
-    iengine(const iengine&) = delete;
-    iengine(iengine&&) = delete;
-    iengine& operator=(const iengine&) = delete;
-    iengine& operator=(iengine&&) = delete;
-
     virtual ~iengine()
     {
     }
@@ -24,11 +22,11 @@ public:
     {
     }
 
-    virtual int initialize(fs::path, fs::path) = 0;
-
+    virtual int initialize() = 0;
     virtual void finalize() = 0;
-
-    virtual void run() = 0;
+    virtual void set_program(uint) = 0;
+    virtual void set_uniform(const std::string&, const texture*) = 0;
+    virtual int swap_buffers() = 0;
 };
 
 iengine& engine_instance();

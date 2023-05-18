@@ -5,6 +5,8 @@
 #include <event.hpp>
 #include <glad/glad.h>
 #include <iengine.hpp>
+#include <texture.hpp>
+#include <vec.hpp>
 #include <vector>
 #include <vertbuf.hpp>
 
@@ -19,15 +21,12 @@ class engine final : public iengine
 {
 public:
     void render();
-    int initialize(fs::path, fs::path) override;
+    int initialize() override;
     void finalize() override;
-    void run() override;
-    void set_program(GLuint);
+    void set_program(uint) override;
+    void set_uniform(const std::string&, const texture*) override;
 
-    template <primitive_t primitive>
-    static void render(const std::vector<vertex>&);
-
-    int swap_buffers();
+    int swap_buffers() override;
 
     engine()
         : iengine()

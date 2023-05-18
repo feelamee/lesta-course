@@ -10,12 +10,12 @@ using namespace std::literals::chrono_literals;
 // see ~/code/lesta-course/external/SDL/include/SDL3/SDL_stdinc.h line 795
 #define SDL_FUNCTION_POINTER_IS_VOID_POINTER
 #include <SDL3/SDL.h>
+#include <glad/glad.h>
 
 #include "engine.hpp"
 #include <event.hpp>
+#include <shader.hpp>
 #include <vertex.hpp>
-
-GLuint create_shader(GLenum, const char*, char*, GLuint);
 
 #define ASSERT_SDL_ERROR(expr)                                                 \
     {                                                                          \
@@ -44,7 +44,7 @@ namespace nano
 {
 
 void
-engine::set_program(GLuint p_program)
+engine::set_program(uint p_program)
 {
     if (!glIsProgram(p_program))
         return;
@@ -96,14 +96,20 @@ prepare_default_gl()
 
     char compile_info[128];
     GLuint vertex_shader =
-        create_shader(GL_VERTEX_SHADER, vertex_shader_src, compile_info, 128);
+        create_shader(static_cast<shader_t>(GL_VERTEX_SHADER),
+                      vertex_shader_src,
+                      compile_info,
+                      128);
     if (0 == vertex_shader)
     {
         std::cerr << compile_info;
         return 0;
     }
-    GLuint fragment_shader = create_shader(
-        GL_FRAGMENT_SHADER, fragment_shader_src, compile_info, 128);
+    GLuint fragment_shader =
+        create_shader(static_cast<shader_t>(GL_FRAGMENT_SHADER),
+                      fragment_shader_src,
+                      compile_info,
+                      128);
     if (0 == fragment_shader)
     {
         std::cerr << compile_info;
@@ -123,7 +129,7 @@ prepare_default_gl()
 }
 
 int
-engine::initialize(fs::path libgame, fs::path tmp_libgame)
+engine::initialize()
 {
 
     sdl_init = raii_wrapper<int, void>(
@@ -172,71 +178,11 @@ engine::finalize()
 {
 }
 
-void
-engine::run()
-{
-    using std::chrono::duration;
-    using std::chrono::duration_cast;
-    using std::chrono::milliseconds;
-
-    bool is_running = true;
-    while (is_running)
-    {
-        event ev;
-        while (poll_event(&ev))
-        {
-            std::cout << "[" << duration_cast<milliseconds>(ev.key.timestamp)
-                      << "]";
-            switch (ev.type)
-            {
-            case EVENT_KEY_DOWN:
-                std::cout << " EVENT_KEY_DOWN: "
-                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
-                break;
-
-            case EVENT_KEY_UP:
-                std::cout << " EVENT_KEY_UP: "
-                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
-
-                if (ev.key.keysym.sym == SDLK_q)
-                    is_running = false;
-                break;
-
-            case EVENT_QUIT:
-                std::cout << " EVENT_QUIT: " << std::endl;
-                is_running = false;
-                break;
-            }
-        }
-
-        // render...
-        swap_buffers();
-    }
-}
-
-template <primitive_t primitive>
-void
-engine::render(const std::vector<vertex>& vertices)
-{
-    GLuint buf;
-    size_t count = vertices.size();
-    glGenBuffers(1, &buf);
-    glBindBuffer(GL_ARRAY_BUFFER, buf);
-    glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(vertex) * count,
-                 vertices.data(),
-                 GL_STATIC_DRAW);
-
-    glVertexAttribPointer(
-        0, 3, GL_FLOAT, GL_FALSE, count * sizeof(GLfloat), (GLvoid*)0);
-    glEnableVertexAttribArray(0);
-    glDrawArrays(static_cast<GLenum>(primitive), 0, count);
-}
-
 int
 engine::swap_buffers()
 {
     ASSERT_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(window.get()));
+    glClear(GL_COLOR_BUFFER_BIT);
     return EXIT_SUCCESS;
 }
 
@@ -246,6 +192,22 @@ engine_instance()
     static engine nano{};
     iengine& inano = nano;
     return inano;
+}
+
+void
+engine::set_uniform(const std::string& name, const texture* p_texture)
+{
+    assert(p_texture != nullptr);
+    const int location = glGetUniformLocation(program, name.data());
+    if (location == -1)
+    {
+        std::cerr << "can't get uniform location from shader\n";
+        throw std::runtime_error("can't get uniform location");
+    }
+
+    uint texture_unit = 0;
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+    glUniform1i(location, static_cast<int>(0 + texture_unit));
 }
 
 } // namespace nano
