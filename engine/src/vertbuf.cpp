@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <vertbuf.hpp>
 
+#include <errors.hpp>
+
 namespace nano
 {
 
@@ -38,11 +40,27 @@ void
 render(const vertbuf& vertices)
 {
     glVertexAttribPointer(
-        0, 2, GL_FLOAT, GL_FALSE, sizeof(nano::vertex), vertices.data());
+        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->pos);
+    OM_GL_CHECK();
     glEnableVertexAttribArray(0);
+    OM_GL_CHECK();
+
+    glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->color);
+    OM_GL_CHECK();
+    glEnableVertexAttribArray(1);
+    OM_GL_CHECK();
 
     glDrawArrays(
         static_cast<GLenum>(vertices.primitive_type()), 0, vertices.size());
+    OM_GL_CHECK();
+
+    glDisableVertexAttribArray(0);
+    OM_GL_CHECK();
+    glDisableVertexAttribArray(1);
+    OM_GL_CHECK();
+    glDisableVertexAttribArray(2);
+    OM_GL_CHECK();
 }
 
 } // namespace nano

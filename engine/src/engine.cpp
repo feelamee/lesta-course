@@ -1,6 +1,5 @@
 #include <chrono>
 #include <cstdlib>
-using namespace std::literals::chrono_literals;
 
 #include <assert.h>
 #include <iostream>
@@ -13,8 +12,10 @@ using namespace std::literals::chrono_literals;
 #include <glad/glad.h>
 
 #include "engine.hpp"
+#include <errors.hpp>
 #include <event.hpp>
 #include <shader.hpp>
+#include <transform.hpp>
 #include <vertex.hpp>
 
 #define ASSERT_SDL_ERROR(expr)                                                 \
@@ -48,27 +49,15 @@ engine::set_program(uint p_program)
 {
     if (!glIsProgram(p_program))
     {
+        OM_GL_CHECK();
         std::cerr << "Such program isn't exist" << std::endl;
         return;
     }
+    OM_GL_CHECK();
 
     program = p_program;
-
-    glLinkProgram(program);
-    GLint exit_code = 0;
-    glGetProgramiv(program, GL_LINK_STATUS, &exit_code);
-    if (GL_FALSE == exit_code)
-    {
-        GLint len = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
-        std::string info;
-        info.reserve(len);
-        glGetShaderInfoLog(program, len, nullptr, info.data());
-        std::cerr << info;
-        glDeleteProgram(program);
-        return;
-    }
     glUseProgram(program);
+    OM_GL_CHECK();
 }
 
 static int
@@ -77,11 +66,15 @@ prepare_default_gl()
     const char* vertex_shader_src = R"(
                                       #version 320 es
 
-                                      layout (location = 0) in vec3 position;
+                                      layout (location = 0) in vec2 p_pos;
+                                      layout (location = 1) in vec3 p_color;
+
+                                      out vec3 color;
 
                                       void main()
                                       {
-                                          gl_Position = vec4(position, 1.0);
+                                          gl_Position = vec4(p_pos, 0, 1.0);
+                                          color = p_color;
                                       }
                                     )";
 
@@ -89,44 +82,66 @@ prepare_default_gl()
                                         #version 320 es
                                         precision mediump float;
 
-                                        out vec4 color;
+                                        in vec3 color;
+
+                                        out vec4 o_color;
 
                                         void main()
                                         {
-                                            color = vec4(1, 0, 0, 1);
+                                            o_color = vec4(color, 1);
                                         }
                                       )";
 
-    char compile_info[128];
+    char compile_info[256];
     GLuint vertex_shader =
         create_shader(static_cast<shader_t>(GL_VERTEX_SHADER),
                       vertex_shader_src,
                       compile_info,
-                      128);
-    if (0 == vertex_shader)
+                      256);
+    if (-1 == vertex_shader)
     {
         std::cerr << compile_info;
-        return 0;
+        return -1;
     }
     GLuint fragment_shader =
         create_shader(static_cast<shader_t>(GL_FRAGMENT_SHADER),
                       fragment_shader_src,
                       compile_info,
-                      128);
-    if (0 == fragment_shader)
+                      256);
+    if (-1 == fragment_shader)
     {
         std::cerr << compile_info;
-        return 0;
+        return -1;
     }
 
     GLuint program = glCreateProgram();
-    if (0 == program)
-        return 0;
+    OM_GL_CHECK();
+    assert(0 != program && "Failed to create GLES program");
 
     glAttachShader(program, vertex_shader);
+    OM_GL_CHECK();
     glAttachShader(program, fragment_shader);
-    glDeleteShader(vertex_shader);
-    glDeleteShader(fragment_shader);
+    OM_GL_CHECK();
+
+    glLinkProgram(program);
+    OM_GL_CHECK();
+    GLint exit_code = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &exit_code);
+    OM_GL_CHECK();
+    if (GL_FALSE == exit_code)
+    {
+        GLint len = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+        OM_GL_CHECK();
+        std::string info;
+        info.resize(len);
+        glGetProgramInfoLog(program, len, nullptr, info.data());
+        OM_GL_CHECK();
+        std::cerr << info;
+        glDeleteProgram(program);
+        OM_GL_CHECK();
+        return -1;
+    }
 
     return program;
 }
@@ -147,8 +162,8 @@ engine::initialize()
     ASSERT_SDL_ERROR(nullptr != window);
 
     // TODO: extract such values to config
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 
     context = std::shared_ptr<void>(
@@ -164,13 +179,15 @@ engine::initialize()
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &real_major_version);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &real_minor_version);
     // TODO: extract such values to config
-    assert(real_major_version >= 2 && real_minor_version >= 0);
+    assert(real_major_version >= 3 && real_minor_version >= 2);
 
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
 
-    // program = prepare_default_gl();
-    // if (0 == program)
-    //     return EXIT_FAILURE;
+    program = prepare_default_gl();
+    if (-1 == program)
+        return EXIT_FAILURE;
+    set_program(program);
+    glViewport(0, 0, w, h);
 
     return EXIT_SUCCESS;
 }
@@ -201,16 +218,38 @@ engine::set_uniform(const std::string& name, const texture* p_texture)
 {
     assert(p_texture != nullptr);
     const int location = glGetUniformLocation(program, name.c_str());
+    OM_GL_CHECK();
     if (location == -1)
     {
-        std::cerr << "can't get uniform location from shader\n";
-        throw std::runtime_error("can't get uniform location");
+        if (!glIsProgram(program))
+            std::cerr << program << " isn't a gl program" << std::endl;
+
+        throw std::runtime_error("can't get uniform location: " + name);
     }
 
-    glBindTexture(GL_TEXTURE_2D, p_texture->get_handle());
     glActiveTexture(GL_TEXTURE0);
+    OM_GL_CHECK();
 
     glUniform1i(location, 0);
+    OM_GL_CHECK();
+}
+
+void
+engine::set_uniform(const std::string& name, const transform* p_transform)
+{
+    assert(p_transform != nullptr);
+    if (GL_FALSE == glIsProgram(program))
+        std::cerr << program << " isn't a gl program" << std::endl;
+
+    const int location = glGetUniformLocation(program, name.c_str());
+    OM_GL_CHECK();
+    if (location == -1)
+    {
+        throw std::runtime_error("can't get uniform location: " + name);
+    }
+
+    glUniformMatrix3fv(location, 1, GL_FALSE, p_transform->data());
+    OM_GL_CHECK();
 }
 
 } // namespace nano

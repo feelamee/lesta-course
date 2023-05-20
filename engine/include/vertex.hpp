@@ -12,10 +12,9 @@ struct vertex
     vec2f pos;
     vec3f color;
     vec2f tpos;
-
-    // operator vec2i() const;
-    // operator struct color() const;
 };
+
+static_assert(sizeof(vertex) == 7 * sizeof(float));
 
 } // namespace nano
 

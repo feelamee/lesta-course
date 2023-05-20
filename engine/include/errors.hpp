@@ -1,3 +1,6 @@
+#include <assert.h>
+#include <iostream>
+
 #define OM_GL_CHECK()                                                          \
     {                                                                          \
         const unsigned int err = glGetError();                                 \

@@ -15,15 +15,15 @@ public:
     texture(const canvas&);
 
     int load(const canvas&);
-    vec2i size() const;
+    vec2s size() const;
     std::uint32_t get_handle() const;
-    void set_size(vec2i);
+    void set_size(vec2s);
 
     ~texture();
 
 private:
     std::uint32_t handle;
-    vec2i m_size;
+    vec2s m_size;
 };
 
 } // namespace nano

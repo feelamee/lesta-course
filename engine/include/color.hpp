@@ -33,10 +33,9 @@ struct color
     }
 
     friend std::ostream&
-    operator<<(std::ostream& os, color color_)
+    operator<<(std::ostream& os, color c)
     {
-        auto tmp = static_cast<color>(color_);
-        return os << "[" << tmp.r << " " << tmp.g << " " << tmp.b << "]";
+        return os << "[" << c.r << " " << c.g << " " << c.b << "]";
     }
 };
 #pragma pack(pop)

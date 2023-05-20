@@ -5,19 +5,19 @@ namespace nano
 {
 using uint = unsigned int;
 
-enum shader_t
+enum class shader_t
 {
     fragment = 0x8B30,
     vertex = 0x8B31,
 };
 
-uint create_shader(shader_t type,
-                   const char* src,
-                   char* compile_info,
-                   uint buf_size);
+int create_shader(shader_t type,
+                  const char* src,
+                  char* compile_info,
+                  uint buf_size);
 
-uint setup_shaders(const char* vertex_shader_src_path,
-                   const char* fragment_shader_src_path);
+int setup_shaders(const char* vertex_shader_src_path,
+                  const char* fragment_shader_src_path);
 
 } // namespace nano
 

@@ -1,13 +1,16 @@
 #version 320 es
 precision mediump float;
 
-in vec2 p_tpos;
+in vec2 tpos;
 
-out vec4 o_color;
+out vec4 color;
 
-uniform sampler2D p_texture;
+uniform sampler2D u_texture;
 
 void main()
 {
-    o_color = texture(p_texture, p_tpos);
+    color = texture(u_texture, tpos);
 }
+
+
+

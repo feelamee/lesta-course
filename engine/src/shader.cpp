@@ -15,26 +15,32 @@ class shader
 {
 };
 
-uint
+int
 create_shader(shader_t type, const char* src, char* compile_info, uint buf_size)
 {
-    GLuint shader = glCreateShader(type);
+    GLuint shader = glCreateShader(static_cast<GLenum>(type));
+    OM_GL_CHECK();
     glShaderSource(shader, 1, &src, nullptr);
+    OM_GL_CHECK();
     glCompileShader(shader);
+    OM_GL_CHECK();
 
     GLint exit_code{};
     glGetShaderiv(shader, GL_COMPILE_STATUS, &exit_code);
+    OM_GL_CHECK();
     if (GL_FALSE == exit_code)
     {
         glGetShaderInfoLog(shader, buf_size, nullptr, compile_info);
+        OM_GL_CHECK();
         glDeleteShader(shader);
-        return 0;
+        OM_GL_CHECK();
+        return -1;
     }
     return shader;
 }
 
 // TERRRRRRIBLE
-uint
+int
 setup_shaders(const char* vertex_shader_src_path,
               const char* fragment_shader_src_path)
 {
@@ -69,7 +75,7 @@ setup_shaders(const char* vertex_shader_src_path,
                       vertex_shader_src.get(),
                       compile_info,
                       256);
-    if (0 == vertex_shader)
+    if (-1 == vertex_shader)
     {
         std::cerr << compile_info;
         return -1;
@@ -79,21 +85,40 @@ setup_shaders(const char* vertex_shader_src_path,
                       fragment_shader_src.get(),
                       compile_info,
                       256);
-    if (0 == fragment_shader)
+    if (-1 == fragment_shader)
     {
         std::cerr << compile_info;
         return -1;
     }
 
     GLuint program = glCreateProgram();
+    OM_GL_CHECK();
     assert(0 != program && "Failed to create GLES program");
 
     glAttachShader(program, vertex_shader);
     OM_GL_CHECK();
     glAttachShader(program, fragment_shader);
     OM_GL_CHECK();
-    // glDeleteShader(vertex_shader);
-    // glDeleteShader(fragment_shader);
+
+    glLinkProgram(program);
+    OM_GL_CHECK();
+    GLint exit_code = 0;
+    glGetProgramiv(program, GL_LINK_STATUS, &exit_code);
+    OM_GL_CHECK();
+    if (GL_FALSE == exit_code)
+    {
+        GLint len = 0;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+        OM_GL_CHECK();
+        std::string info;
+        info.resize(len);
+        glGetProgramInfoLog(program, len, nullptr, info.data());
+        OM_GL_CHECK();
+        std::cerr << info;
+        glDeleteProgram(program);
+        OM_GL_CHECK();
+        return -1;
+    }
 
     return program;
 }

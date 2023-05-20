@@ -18,12 +18,15 @@ public:
               float m_10, float m_11, float m_12,
               float m_20, float m_21, float m_22);
     // clang-format on
-    transform();
+    transform()
+    {
+    }
 
-    inline float* data();
+    float* data();
+    const float* data() const;
 
-    inline float& operator()(std::size_t row, std::size_t col);
-    inline float operator()(std::size_t row, std::size_t col) const;
+    float& operator()(std::size_t row, std::size_t col);
+    float operator()(std::size_t row, std::size_t col) const;
 
     transform& move(const vec2f& offset);
     vec2f move_point(const vec2f& point);
@@ -49,9 +52,9 @@ public:
 private:
     // clang-format off
     float mat[9]{
-        0.f, 0.f, 0.f,
-        0.f, 0.f, 0.f,
-        0.f, 0.f, 0.f,
+        1.f, 0.f, 0.f,
+        0.f, 1.f, 0.f,
+        0.f, 0.f, 1.f,
     };
     // clang-format on
 };

@@ -1,8 +1,10 @@
-#include "iengine.hpp"
-#include "shader.hpp"
-#include <glad/glad.h>
 #include <shape.hpp>
-#include <vertbuf.hpp>
+
+#include <cmath>
+#include <errors.hpp>
+#include <glad/glad.h>
+#include <iengine.hpp>
+#include <transform.hpp>
 
 namespace nano
 {
@@ -25,40 +27,37 @@ shape::set_texture(const texture& p_texture)
     m_texture = p_texture;
 }
 
-void
-shape::set_viewport(const rect<int>& p_viewport)
-{
-    viewport = p_viewport;
-}
-
-inline const auto
+const auto
 shape::data() const
 {
     return vertices.data();
 }
 
-inline auto
+auto
 shape::data()
 {
     return vertices.data();
 }
 
-inline void
+void
 shape::move(const vec2f& offset)
 {
-    m_transform.move(offset);
+    position += offset;
+    transform_need_update = true;
 }
 
-inline void
+void
 shape::scale(const vec2f& scale)
 {
-    m_transform.scale(scale);
+    factor = { factor.fst * scale.fst, factor.snd * scale.snd };
+    transform_need_update = true;
 }
 
-inline void
+void
 shape::rotate(radian angle)
 {
-    m_transform.rotate(angle);
+    rotation += angle;
+    transform_need_update = true;
 }
 
 primitive_t
@@ -79,6 +78,31 @@ shape::get_texture()
     return &m_texture;
 }
 
+const transform&
+shape::get_transform() const
+{
+    if (transform_need_update)
+    {
+        const float sin = std::sin(rotation);
+        const float cos = std::cos(rotation);
+
+        const float _00 = factor.fst * cos;
+        const float _11 = factor.snd * cos;
+        const float _01 = factor.snd * sin;
+        const float _10 = -factor.fst * sin;
+        const float _02 = -origin.fst * _00 - origin.snd * _01 + position.fst;
+        const float _12 = -origin.fst * _10 - origin.snd * _11 + position.snd;
+
+        // clang-format off
+        m_transform = transform(_00, _01, _02,
+                                _10, _11, _12,
+                                  0,   0,   1);
+        // clang-format on
+        transform_need_update = false;
+    }
+    return m_transform;
+}
+
 const texture*
 shape::get_texture() const
 {
@@ -89,22 +113,35 @@ void
 render(const shape& p_shape)
 {
     auto tex = p_shape.get_texture();
-    engine_instance().set_uniform("p_texture", tex);
+    if (GL_FALSE == glIsTexture(tex->get_handle()))
+    {
+        std::cerr << tex->get_handle() << " isn't texture" << std::endl;
+        return;
+    }
+    engine_instance().set_uniform("u_texture", tex);
+    engine_instance().set_uniform("u_matrix", &p_shape.get_transform());
     glVertexAttribPointer(
-        0, 2, GL_FLOAT, GL_FALSE, sizeof(nano::vertex), &p_shape.data()->pos);
+        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->pos);
+    OM_GL_CHECK();
     glEnableVertexAttribArray(0);
+    OM_GL_CHECK();
 
     glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(nano::vertex), &p_shape.data()->color);
+        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->color);
+    OM_GL_CHECK();
     glEnableVertexAttribArray(1);
+    OM_GL_CHECK();
 
     glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, sizeof(nano::vertex), &p_shape.data()->tpos);
+        2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->tpos);
+    OM_GL_CHECK();
     glEnableVertexAttribArray(2);
+    OM_GL_CHECK();
 
     glDrawArrays(static_cast<GLenum>(p_shape.primitive_type()),
                  0,
                  p_shape.points_count());
+    OM_GL_CHECK();
 }
 
 } // namespace nano

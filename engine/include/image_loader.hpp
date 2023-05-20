@@ -4,7 +4,6 @@
 #include "canvas.hpp"
 #include "color.hpp"
 
-#include <boost/numeric/ublas/storage.hpp>
 #include <cstdint>
 #include <limits>
 #include <ranges>
@@ -46,19 +45,19 @@ load(std::istream& src, canvas& img)
         !iswspace(sep))
         return EXIT_FAILURE;
 
-    img.resize(width, height, false);
+    img.resize({ width, height });
 
     if (fmt == "P6")
     {
-        src.read(reinterpret_cast<char*>(img.data().begin()),
+        src.read(reinterpret_cast<char*>(img.data()),
                  img.width() * img.height() * sizeof(color));
     }
     else
     {
         size_t r, g, b;
         auto max = std::numeric_limits<color_channel_t<>>::max();
-        for (auto i : vs::iota(0UL, img.width()))
-            for (auto j : vs::iota(0UL, img.height()))
+        for (auto j : vs::iota(0UL, img.height()))
+            for (auto i : vs::iota(0UL, img.width()))
             {
                 src >> r >> g >> b;
                 img(i, j) = { static_cast<color_channel_t<>>(r),
@@ -84,17 +83,17 @@ dump(std::ostream& dst, const canvas& img)
 
     if constexpr (fmt == fmt::P3)
     {
-        for (auto i : vs::iota(0UL, img.height()))
-            for (auto j : vs::iota(0UL, img.width()))
+        for (auto i : vs::iota(0UL, img.width()))
+            for (auto j : vs::iota(0UL, img.height()))
             {
-                dst << static_cast<size_t>(img(j, i).r) << " "
-                    << static_cast<size_t>(img(j, i).g) << " "
-                    << static_cast<size_t>(img(j, i).b) << std::endl;
+                dst << static_cast<size_t>(img(i, j).r) << " "
+                    << static_cast<size_t>(img(i, j).g) << " "
+                    << static_cast<size_t>(img(i, j).b) << std::endl;
             }
     }
     else // fmt == fmt::P6
     {
-        dst.write(reinterpret_cast<const char*>(&img(0, 0)),
+        dst.write(reinterpret_cast<const char*>(img.data()),
                   img.width() * img.height() * sizeof(color));
     }
 

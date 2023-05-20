@@ -1,47 +1,77 @@
-#include "texture.hpp"
+#include "transform.hpp"
+#include <chrono>
+#include <cmath>
 #include <event.hpp>
+#include <functional>
 #include <iengine.hpp>
 #include <image_loader.hpp>
 #include <shader.hpp>
 #include <shape.hpp>
 #include <texture.hpp>
+#include <vec.hpp>
 #include <vertbuf.hpp>
 #include <vertex.hpp>
 
 #include <assert.h>
+#include <concepts>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <vector>
 
+void
+print(const std::ranges::range auto& r)
+{
+    for (const auto& i : r)
+        std::cout << i << " ";
+    std::cout << std::endl;
+}
+
+template <typename T>
+void
+print(const T* r, std::size_t w, std::size_t h)
+{
+    for (auto i{ 0 }; i < w; ++i)
+    {
+        for (auto j{ 0 }; j < h; ++j)
+            std::cout << r[i * h + j] << " ";
+        std::cout << std::endl;
+    }
+}
+
 int
 main()
 {
-    nano::iengine& eng = nano::engine_instance();
+    using namespace nano;
+    iengine& eng = engine_instance();
     eng.initialize();
 
     // clang-format off
-    nano::vertbuf buf(
-        nano::primitive_t::triangle_strip,
-        { { 1, -1,    0, 0, 0,    0, 1},
-          { 1,  1,    0, 0, 0,    0, 0},
-          { 1,  0,    0, 0, 0,    1, 1},
-          { 0,  1,    0, 0, 0,    1, 0},
-          });
+    vertbuf buf(
+        primitive_t::triangle_strip,
+        {
+          {{-.3,  .3},   {0, 0, 0},    {0, 0}},
+          {{ .3,  .3},   {0, 0, 0},    {0, 1}},
+          {{-.3, -.3},   {0, 0, 0},    {1, 0}},
+          {{ .3, -.3},   {0, 0, 0},    {1, 1}},
+        });
     // clang-format on
 
-    std::ifstream FILE("../engine/test/leo.ppm");
-    nano::canvas img;
-    nano::ppm::load(FILE, img);
-    nano::texture tex(img);
-    nano::shape tmp(buf, tex);
+    std::ifstream file("../engine/test/leo.ppm");
+    canvas img;
+    ppm::load(file, img);
+    img.transpose();
+    texture tex(img);
+    shape tmp(buf, tex);
+    tmp.scale({ 747. / 1328, 720. / 480 });
 
-    auto program = nano::setup_shaders("../engine/test/vertex-shader.vert",
-                                       "../engine/test/fragment-shader.frag");
+    auto program = setup_shaders("../engine/test/vertex-shader.vert",
+                                 "../engine/test/fragment-shader.frag");
     if (-1 == program)
     {
         eng.finalize();
+        std::cerr << "setup shader was failed" << std::endl;
         return EXIT_FAILURE;
     }
     eng.set_program(program);
@@ -50,32 +80,52 @@ main()
     using std::chrono::duration_cast;
     using std::chrono::milliseconds;
 
+    bool is_rotate = false;
     bool is_running = true;
     while (is_running)
     {
-        nano::event ev;
+        event ev;
         while (poll_event(&ev))
         {
-            std::cout << "[" << duration_cast<milliseconds>(ev.key.timestamp)
-                      << "]";
             switch (ev.type)
             {
-            case nano::EVENT_KEY_DOWN:
-                std::cout << " EVENT_KEY_DOWN: "
-                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
-                break;
+            case event_t::key_down:
+                switch (ev.key.sym.sym)
+                {
+                case keycode::kb_w:
+                    tmp.move({ 0, 0.01 });
+                    break;
 
-            case nano::EVENT_KEY_UP:
-                std::cout << " EVENT_KEY_UP: "
-                          << SDL_GetKeyName(ev.key.keysym.sym) << std::endl;
+                case keycode::kb_a:
+                    tmp.move({ -0.01, 0 });
+                    break;
 
-                if (ev.key.keysym.sym == SDLK_q)
-                    is_running = false;
+                case keycode::kb_s:
+                    tmp.move({ 0, -0.01 });
+                    break;
+
+                case keycode::kb_d:
+                    tmp.move({ 0.01, 0 });
+                    break;
+                case keycode::kb_r:
+                    is_rotate = is_rotate ? false : true;
+                    break;
+                }
                 break;
             }
+            if (ev.key.sym.sym == keycode::kb_q)
+                is_running = false;
+            break;
         }
 
-        nano::render(tmp);
+        if (is_rotate)
+        {
+            auto time =
+                std::chrono::system_clock::now().time_since_epoch().count();
+            tmp.rotate(time);
+        }
+
+        render(tmp);
         eng.swap_buffers();
     }
 

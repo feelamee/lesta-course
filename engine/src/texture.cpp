@@ -16,7 +16,7 @@ texture::~texture()
     glDeleteTextures(1, &handle);
 }
 
-vec2i
+vec2s
 texture::size() const
 {
     return m_size;
@@ -29,7 +29,7 @@ texture::get_handle() const
 }
 
 void
-texture::set_size(vec2i new_size)
+texture::set_size(vec2s new_size)
 {
     m_size = new_size;
 }
@@ -38,15 +38,16 @@ int
 texture::load(const canvas& image)
 {
     glGenTextures(1, &handle);
+    OM_GL_CHECK();
     glBindTexture(GL_TEXTURE_2D, handle);
+    OM_GL_CHECK();
 
-    set_size(
-        { static_cast<int>(image.width()), static_cast<int>(image.height()) });
+    set_size(image.size());
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGB,
-                 size().snd,
                  size().fst,
+                 size().snd,
                  0,
                  GL_RGB,
                  GL_UNSIGNED_BYTE,
@@ -54,7 +55,14 @@ texture::load(const canvas& image)
     OM_GL_CHECK();
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    OM_GL_CHECK();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    OM_GL_CHECK();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    OM_GL_CHECK();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    OM_GL_CHECK();
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     OM_GL_CHECK();
 
     return EXIT_SUCCESS;

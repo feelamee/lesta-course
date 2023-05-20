@@ -19,27 +19,28 @@ transform::transform(float m_00, float m_01, float m_02,
 {}
 // clang-format on
 
-transform::transform()
-    : mat{ 0 }
-{
-}
-
-inline float*
+float*
 transform::data()
 {
     return mat;
 }
 
-inline float&
-transform::operator()(std::size_t col_x, std::size_t row_y)
+const float*
+transform::data() const
 {
-    return mat[row_y * width + col_x];
+    return mat;
 }
 
-inline float
-transform::operator()(std::size_t col_x, std::size_t row_y) const
+float&
+transform::operator()(std::size_t row, std::size_t col)
 {
-    return mat[row_y * width + col_x];
+    return mat[row * width + col];
+}
+
+float
+transform::operator()(std::size_t row, std::size_t col) const
+{
+    return mat[row * width + col];
 }
 
 // TODO: use multiplication of vectors and stride
