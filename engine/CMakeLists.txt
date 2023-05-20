@@ -15,6 +15,7 @@ add_library(
     src/texture.cpp
     src/shader.cpp
     src/shape.cpp
+    src/canvas.cpp
 
     include/vertbuf.hpp
     include/shape.hpp

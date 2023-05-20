@@ -16,8 +16,11 @@ public:
 
     int load(const canvas&);
     vec2s size() const;
+    std::size_t width() const;
+    std::size_t height() const;
     std::uint32_t get_handle() const;
     void set_size(vec2s);
+    void set_size(std::size_t, std::size_t);
 
     ~texture();
 

@@ -1,4 +1,3 @@
-#include "transform.hpp"
 #include <chrono>
 #include <cmath>
 #include <event.hpp>
@@ -12,7 +11,6 @@
 #include <vertbuf.hpp>
 #include <vertex.hpp>
 
-#include <assert.h>
 #include <concepts>
 #include <cstdlib>
 #include <filesystem>
@@ -60,7 +58,13 @@ main()
 
     std::ifstream file("../engine/test/leo.ppm");
     canvas img;
-    ppm::load(file, img);
+    int img_load_res = ppm::load(file, img);
+    if (EXIT_FAILURE == img_load_res)
+    {
+        std::cerr << ppm::error2str(ppm::error()) << std::endl;
+        return EXIT_FAILURE;
+    }
+
     img.transpose();
     texture tex(img);
     shape tmp(buf, tex);

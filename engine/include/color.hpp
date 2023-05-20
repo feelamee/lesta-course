@@ -1,51 +1,38 @@
 #ifndef COLOR_HPP
 #define COLOR_HPP
 
-#include <concepts>
 #include <cstdint>
-#include <limits>
-#include <numeric>
-#include <ostream>
 
-template <typename compT = uint8_t>
-    requires std::is_same_v<uint8_t, compT> or std::is_same_v<uint16_t, compT>
-using color_channel_t = compT;
+#include <numeric>
+
+namespace nano
+{
 
 ; // trick to disable incorrect warning in clangd
 #pragma pack(push, 1)
 struct color
 {
-    union
-    {
-        struct
-        {
-            color_channel_t<> r = 0;
-            color_channel_t<> g = 0;
-            color_channel_t<> b = 0;
-        };
-        char components[3 * sizeof(color_channel_t<>)];
-    };
+    using channel_t = std::uint8_t;
+    channel_t r;
+    channel_t g;
+    channel_t b;
 
     friend bool
-    operator==(const color& l, const color& r)
+    operator==(color lhs, color rhs)
     {
-        return l.r == r.r && l.g == r.g && l.b == r.b;
-    }
-
-    friend std::ostream&
-    operator<<(std::ostream& os, color c)
-    {
-        return os << "[" << c.r << " " << c.g << " " << c.b << "]";
+        // clang-format off
+        return lhs.r == rhs.r &&
+               lhs.g == rhs.g &&
+               lhs.b == rhs.b;
+        // clang-format on
     }
 };
 #pragma pack(pop)
 
 namespace colors
 {
-inline static constexpr auto min =
-    std::numeric_limits<color_channel_t<>>::min();
-inline static constexpr auto max =
-    std::numeric_limits<color_channel_t<>>::max();
+inline static constexpr auto min = std::numeric_limits<color::channel_t>::min();
+inline static constexpr auto max = std::numeric_limits<color::channel_t>::max();
 
 inline constexpr color black{ min, min, min };
 inline constexpr color white{ max, max, max };
@@ -53,5 +40,7 @@ inline constexpr color red{ max, min, min };
 inline constexpr color green{ min, max, min };
 inline constexpr color blue{ min, min, max };
 } // namespace colors
+
+} // namespace nano
 
 #endif // COLOR_HPP

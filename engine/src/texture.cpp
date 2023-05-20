@@ -22,6 +22,18 @@ texture::size() const
     return m_size;
 }
 
+std::size_t
+texture::width() const
+{
+    return m_size.fst;
+}
+
+std::size_t
+texture::height() const
+{
+    return m_size.snd;
+}
+
 std::uint32_t
 texture::get_handle() const
 {
@@ -29,9 +41,15 @@ texture::get_handle() const
 }
 
 void
-texture::set_size(vec2s new_size)
+texture::set_size(std::size_t width, std::size_t height)
 {
-    m_size = new_size;
+    m_size = { width, height };
+}
+
+void
+texture::set_size(vec2s size)
+{
+    m_size = size;
 }
 
 int
@@ -42,7 +60,7 @@ texture::load(const canvas& image)
     glBindTexture(GL_TEXTURE_2D, handle);
     OM_GL_CHECK();
 
-    set_size(image.size());
+    set_size(image.width(), image.height());
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGB,
