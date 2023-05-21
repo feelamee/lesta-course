@@ -14,20 +14,13 @@ template <typename T>
 struct vec2
 {
     using type = T;
-    union
-    {
-        struct
-        {
-            T fst;
-            T snd;
-        };
-        T vec[2];
-    };
+    T x;
+    T y;
 
     friend vec2<T>
     operator+(const vec2<T>& lhs, const vec2<T>& rhs)
     {
-        return { lhs.fst + rhs.fst, lhs.snd + rhs.snd };
+        return { lhs.x + rhs.x, lhs.y + rhs.y };
     }
 
     vec2<T>&
@@ -46,16 +39,9 @@ template <typename T>
 struct vec3
 {
     using type = T;
-    union
-    {
-        struct
-        {
-            T fst;
-            T snd;
-            T thd;
-        };
-        T vec[3];
-    };
+    T x;
+    T y;
+    T z;
 };
 using vec3f = vec3<float>;
 

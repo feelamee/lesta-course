@@ -79,8 +79,8 @@ transform::move(const vec2f& offset)
 {
     // clang-format off
     const transform moving = {
-                    1, 0, offset.fst,
-                    0, 1, offset.snd,
+                    1, 0, offset.x,
+                    0, 1, offset.y,
                     0, 0,          1};
     // clang-format on
 
@@ -100,8 +100,8 @@ transform::scale(const vec2f& scale)
 {
     // clang-format off
     const transform scaling = {
-                    scale.fst, 0,         0,
-                    0,         scale.snd, 0,
+                    scale.x, 0,         0,
+                    0,         scale.y, 0,
                     0,         0,         1};
     // clang-format on
 

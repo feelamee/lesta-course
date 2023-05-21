@@ -25,13 +25,13 @@ texture::size() const
 std::size_t
 texture::width() const
 {
-    return m_size.fst;
+    return m_size.x;
 }
 
 std::size_t
 texture::height() const
 {
-    return m_size.snd;
+    return m_size.y;
 }
 
 std::uint32_t
@@ -64,8 +64,8 @@ texture::load(const canvas& image)
     glTexImage2D(GL_TEXTURE_2D,
                  0,
                  GL_RGB,
-                 size().fst,
-                 size().snd,
+                 size().x,
+                 size().y,
                  0,
                  GL_RGB,
                  GL_UNSIGNED_BYTE,

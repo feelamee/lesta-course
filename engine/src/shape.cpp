@@ -49,7 +49,7 @@ shape::move(const vec2f& offset)
 void
 shape::scale(const vec2f& scale)
 {
-    factor = { factor.fst * scale.fst, factor.snd * scale.snd };
+    factor = { factor.x * scale.x, factor.y * scale.y };
     transform_need_update = true;
 }
 
@@ -86,12 +86,12 @@ shape::get_transform() const
         const float sin = std::sin(rotation);
         const float cos = std::cos(rotation);
 
-        const float _00 = factor.fst * cos;
-        const float _11 = factor.snd * cos;
-        const float _01 = factor.snd * sin;
-        const float _10 = -factor.fst * sin;
-        const float _02 = -origin.fst * _00 - origin.snd * _01 + position.fst;
-        const float _12 = -origin.fst * _10 - origin.snd * _11 + position.snd;
+        const float _00 = factor.x * cos;
+        const float _11 = factor.y * cos;
+        const float _01 = factor.y * sin;
+        const float _10 = -factor.x * sin;
+        const float _02 = -origin.x * _00 - origin.y * _01 + position.x;
+        const float _12 = -origin.x * _10 - origin.y * _11 + position.y;
 
         // clang-format off
         m_transform = transform(_00, _01, _02,
