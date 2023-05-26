@@ -14,19 +14,19 @@ namespace nano
 class shape
 {
 public:
-    shape(const vertbuf&, const texture&);
+    shape(const vertbuf&, texture*);
 
-    void set_transform(const transform&);
-    void set_texture(const texture&);
+    void set_transform(const transform2D&);
+    void set_texture(texture*);
 
-    const auto data() const;
-    auto data();
+    const vertex* data() const;
+    vertex* data();
 
     primitive_t primitive_type() const;
     std::size_t points_count() const;
     const texture* get_texture() const;
     texture* get_texture();
-    const transform& get_transform() const;
+    const transform2D& get_transform() const;
 
     void move(const vec2f& offset);
     void scale(const vec2f& scale);
@@ -35,14 +35,14 @@ public:
 
 private:
     vertbuf vertices;
-    vec2f origin;
-    vec2f position;
-    radian rotation;
+    vec2f origin{ 0, 0 };
+    vec2f position{ 0, 0 };
+    radian rotation{ 0 };
     vec2f factor{ 1., 1. };
-    mutable transform m_transform;
-    texture m_texture;
+    mutable transform2D m_transform;
+    texture* m_texture;
     color fill{ colors::white };
-    mutable bool transform_need_update{ true };
+    mutable bool transform_need_update{ false };
 };
 
 void render(const shape&);

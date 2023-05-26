@@ -1,7 +1,7 @@
 #include <glad/glad.h>
 #include <vertbuf.hpp>
 
-#include <errors.hpp>
+#include <glcheck.hpp>
 
 namespace nano
 {
@@ -39,28 +39,16 @@ vertbuf::data() const
 void
 render(const vertbuf& vertices)
 {
-    glVertexAttribPointer(
-        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->pos);
-    OM_GL_CHECK();
-    glEnableVertexAttribArray(0);
-    OM_GL_CHECK();
+    GL_CHECK(glVertexAttribPointer(
+        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->pos));
+    GL_CHECK(glEnableVertexAttribArray(0));
 
-    glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->color);
-    OM_GL_CHECK();
-    glEnableVertexAttribArray(1);
-    OM_GL_CHECK();
+    GL_CHECK(glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->color));
+    GL_CHECK(glEnableVertexAttribArray(1));
 
-    glDrawArrays(
-        static_cast<GLenum>(vertices.primitive_type()), 0, vertices.size());
-    OM_GL_CHECK();
-
-    glDisableVertexAttribArray(0);
-    OM_GL_CHECK();
-    glDisableVertexAttribArray(1);
-    OM_GL_CHECK();
-    glDisableVertexAttribArray(2);
-    OM_GL_CHECK();
+    GL_CHECK(glDrawArrays(
+        static_cast<GLenum>(vertices.primitive_type()), 0, vertices.size()));
 }
 
 } // namespace nano

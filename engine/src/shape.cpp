@@ -1,39 +1,41 @@
 #include <shape.hpp>
 
-#include <cmath>
-#include <errors.hpp>
 #include <glad/glad.h>
+
+#include <cmath>
+
+#include <glcheck.hpp>
 #include <iengine.hpp>
 #include <transform.hpp>
 
 namespace nano
 {
 
-shape::shape(const vertbuf& p_vertbuf, const texture& p_texture)
+shape::shape(const vertbuf& p_vertbuf, texture* p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
 }
 
 void
-shape::set_transform(const transform& p_transform)
+shape::set_transform(const transform2D& p_transform)
 {
     m_transform = p_transform;
 }
 
 void
-shape::set_texture(const texture& p_texture)
+shape::set_texture(texture* p_texture)
 {
     m_texture = p_texture;
 }
 
-const auto
+const vertex*
 shape::data() const
 {
     return vertices.data();
 }
 
-auto
+vertex*
 shape::data()
 {
     return vertices.data();
@@ -75,10 +77,10 @@ shape::points_count() const
 texture*
 shape::get_texture()
 {
-    return &m_texture;
+    return m_texture;
 }
 
-const transform&
+const transform2D&
 shape::get_transform() const
 {
     if (transform_need_update)
@@ -94,7 +96,7 @@ shape::get_transform() const
         const float _12 = -origin.x * _10 - origin.y * _11 + position.y;
 
         // clang-format off
-        m_transform = transform(_00, _01, _02,
+        m_transform = transform2D(_00, _01, _02,
                                 _10, _11, _12,
                                   0,   0,   1);
         // clang-format on
@@ -106,42 +108,38 @@ shape::get_transform() const
 const texture*
 shape::get_texture() const
 {
-    return &m_texture;
+    return m_texture;
 }
 
 void
 render(const shape& p_shape)
 {
     auto tex = p_shape.get_texture();
-    if (GL_FALSE == glIsTexture(tex->get_handle()))
+    GLboolean is_exist{ false };
+    GL_CHECK(is_exist = glIsTexture(tex->get_handle()));
+    if (GL_FALSE == is_exist)
     {
-        std::cerr << tex->get_handle() << " isn't texture" << std::endl;
+        err << tex->get_handle() << " isn't texture" << std::endl;
         return;
     }
+
     engine_instance().set_uniform("u_texture", tex);
     engine_instance().set_uniform("u_matrix", &p_shape.get_transform());
-    glVertexAttribPointer(
-        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->pos);
-    OM_GL_CHECK();
-    glEnableVertexAttribArray(0);
-    OM_GL_CHECK();
+    GL_CHECK(glVertexAttribPointer(
+        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->pos));
+    GL_CHECK(glEnableVertexAttribArray(0));
 
-    glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->color);
-    OM_GL_CHECK();
-    glEnableVertexAttribArray(1);
-    OM_GL_CHECK();
+    GL_CHECK(glVertexAttribPointer(
+        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->color));
+    GL_CHECK(glEnableVertexAttribArray(1));
 
-    glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->tpos);
-    OM_GL_CHECK();
-    glEnableVertexAttribArray(2);
-    OM_GL_CHECK();
+    GL_CHECK(glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->tpos));
+    GL_CHECK(glEnableVertexAttribArray(2));
 
-    glDrawArrays(static_cast<GLenum>(p_shape.primitive_type()),
-                 0,
-                 p_shape.points_count());
-    OM_GL_CHECK();
+    GL_CHECK(glDrawArrays(static_cast<GLenum>(p_shape.primitive_type()),
+                          0,
+                          p_shape.points_count()));
 }
 
 } // namespace nano

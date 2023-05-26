@@ -16,7 +16,9 @@ add_library(
     src/shader.cpp
     src/shape.cpp
     src/canvas.cpp
+    src/glcheck.cpp
 
+    include/glcheck.hpp
     include/vertbuf.hpp
     include/shape.hpp
     include/shader.hpp
@@ -32,10 +34,11 @@ add_library(
     include/iengine.hpp
     include/event.hpp
     include/transform.hpp
-    include/errors.hpp
 )
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(${TARGET} PUBLIC cxx_std_20)
+target_compile_options(${TARGET} PUBLIC -DNANO_DEBUG)
+target_compile_options(${TARGET} PUBLIC -g)
 
 find_package(SDL3 REQUIRED)
 target_link_libraries(${TARGET} PUBLIC SDL3-shared)

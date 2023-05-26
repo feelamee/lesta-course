@@ -23,6 +23,7 @@ class vertbuf
 {
 public:
     vertbuf(primitive_t p_type, const std::vector<vertex>& p_vertices);
+    std::vector<color> buf;
     std::size_t size() const;
     primitive_t primitive_type() const;
     vertex* data();

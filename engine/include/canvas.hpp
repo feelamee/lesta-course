@@ -22,14 +22,12 @@ public:
     {
     }
 
-    canvas()
-    {
-    }
+    canvas() = default;
 
     std::size_t width() const;
     std::size_t height() const;
-    const color& operator()(size_t i, size_t j) const;
-    color& operator()(size_t i, size_t j);
+    const color& operator()(size_t row, size_t col) const;
+    color& operator()(size_t row, size_t col);
     void fill(const color& val);
     bool operator==(const canvas& other) const;
     const color* data() const;
@@ -38,9 +36,9 @@ public:
     void transpose();
 
 private:
+    std::vector<color> buf;
     std::size_t m_width{ 0 };
     std::size_t m_height{ 0 };
-    std::vector<color> buf;
 };
 
 } // namespace nano

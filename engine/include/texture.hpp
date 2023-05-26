@@ -14,6 +14,8 @@ public:
     texture() = default;
     texture(const canvas&);
 
+    ~texture();
+
     int load(const canvas&);
     vec2s size() const;
     std::size_t width() const;
@@ -21,8 +23,6 @@ public:
     std::uint32_t get_handle() const;
     void set_size(vec2s);
     void set_size(std::size_t, std::size_t);
-
-    ~texture();
 
 private:
     std::uint32_t handle;

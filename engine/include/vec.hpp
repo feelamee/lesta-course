@@ -7,8 +7,6 @@
 namespace nano
 {
 
-struct vertex;
-
 template <typename T>
     requires std::is_arithmetic_v<T>
 struct vec2
@@ -51,17 +49,15 @@ template <std::ranges::input_range T, typename Proj>
 constexpr auto
 mult(const T& lhs, const T& rhs, Proj func) -> T
 {
-    using std::ranges::begin;
-    using std::ranges::distance;
-    using std::ranges::end;
+    namespace rng = std::ranges;
 
     T ret{ lhs };
-    auto lhs_size = distance(begin(lhs), end(lhs));
-    auto rhs_size = distance(begin(rhs), end(rhs));
+    const auto lhs_size = rng::distance(begin(lhs), end(lhs));
+    const auto rhs_size = rng::distance(begin(rhs), end(rhs));
     assert(lhs_size == rhs_size and "size of vectors should be equal");
 
-    auto lhs_it = begin(lhs);
-    auto rhs_it = begin(rhs);
+    auto lhs_it = rng::begin(lhs);
+    auto rhs_it = rng::begin(rhs);
 
     for (auto& i : ret)
     {
