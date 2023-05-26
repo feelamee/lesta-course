@@ -28,7 +28,7 @@ public:
     virtual void finalize() = 0;
     virtual void set_program(uint) = 0;
     virtual void set_uniform(const std::string&, const texture*) = 0;
-    virtual void set_uniform(const std::string&, const transform*) = 0;
+    virtual void set_uniform(const std::string&, const transform2D*) = 0;
     virtual int swap_buffers() = 0;
 };
 

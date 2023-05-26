@@ -16,15 +16,15 @@ canvas::height() const
 }
 
 const color&
-canvas::operator()(size_t i, size_t j) const
+canvas::operator()(size_t row, size_t col) const
 {
-    return buf[i * width() + j];
+    return buf[row * width() + col];
 }
 
 color&
-canvas::operator()(size_t i, size_t j)
+canvas::operator()(size_t row, size_t col)
 {
-    return buf[i * width() + j];
+    return buf[row * width() + col];
 }
 
 void

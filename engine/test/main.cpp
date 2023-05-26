@@ -65,73 +65,84 @@ main()
         return EXIT_FAILURE;
     }
 
-    img.transpose();
-    texture tex(img);
-    shape tmp(buf, tex);
-    tmp.scale({ 747. / 1328, 720. / 480 });
+    // img.transpose();
+    // texture tex;
+    // img_load_res = tex.load(img);
+    // if (EXIT_FAILURE == img_load_res)
+    // {
+    //     std::cerr << "failed to load texture" << std::endl;
+    //     return EXIT_FAILURE;
+    // }
 
-    auto program = setup_shaders("../engine/test/vertex-shader.vert",
-                                 "../engine/test/fragment-shader.frag");
-    if (-1 == program)
-    {
-        eng.finalize();
-        std::cerr << "setup shader was failed" << std::endl;
-        return EXIT_FAILURE;
-    }
-    eng.set_program(program);
+    // shape tmp(buf, &tex);
+    // tmp.scale({ 747. / 1328, 720. / 480 });
 
-    using std::chrono::duration;
-    using std::chrono::duration_cast;
-    using std::chrono::milliseconds;
+    // unsigned int program = 0;
+    // /*
+    //   "../engine/test/vertex-shader.vert",
+    //   "../engine/test/fragment-shader.frag");
+    //  */
 
-    bool is_rotate = false;
-    bool is_running = true;
-    while (is_running)
-    {
-        event ev;
-        while (poll_event(&ev))
-        {
-            switch (ev.type)
-            {
-            case event_t::key_down:
-                switch (ev.key.sym.sym)
-                {
-                case keycode::kb_w:
-                    tmp.move({ 0, 0.01 });
-                    break;
+    // if (0 == program)
+    // {
+    //     eng.finalize();
+    //     std::cerr << "setup shader was failed" << std::endl;
+    //     return EXIT_FAILURE;
+    // }
+    // eng.set_program(program);
 
-                case keycode::kb_a:
-                    tmp.move({ -0.01, 0 });
-                    break;
+    // using std::chrono::duration;
+    // using std::chrono::duration_cast;
+    // using std::chrono::milliseconds;
 
-                case keycode::kb_s:
-                    tmp.move({ 0, -0.01 });
-                    break;
+    // bool is_rotate = false;
+    // bool is_running = true;
+    // while (is_running)
+    // {
+    //     event ev;
+    //     while (poll_event(&ev))
+    //     {
+    //         switch (ev.type)
+    //         {
+    //         case event_t::key_down:
+    //             switch (ev.key.sym.sym)
+    //             {
+    //             case keycode::kb_w:
+    //                 tmp.move({ 0, 0.01 });
+    //                 break;
 
-                case keycode::kb_d:
-                    tmp.move({ 0.01, 0 });
-                    break;
-                case keycode::kb_r:
-                    is_rotate = is_rotate ? false : true;
-                    break;
-                }
-                break;
-            }
-            if (ev.key.sym.sym == keycode::kb_q)
-                is_running = false;
-            break;
-        }
+    //             case keycode::kb_a:
+    //                 tmp.move({ -0.01, 0 });
+    //                 break;
 
-        if (is_rotate)
-        {
-            auto time =
-                std::chrono::system_clock::now().time_since_epoch().count();
-            tmp.rotate(time);
-        }
+    //             case keycode::kb_s:
+    //                 tmp.move({ 0, -0.01 });
+    //                 break;
 
-        render(tmp);
-        eng.swap_buffers();
-    }
+    //             case keycode::kb_d:
+    //                 tmp.move({ 0.01, 0 });
+    //                 break;
+    //             case keycode::kb_r:
+    //                 is_rotate = is_rotate ? false : true;
+    //                 break;
+    //             }
+    //             break;
+    //         }
+    //         if (ev.key.sym.sym == keycode::kb_q)
+    //             is_running = false;
+    //         break;
+    //     }
+
+    //     if (is_rotate)
+    //     {
+    //         auto time =
+    //             std::chrono::system_clock::now().time_since_epoch().count();
+    //         tmp.rotate(time);
+    //     }
+
+    //     render(tmp);
+    //     eng.swap_buffers();
+    // }
 
     eng.finalize();
     return EXIT_SUCCESS;

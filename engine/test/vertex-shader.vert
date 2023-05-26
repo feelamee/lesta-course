@@ -12,7 +12,7 @@ out vec2 tpos;
 void main()
 {
     gl_Position = vec4(vec3(p_pos, 1.) * u_matrix, 1.);
-    color = p_color;
+    color = vec3(1, 1, 1); //p_color;
     tpos = p_tpos;
 }
 

@@ -27,7 +27,7 @@ public:
     void finalize() override;
     void set_program(uint) override;
     void set_uniform(const std::string&, const texture*) override;
-    void set_uniform(const std::string&, const transform*) override;
+    void set_uniform(const std::string&, const transform2D*) override;
 
     int swap_buffers() override;
 
@@ -36,10 +36,7 @@ public:
     {
     }
 
-    ~engine()
-    {
-        glDeleteProgram(program);
-    }
+    ~engine();
 
 private:
     raii_wrapper<int, void> sdl_init;

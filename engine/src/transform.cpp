@@ -10,7 +10,7 @@ namespace nano
 {
 
 // clang-format off
-transform::transform(float m_00, float m_01, float m_02,
+transform2D::transform2D(float m_00, float m_01, float m_02,
                      float m_10, float m_11, float m_12,
                      float m_20, float m_21, float m_22)
     : mat{m_00, m_01, m_02,
@@ -20,32 +20,32 @@ transform::transform(float m_00, float m_01, float m_02,
 // clang-format on
 
 float*
-transform::data()
+transform2D::data()
 {
     return mat;
 }
 
 const float*
-transform::data() const
+transform2D::data() const
 {
     return mat;
 }
 
 float&
-transform::operator()(std::size_t row, std::size_t col)
+transform2D::operator()(std::size_t row, std::size_t col)
 {
     return mat[row * width + col];
 }
 
 float
-transform::operator()(std::size_t row, std::size_t col) const
+transform2D::operator()(std::size_t row, std::size_t col) const
 {
     return mat[row * width + col];
 }
 
 // TODO: use multiplication of vectors and stride
-transform&
-transform::combine(const transform& other)
+transform2D&
+transform2D::combine(const transform2D& other)
 {
 
     auto& mat = *this;
@@ -66,19 +66,19 @@ transform::combine(const transform& other)
     return *this;
 }
 
-transform
-operator*(const transform& lhs, const transform& rhs)
+transform2D
+operator*(const transform2D& lhs, const transform2D& rhs)
 {
-    transform ret{ lhs };
+    transform2D ret{ lhs };
     ret.combine(rhs);
     return ret;
 }
 
-transform&
-transform::move(const vec2f& offset)
+transform2D&
+transform2D::move(const vec2f& offset)
 {
     // clang-format off
-    const transform moving = {
+    const transform2D moving = {
                     1, 0, offset.x,
                     0, 1, offset.y,
                     0, 0,          1};
@@ -87,19 +87,19 @@ transform::move(const vec2f& offset)
     return combine(moving);
 }
 
-transform
-transform::moved(const vec2f& offset)
+transform2D
+transform2D::moved(const vec2f& offset)
 {
-    transform ret = (*this);
+    transform2D ret = (*this);
     ret.move(offset);
     return ret;
 }
 
-transform&
-transform::scale(const vec2f& scale)
+transform2D&
+transform2D::scale(const vec2f& scale)
 {
     // clang-format off
-    const transform scaling = {
+    const transform2D scaling = {
                     scale.x, 0,         0,
                     0,         scale.y, 0,
                     0,         0,         1};
@@ -108,42 +108,44 @@ transform::scale(const vec2f& scale)
     return combine(scaling);
 }
 
-transform
-transform::scaled(const vec2f& scale)
+transform2D
+transform2D::scaled(const vec2f& scale)
 {
-    transform ret = (*this);
+    transform2D ret = (*this);
     ret.scale(scale);
     return ret;
 }
+
 ///////////////////////////////
-vec2f
-move_point(const vec2f& point)
-{
-}
+// vec2f
+// move_point(const vec2f& point)
+// {
+// }
 
-vec2f
-scale_point(const vec2f& point)
-{
-}
+// vec2f
+// scale_point(const vec2f& point)
+// {
+// }
 
-vec2f
-rotate_point(const vec2f& point)
-{
-}
+// vec2f
+// rotate_point(const vec2f& point)
+// {
+// }
 
-vec2f
-transform_point(const vec2f& point)
-{
-}
+// vec2f
+// transform_point(const vec2f& point)
+// {
+// }
 ///////////////////////////////
-transform&
-transform::rotate(radian angle)
+
+transform2D&
+transform2D::rotate(radian angle)
 {
     const float cos = std::cos(angle);
     const float sin = std::sin(angle);
 
     // clang-format off
-    const transform rot{cos, -sin, 0,
+    const transform2D rot{cos, -sin, 0,
                         sin,  cos, 0,
                           0,    0, 1};
     // clang-format on
@@ -151,10 +153,10 @@ transform::rotate(radian angle)
     return combine(rot);
 }
 
-transform
-transform::rotated(radian angle)
+transform2D
+transform2D::rotated(radian angle)
 {
-    transform ret = (*this);
+    transform2D ret = (*this);
     ret.rotate(angle);
     return ret;
 }

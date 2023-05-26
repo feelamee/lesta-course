@@ -1,23 +1,39 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
+#include <filesystem>
+#include <string>
+
 namespace nano
 {
-using uint = unsigned int;
 
-enum class shader_t
+class shader
 {
-    fragment = 0x8B30,
-    vertex = 0x8B31,
+public:
+    enum class type
+    {
+        fragment = 0x8B30,
+        vertex = 0x8B31,
+    };
+
+    shader() = default;
+    ~shader();
+
+    shader(const shader&) = delete;
+    shader& operator=(const shader&) = delete;
+
+    shader(shader&&);
+    shader& operator=(shader&&);
+
+    int load(type t, const std::filesystem::path& filename);
+
+private:
+    int compile(std::string& src, type t);
+    static char log[1024];
+
+    unsigned int handle{ 0 };
+    int cur_texture{ -1 };
 };
-
-int create_shader(shader_t type,
-                  const char* src,
-                  char* compile_info,
-                  uint buf_size);
-
-int setup_shaders(const char* vertex_shader_src_path,
-                  const char* fragment_shader_src_path);
 
 } // namespace nano
 
