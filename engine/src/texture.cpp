@@ -1,3 +1,4 @@
+#include "SDL_video.h"
 #include <cstdlib>
 #include <texture.hpp>
 
@@ -6,6 +7,7 @@
 #include <glcheck.hpp>
 #include <vec.hpp>
 
+#include <iostream>
 namespace nano
 {
 
