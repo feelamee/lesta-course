@@ -35,9 +35,9 @@ public:
 
 private:
     vertbuf vertices;
-    vec2f origin;
-    vec2f position;
-    radian rotation;
+    vec2f origin{ 0, 0 };
+    vec2f position{ 0, 0 };
+    radian rotation{ 0 };
     vec2f factor{ 1., 1. };
     mutable transform m_transform;
     texture m_texture;
