@@ -43,8 +43,12 @@ render(const vertbuf& vertices)
         0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->pos));
     GL_CHECK(glEnableVertexAttribArray(0));
 
-    GL_CHECK(glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), &vertices.data()->color));
+    GL_CHECK(glVertexAttribPointer(1,
+                                   4,
+                                   GL_UNSIGNED_BYTE,
+                                   GL_FALSE,
+                                   sizeof(vertex),
+                                   &vertices.data()->rgb));
     GL_CHECK(glEnableVertexAttribArray(1));
 
     GL_CHECK(glDrawArrays(

@@ -10,11 +10,13 @@ namespace nano
 struct vertex
 {
     vec2f pos;
-    vec3f color;
+    color rgb;
     vec2f tpos;
+    // vec3f color;
 };
 
-static_assert(sizeof(vertex) == 7 * sizeof(float));
+// static_assert(sizeof(vertex) == 7 * sizeof(float));
+static_assert(sizeof(vertex) == 20);
 
 } // namespace nano
 
