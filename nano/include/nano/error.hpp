@@ -1,0 +1,60 @@
+#ifndef GL_CHECK_HPP
+#define GL_CHECK_HPP
+
+#include <glad/glad.h>
+
+#include <filesystem>
+#include <iosfwd>
+#include <string_view>
+
+namespace nano
+{
+extern std::ostream& err_os;
+}
+
+#ifdef NANO_DEBUG
+#define GL_CHECK(expr)                                                         \
+    {                                                                          \
+        expr;                                                                  \
+        gl_check(__FILE__, __LINE__, #expr);                                   \
+    }
+
+#define LOG_DEBUG(message)                                                     \
+    {                                                                          \
+        nano::err_os << "[DEBUG: " << __FILE__ << ":" << __LINE__              \
+                     << "]:\n    " << (message) << '\n'                        \
+                     << std::endl;                                             \
+    }
+
+#else
+#define GL_CHECK(expr) (expr)
+#define LOG_DEBUG(message)
+#endif
+
+#define ASSERT_SDL_ERROR(expr)                                                 \
+    {                                                                          \
+        if (!(expr))                                                           \
+        {                                                                      \
+            std::cerr << SDL_GetError() << std::endl;                          \
+            return EXIT_FAILURE;                                               \
+        }                                                                      \
+    }
+
+#define TEST_SDL_ERROR(expr)                                                   \
+    {                                                                          \
+        if (!(expr))                                                           \
+        {                                                                      \
+            std::cerr << SDL_GetError() << std::endl;                          \
+        }                                                                      \
+    }
+
+namespace nano
+{
+
+int gl_check(const std::filesystem::path& filename,
+             unsigned int line,
+             std::string_view expr);
+
+} // namespace nano
+
+#endif // GL_CHECK_HPP
