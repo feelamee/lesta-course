@@ -88,9 +88,9 @@ engine_instance()
 void
 engine::set_uniform(const std::string& name, const texture* p_texture)
 {
-    if (not p_texture)
+    if (p_texture and not texture::exist(*p_texture))
     {
-        LOG_DEBUG("Texture is not valid");
+        LOG_DEBUG("Texture does not exist");
         return;
     }
 
@@ -105,23 +105,17 @@ engine::set_uniform(const std::string& name, const texture* p_texture)
     GL_CHECK(location = glGetUniformLocation(program, name.c_str()));
     if (location == -1)
     {
-        throw std::runtime_error("can't get uniform location: " + name);
+        LOG_DEBUG("Failed to get uniform location: " + name);
+        return;
     }
 
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
-
     GL_CHECK(glUniform1i(location, 0));
 }
 
 void
-engine::set_uniform(const std::string& name, const transform2D* p_transform)
+engine::set_uniform(const std::string& name, const transform2D& p_transform)
 {
-    if (not p_transform)
-    {
-        LOG_DEBUG("Transform2D is not valid");
-        return;
-    }
-
     GLuint program = shader::active();
     if (not program)
     {
@@ -137,7 +131,7 @@ engine::set_uniform(const std::string& name, const transform2D* p_transform)
         return;
     }
 
-    GL_CHECK(glUniformMatrix3fv(location, 1, GL_FALSE, p_transform->data()));
+    GL_CHECK(glUniformMatrix3fv(location, 1, GL_FALSE, p_transform.data()));
 }
 
 } // namespace nano

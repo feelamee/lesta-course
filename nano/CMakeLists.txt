@@ -41,12 +41,9 @@ target_compile_features(${TARGET} PUBLIC cxx_std_20)
 option(NANO_DEBUG "Debug macro for libnano-engine" ON)
 if (NANO_DEBUG)
 target_compile_options(${TARGET} PUBLIC -DNANO_DEBUG)
+target_compile_options(${TARGET} PUBLIC -g)
 endif()
 
-target_compile_options(${TARGET} PUBLIC -g)
 
-find_package(SDL3 REQUIRED)
-target_link_libraries(${TARGET} PUBLIC SDL3-shared)
-
-find_library(FIND_GLAD_RESULT glad)
+target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
 target_link_libraries(${TARGET} PUBLIC glad)

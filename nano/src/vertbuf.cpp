@@ -1,7 +1,8 @@
 #include <nano/vertbuf.hpp>
 
-#include <glad/glad.h>
 #include <nano/error.hpp>
+
+#include <glad/glad.h>
 
 namespace nano
 {

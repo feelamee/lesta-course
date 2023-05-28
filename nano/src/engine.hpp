@@ -27,7 +27,7 @@ public:
     int initialize() override;
     void finalize() override;
     void set_uniform(const std::string&, const texture*) override;
-    void set_uniform(const std::string&, const transform2D*) override;
+    void set_uniform(const std::string&, const transform2D&) override;
 
     int swap_buffers() override;
 

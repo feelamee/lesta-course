@@ -26,6 +26,8 @@ public:
     shader(shader&&) noexcept;
     shader& operator=(shader);
 
+    static void swap(shader& lhs, shader& rhs);
+
     int load(type t, const std::filesystem::path& filename);
 
     int load(const std::filesystem::path& frag_fn,

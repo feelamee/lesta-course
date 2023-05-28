@@ -38,9 +38,15 @@ shader::shader(shader&& other) noexcept
 shader&
 shader::operator=(shader other)
 {
-    handle = other.handle;
-    texture = other.texture;
+    swap(*this, other);
     return *this;
+}
+
+void
+shader::swap(shader& lhs, shader& rhs)
+{
+    std::swap(lhs.handle, rhs.handle);
+    std::swap(lhs.texture, rhs.texture);
 }
 
 std::string

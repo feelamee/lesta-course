@@ -122,7 +122,7 @@ render(const shape& p_shape)
     }
 
     engine_instance().set_uniform("u_texture", tex);
-    engine_instance().set_uniform("u_matrix", &p_shape.get_transform());
+    engine_instance().set_uniform("u_matrix", p_shape.get_transform());
     GL_CHECK(glVertexAttribPointer(
         0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->pos));
     GL_CHECK(glEnableVertexAttribArray(0));
