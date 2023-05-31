@@ -3,6 +3,7 @@ project(nano)
 set(TARGET ${PROJECT_NAME})
 add_library(
     ${TARGET} SHARED
+
     src/engine.cpp
     src/engine.hpp
     src/event.cpp

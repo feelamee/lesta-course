@@ -86,9 +86,9 @@ engine_instance()
 }
 
 void
-engine::set_uniform(const std::string& name, const texture* p_texture)
+engine::set_uniform(const std::string& name, const texture2D* p_texture)
 {
-    if (p_texture and not texture::exist(*p_texture))
+    if (p_texture and not texture2D::exist(*p_texture))
     {
         LOG_DEBUG("Texture does not exist");
         return;

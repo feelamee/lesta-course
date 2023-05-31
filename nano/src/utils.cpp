@@ -24,13 +24,13 @@ extract_file(std::string& dst, const std::filesystem::path& filename)
         return EXIT_FAILURE;
     }
 
-    dst.resize(size);
     std::ifstream src(filename);
     if (not src)
     {
         LOG_DEBUG("error opening file: " + path2str(filename));
         return EXIT_FAILURE;
     }
+    dst.resize(size);
     src.read(dst.data(), size);
 
     return src.good() ? EXIT_SUCCESS : EXIT_FAILURE;

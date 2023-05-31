@@ -1,3 +1,4 @@
+#include <chrono>
 #include <nano/shader.hpp>
 
 #include <nano/error.hpp>
@@ -23,33 +24,28 @@ shader::shader()
 
 shader::~shader()
 {
-    if (exist(*this))
-    {
-        remove(*this);
-    }
+    remove(*this);
 }
 
 shader::shader(shader&& other) noexcept
 {
-    handle = std::move(other.handle);
-    texture = std::move(other.texture);
+    handle = other.handle;
 }
 
 shader&
-shader::operator=(shader other)
+shader::operator=(shader&& other) noexcept
 {
-    swap(*this, other);
+    handle = other.handle;
     return *this;
 }
 
-void
-shader::swap(shader& lhs, shader& rhs)
+constexpr void
+shader::clear_log_buf()
 {
-    std::swap(lhs.handle, rhs.handle);
-    std::swap(lhs.texture, rhs.texture);
+    std::fill_n(log, sizeof(log), 0);
 }
 
-std::string
+constexpr std::string
 shader::type2str(type t)
 {
     switch (static_cast<GLenum>(t))
@@ -95,11 +91,9 @@ shader::load(type t, const std::filesystem::path& filename)
     {
         LOG_DEBUG("Fail when compiling shader source from: " +
                   path2str(filename));
-        return EXIT_FAILURE;
     }
-    err_code = EXIT_FAILURE;
 
-    return EXIT_SUCCESS;
+    return err_code;
 }
 
 int
@@ -133,6 +127,7 @@ shader::compile(type t, const std::string& src)
     GL_CHECK(shader_handle = glCreateShader(static_cast<GLenum>(t)));
     if (0 == shader_handle)
     {
+        LOG_DEBUG("Failed creating of shader handle.");
         return EXIT_FAILURE;
     }
 
@@ -146,7 +141,7 @@ shader::compile(type t, const std::string& src)
     GL_CHECK(glGetShaderiv(shader_handle, GL_COMPILE_STATUS, &compile_status))
     if (GL_FALSE == compile_status)
     {
-        std::memset(log, 0, sizeof(log));
+        clear_log_buf();
         glGetShaderInfoLog(shader_handle, sizeof(log), nullptr, log);
         LOG_DEBUG(log);
         GL_CHECK(glDeleteShader(shader_handle));
@@ -202,7 +197,7 @@ shader::link(const shader& p)
     GL_CHECK(glGetProgramiv(p.handle, GL_LINK_STATUS, &link_status))
     if (GL_FALSE == link_status)
     {
-        std::memset(log, 0, sizeof(log));
+        clear_log_buf();
         glGetProgramInfoLog(p.handle, sizeof(log), nullptr, log);
         LOG_DEBUG(log);
         return EXIT_FAILURE;

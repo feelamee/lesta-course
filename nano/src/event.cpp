@@ -1,6 +1,8 @@
+#include <chrono>
 #include <nano/event.hpp>
 
 #include <SDL3/SDL_events.h>
+#include <ratio>
 
 namespace nano
 {

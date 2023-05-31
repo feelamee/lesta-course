@@ -57,8 +57,8 @@ main()
         });
     // clang-format on
 
-    texture tex;
-    tex.load("../tests/nano/transform/leo.ppm", true);
+    texture2D tex;
+    tex.load("../tests/nano/transform/leo.ppm");
 
     shape tmp(buf, &tex);
     tmp.scale({ 747. / 1328, 720. / 480 });
@@ -96,10 +96,6 @@ main()
         return EXIT_FAILURE;
     }
     err_code = EXIT_FAILURE;
-
-    using std::chrono::duration;
-    using std::chrono::duration_cast;
-    using std::chrono::milliseconds;
 
     bool is_rotate = false;
     bool is_running = true;

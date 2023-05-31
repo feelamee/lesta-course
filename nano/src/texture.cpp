@@ -13,12 +13,26 @@
 namespace nano
 {
 
-texture::texture(const canvas& img)
+texture2D::texture2D(const canvas& img)
 {
     load(img);
 }
 
-texture::~texture()
+texture2D::texture2D(texture2D&& other) noexcept
+{
+    m_handle = other.m_handle;
+    m_size = other.m_size;
+}
+
+texture2D&
+texture2D::operator=(texture2D&& other) noexcept
+{
+    m_handle = other.m_handle;
+    m_size = other.m_size;
+    return *this;
+}
+
+texture2D::~texture2D()
 {
     if (exist(*this))
     {
@@ -27,44 +41,40 @@ texture::~texture()
 }
 
 vec2s
-texture::size() const
+texture2D::size() const
 {
     return m_size;
 }
 
 std::size_t
-texture::width() const
+texture2D::width() const
 {
     return m_size.x;
 }
 
 std::size_t
-texture::height() const
+texture2D::height() const
 {
     return m_size.y;
 }
 
-std::uint32_t
-texture::handle() const
-{
-    return m_handle;
-}
-
 void
-texture::set_size(std::size_t width, std::size_t height)
+texture2D::set_size(std::size_t width, std::size_t height)
 {
     m_size = { width, height };
 }
 
 void
-texture::set_size(vec2s size)
+texture2D::set_size(vec2s size)
 {
     m_size = size;
 }
 
 int
-texture::load(const canvas& image)
+texture2D::load(const canvas& image)
 {
+    remove(*this);
+
     GL_CHECK(glGenTextures(1, &m_handle));
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_handle));
 
@@ -79,16 +89,18 @@ texture::load(const canvas& image)
                           GL_UNSIGNED_BYTE,
                           image.data()));
 
+    // TODO: add methods for this
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
+    // is it correct?
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
 
     return EXIT_SUCCESS;
 }
 
 int
-texture::load(const std::filesystem::path& filename, bool transpose)
+texture2D::load(const std::filesystem::path& filename)
 {
     std::ifstream file(filename);
     if (not file)
@@ -107,11 +119,6 @@ texture::load(const std::filesystem::path& filename, bool transpose)
     }
     err_code = EXIT_FAILURE;
 
-    if (transpose)
-    {
-        img.transpose();
-    }
-
     err_code = load(img);
     if (EXIT_FAILURE == err_code)
     {
@@ -124,11 +131,20 @@ texture::load(const std::filesystem::path& filename, bool transpose)
 }
 
 bool
-texture::exist(const texture& t)
+texture2D::exist(const texture2D& t)
 {
     GLboolean ret{ false };
     GL_CHECK(ret = glIsTexture(t.m_handle));
     return ret;
+}
+
+void
+texture2D::remove(const texture2D& t)
+{
+    if (exist(t))
+    {
+        GL_CHECK(glDeleteTextures(1, &t.m_handle));
+    }
 }
 
 } // namespace nano

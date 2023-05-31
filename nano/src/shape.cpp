@@ -11,7 +11,7 @@
 namespace nano
 {
 
-shape::shape(const vertbuf& p_vertbuf, texture* p_texture)
+shape::shape(const vertbuf& p_vertbuf, texture2D* p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
@@ -24,7 +24,7 @@ shape::set_transform(const transform2D& p_transform)
 }
 
 void
-shape::set_texture(texture* p_texture)
+shape::set_texture(texture2D* p_texture)
 {
     m_texture = p_texture;
 }
@@ -74,7 +74,7 @@ shape::points_count() const
     return vertices.size();
 }
 
-texture*
+texture2D*
 shape::get_texture()
 {
     return m_texture;
@@ -105,7 +105,7 @@ shape::get_transform() const
     return m_transform;
 }
 
-const texture*
+const texture2D*
 shape::get_texture() const
 {
     return m_texture;
@@ -115,7 +115,7 @@ void
 render(const shape& p_shape)
 {
     auto tex = p_shape.get_texture();
-    if (nullptr == tex and texture::exist(*tex))
+    if (nullptr == tex and texture2D::exist(*tex))
     {
         LOG_DEBUG("Texture does not exist");
         return;

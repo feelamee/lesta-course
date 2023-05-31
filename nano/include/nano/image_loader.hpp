@@ -130,6 +130,8 @@ load(std::istream& src, canvas& img)
             }
     }
 
+    img.transpose();
+
     if (not src)
     {
         err = err_t::bad_stream;
