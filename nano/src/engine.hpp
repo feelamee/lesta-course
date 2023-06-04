@@ -23,11 +23,8 @@ struct vertex;
 class engine final : public iengine
 {
 public:
-    void render();
     int initialize() override;
     void finalize() override;
-    void set_uniform(const std::string&, const texture2D*) override;
-    void set_uniform(const std::string&, const transform2D&) override;
 
     int swap_buffers() override;
 
@@ -38,7 +35,7 @@ public:
 
     ~engine();
 
-private:
+public:
     raii_wrapper<int, void> sdl_init;
     std::shared_ptr<SDL_Window> window;
     std::shared_ptr<void> context;

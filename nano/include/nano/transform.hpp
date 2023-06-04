@@ -45,8 +45,8 @@ public:
                                  const transform2D& rhs);
 
 public:
-    inline static constexpr size_t width = 3;
-    inline static constexpr size_t height = 3;
+    static constexpr size_t width = 3;
+    static constexpr size_t height = 3;
 
 private:
     // clang-format off

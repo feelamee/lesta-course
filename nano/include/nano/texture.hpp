@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <stack>
 
 namespace nano
 {
@@ -34,8 +35,10 @@ public:
     void set_size(vec2s);
     void set_size(vec2s::type, vec2s::type);
 
-    static void remove(const texture2D& t);
-    static bool exist(const texture2D& t);
+    static void remove(const texture2D&);
+    static bool exist(const texture2D&);
+    static int bind(const texture2D&);
+    static std::size_t max_active();
 
 private:
     std::uint32_t m_handle{ 0 };

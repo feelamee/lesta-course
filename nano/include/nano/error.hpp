@@ -1,5 +1,5 @@
-#ifndef GL_CHECK_HPP
-#define GL_CHECK_HPP
+#ifndef ERROR_HPP
+#define ERROR_HPP
 
 #include <glad/glad.h>
 
@@ -19,6 +19,15 @@ extern std::ostream& err_os;
         gl_check(__FILE__, __LINE__, #expr);                                   \
     }
 
+#define GL_ASSERT(expr)                                                        \
+    {                                                                          \
+        expr;                                                                  \
+        if (EXIT_FAILURE == gl_check(__FILE__, __LINE__, #expr))               \
+        {                                                                      \
+            return EXIT_FAILURE;                                               \
+        }                                                                      \
+    }
+
 #define LOG_DEBUG(message)                                                     \
     {                                                                          \
         nano::err_os << "[DEBUG: " << __FILE__ << ":" << __LINE__              \
@@ -28,6 +37,7 @@ extern std::ostream& err_os;
 
 #else
 #define GL_CHECK(expr) (expr)
+#define GL_ASSERT(expr, iferr_expr) (expr)
 #define LOG_DEBUG(message)
 #endif
 
@@ -57,4 +67,4 @@ int gl_check(const std::filesystem::path& filename,
 
 } // namespace nano
 
-#endif // GL_CHECK_HPP
+#endif // ERROR_HPP

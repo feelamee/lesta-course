@@ -1,4 +1,4 @@
-#include <chrono>
+#include "nano/texture.hpp"
 #include <nano/shader.hpp>
 
 #include <nano/error.hpp>
@@ -10,10 +10,38 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <ranges>
 #include <system_error>
 
 namespace nano
 {
+
+struct shader::state_guard
+{
+    state_guard(const shader& s)
+    {
+        cur_handle = s.handle;
+        prev_handle = shader::active();
+        if (prev_handle < 0)
+            prev_handle = 0;
+
+        if (prev_handle != cur_handle)
+        {
+            GL_CHECK(glUseProgram(cur_handle));
+        }
+    }
+
+    ~state_guard()
+    {
+        if (prev_handle != cur_handle)
+        {
+            GL_CHECK(glUseProgram(prev_handle));
+        }
+    }
+
+    std::uint32_t prev_handle{ 0 };
+    std::uint32_t cur_handle{ 0 };
+};
 
 char shader::log[1024]{ 0 };
 
@@ -121,6 +149,90 @@ shader::load(const std::filesystem::path& frag_filename,
 }
 
 int
+shader::uniform(const std::string& name, const texture2D& tex)
+{
+    if (not texture2D::exist(tex))
+    {
+        LOG_DEBUG("Texture does not exist.");
+        return EXIT_FAILURE;
+    }
+
+    int location = uniform_location(name);
+    if (location < 0)
+    {
+        LOG_DEBUG("Failed getting location of uniform: " + name);
+        return EXIT_FAILURE;
+    }
+
+    auto it = textures.find(location);
+    if (it == textures.end())
+    {
+        if (textures.size() + 1 >= texture2D::max_active())
+        {
+            LOG_DEBUG("Failed because all textures units are already used");
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        textures.erase(it);
+    }
+    auto [_, is_success] = textures.emplace(location, tex);
+
+    return is_success ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+int
+shader::uniform(const std::string& name, const transform2D& tr)
+{
+    state_guard program_guard(*this);
+    int location = uniform_location(name);
+    if (location < 0)
+    {
+        LOG_DEBUG("Failed getting location of uniform: " + name);
+        return EXIT_FAILURE;
+    }
+
+    GL_CHECK(glUniformMatrix3fv(location, 1, GL_FALSE, tr.data()));
+    return EXIT_SUCCESS;
+}
+
+shader::location_t
+shader::uniform_location(const std::string& name)
+{
+    location_t location{ -1 };
+    auto it = uniforms.find(name);
+    if (it == uniforms.end())
+    {
+        GL_CHECK(location = glGetUniformLocation(handle, name.c_str()));
+        if (location >= 0)
+        {
+            uniforms[name] = location;
+        }
+    }
+    else
+    {
+        location = it->second;
+    }
+
+    return location;
+}
+
+void
+shader::bind_textures() const
+{
+    auto it = textures.begin();
+    for (GLsizei i{ 0 }; i < textures.size(); ++i, ++it)
+    {
+        // TODO: create method texture2D::active()
+        GL_CHECK(glActiveTexture(GL_TEXTURE0 + i));
+        texture2D::bind(it->second);
+        GL_CHECK(glUniform1i(it->first, i));
+    }
+    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+}
+
+int
 shader::compile(type t, const std::string& src)
 {
     GLuint shader_handle{ 0 };
@@ -180,6 +292,8 @@ shader::use(const shader& p)
     }
 
     GL_CHECK(glUseProgram(p.handle));
+    p.bind_textures();
+
     return EXIT_SUCCESS;
 }
 
@@ -259,11 +373,6 @@ shader::active()
 {
     GLint cur{ 0 };
     GL_CHECK(glGetIntegerv(GL_CURRENT_PROGRAM, &cur));
-    if (0 == cur)
-    {
-        LOG_DEBUG("There is no active program");
-    }
-
     return cur;
 }
 

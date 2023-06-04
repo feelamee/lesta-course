@@ -79,22 +79,23 @@ texture2D::load(const canvas& image)
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_handle));
 
     set_size(image.width(), image.height());
-    GL_CHECK(glTexImage2D(GL_TEXTURE_2D,
-                          0,
-                          GL_RGB,
-                          size().x,
-                          size().y,
-                          0,
-                          GL_RGB,
-                          GL_UNSIGNED_BYTE,
-                          image.data()));
+    GL_ASSERT(glTexImage2D(GL_TEXTURE_2D,
+                           0,
+                           GL_RGB,
+                           size().x,
+                           size().y,
+                           0,
+                           GL_RGB,
+                           GL_UNSIGNED_BYTE,
+                           image.data()));
 
     // TODO: add methods for this
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
-    // is it correct?
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
+    // because glIsTexture return GL_FALSE while texture is not binded firstly
+    glBindTexture(GL_TEXTURE_2D, m_handle);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
     return EXIT_SUCCESS;
 }
@@ -138,6 +139,18 @@ texture2D::exist(const texture2D& t)
     return ret;
 }
 
+int
+texture2D::bind(const texture2D& t)
+{
+    if (not exist(t))
+    {
+        LOG_DEBUG("Texture does not exist.");
+        return EXIT_FAILURE;
+    }
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, t.m_handle));
+    return EXIT_SUCCESS;
+}
+
 void
 texture2D::remove(const texture2D& t)
 {
@@ -145,6 +158,14 @@ texture2D::remove(const texture2D& t)
     {
         GL_CHECK(glDeleteTextures(1, &t.m_handle));
     }
+}
+
+std::size_t
+texture2D::max_active()
+{
+    static GLint max{ 0 };
+    GL_CHECK(glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max));
+    return max < 0 ? 0 : max;
 }
 
 } // namespace nano

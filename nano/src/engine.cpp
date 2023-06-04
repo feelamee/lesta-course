@@ -53,7 +53,7 @@ engine::initialize()
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &real_minor_version);
 
     // TODO: extract such values to config
-    assert(real_major_version >= 3 && real_minor_version >= 2);
+    assert(real_major_version == 3 && real_minor_version == 2);
 
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
 
@@ -72,7 +72,7 @@ engine::~engine()
 int
 engine::swap_buffers()
 {
-    ASSERT_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(window.get()));
+    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(window.get()));
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
     return EXIT_SUCCESS;
 }
@@ -83,55 +83,6 @@ engine_instance()
     static engine nano{};
     iengine& inano = nano;
     return inano;
-}
-
-void
-engine::set_uniform(const std::string& name, const texture2D* p_texture)
-{
-    if (p_texture and not texture2D::exist(*p_texture))
-    {
-        LOG_DEBUG("Texture does not exist");
-        return;
-    }
-
-    GLuint program = shader::active();
-    if (not program)
-    {
-        LOG_DEBUG("Shader program does not exist");
-        return;
-    }
-
-    int location{ -1 };
-    GL_CHECK(location = glGetUniformLocation(program, name.c_str()));
-    if (location == -1)
-    {
-        LOG_DEBUG("Failed to get uniform location: " + name);
-        return;
-    }
-
-    GL_CHECK(glActiveTexture(GL_TEXTURE0));
-    GL_CHECK(glUniform1i(location, 0));
-}
-
-void
-engine::set_uniform(const std::string& name, const transform2D& p_transform)
-{
-    GLuint program = shader::active();
-    if (not program)
-    {
-        LOG_DEBUG("Shader program does not exist");
-        return;
-    }
-
-    int location{ 0 };
-    GL_CHECK(location = glGetUniformLocation(program, name.c_str()));
-    if (location == -1)
-    {
-        LOG_DEBUG("Cant't get uniform location: " + name);
-        return;
-    }
-
-    GL_CHECK(glUniformMatrix3fv(location, 1, GL_FALSE, p_transform.data()));
 }
 
 } // namespace nano

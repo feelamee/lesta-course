@@ -11,22 +11,10 @@
 namespace nano
 {
 
-shape::shape(const vertbuf& p_vertbuf, texture2D* p_texture)
+shape::shape(const vertbuf& p_vertbuf, const texture2D& p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
-}
-
-void
-shape::set_transform(const transform2D& p_transform)
-{
-    m_transform = p_transform;
-}
-
-void
-shape::set_texture(texture2D* p_texture)
-{
-    m_texture = p_texture;
 }
 
 const vertex*
@@ -74,8 +62,8 @@ shape::points_count() const
     return vertices.size();
 }
 
-texture2D*
-shape::get_texture()
+const texture2D&
+shape::get_texture() const
 {
     return m_texture;
 }
@@ -105,24 +93,33 @@ shape::get_transform() const
     return m_transform;
 }
 
-const texture2D*
-shape::get_texture() const
+vec2f
+shape::get_origin() const
 {
-    return m_texture;
+    return origin;
+}
+
+vec2f
+shape::get_position() const
+{
+    return position;
+}
+
+shape::radian
+shape::get_rotation() const
+{
+    return rotation;
+}
+
+vec2f
+shape::get_factor() const
+{
+    return factor;
 }
 
 void
 render(const shape& p_shape)
 {
-    auto tex = p_shape.get_texture();
-    if (nullptr == tex and texture2D::exist(*tex))
-    {
-        LOG_DEBUG("Texture does not exist");
-        return;
-    }
-
-    engine_instance().set_uniform("u_texture", tex);
-    engine_instance().set_uniform("u_matrix", p_shape.get_transform());
     GL_CHECK(glVertexAttribPointer(
         0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->pos));
     GL_CHECK(glEnableVertexAttribArray(0));

@@ -14,7 +14,12 @@ gl_check(const std::filesystem::path& file,
          std::string_view expression)
 {
     GLenum error_code = glGetError();
-    while (GL_NO_ERROR != error_code)
+    if (GL_NO_ERROR == error_code)
+    {
+        return EXIT_SUCCESS;
+    }
+
+    do
     {
         std::string error = "Unknown error";
         std::string description = "No description";
@@ -84,7 +89,8 @@ gl_check(const std::filesystem::path& file,
                << std::endl;
 
         error_code = glGetError();
-    }
+    } while (GL_NO_ERROR != error_code);
+
     return EXIT_FAILURE;
 }
 

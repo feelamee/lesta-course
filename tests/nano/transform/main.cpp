@@ -60,7 +60,7 @@ main()
     texture2D tex;
     tex.load("../tests/nano/transform/leo.ppm");
 
-    shape tmp(buf, &tex);
+    shape tmp(buf, tex);
     tmp.scale({ 747. / 1328, 720. / 480 });
 
     shader program;
@@ -85,6 +85,14 @@ main()
     if (EXIT_FAILURE == err_code)
     {
         LOG_DEBUG("Shader program validation failure");
+        return EXIT_FAILURE;
+    }
+    err_code = EXIT_FAILURE;
+
+    err_code = program.uniform("u_texture", tmp.get_texture());
+    if (EXIT_FAILURE == err_code)
+    {
+        LOG_DEBUG("Setting uniform u_texture failure");
         return EXIT_FAILURE;
     }
     err_code = EXIT_FAILURE;
@@ -144,6 +152,7 @@ main()
 
         render(tmp);
         eng.swap_buffers();
+        program.uniform("u_matrix", tmp.get_transform());
     }
 
     eng.finalize();

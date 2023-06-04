@@ -1,4 +1,4 @@
-project(transform-test)
+project(imgui-first-step)
 
 add_executable(
   ${PROJECT_NAME}
@@ -7,7 +7,7 @@ add_executable(
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 target_compile_options(${PROJECT_NAME} PUBLIC -g)
 
-find_library(FIND_RESULT nano)
 target_link_libraries(${PROJECT_NAME} PRIVATE nano)
+target_link_libraries(${PROJECT_NAME} PRIVATE ImGui)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE sanitizer)
