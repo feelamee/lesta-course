@@ -11,7 +11,7 @@
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
 
-#include "engine.hpp"
+#include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/event.hpp>
 #include <nano/shader.hpp>
@@ -21,32 +21,51 @@
 namespace nano
 {
 
+struct engine::impl_t
+{
+    SDL_Window* window;
+    void* context;
+
+    ~impl_t()
+    {
+        SDL_DestroyWindow(window);
+        TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_DeleteContext(context));
+        SDL_Quit();
+    }
+};
+
+void*
+engine::window()
+{
+    return impl->window;
+}
+void*
+engine::context()
+{
+    return impl->context;
+}
+
 int
 engine::initialize()
 {
-    sdl_init = raii_wrapper<int, void>(SDL_Init(SDL_INIT_EVERYTHING), SDL_Quit);
-    ASSERT_SDL_ERROR(EXIT_SUCCESS == sdl_init.constructor_ret_v);
+    impl = std::make_shared<impl_t>();
+    int err_code = SDL_Init(SDL_INIT_EVERYTHING);
+    ASSERT_SDL_ERROR(EXIT_SUCCESS == err_code);
 
     // TODO: extract such values to config
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
     constexpr size_t w = 720, h = 480;
 
-    window = std::shared_ptr<SDL_Window>(
-        SDL_CreateWindow("test", w, h, SDL_WINDOW_OPENGL), SDL_DestroyWindow);
-    ASSERT_SDL_ERROR(nullptr != window);
+    impl->window = SDL_CreateWindow("test", w, h, SDL_WINDOW_OPENGL);
+    ASSERT_SDL_ERROR(nullptr != impl->window);
 
     // TODO: extract such values to config
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-    context = std::shared_ptr<void>(
-        SDL_GL_CreateContext(window.get()),
-        [](SDL_GLContext context)
-        {
-            ASSERT_SDL_ERROR(EXIT_SUCCESS == SDL_GL_DeleteContext(context));
-            return EXIT_SUCCESS;
-        });
-    ASSERT_SDL_ERROR(nullptr != context);
+
+    impl->context = SDL_GL_CreateContext(impl->window);
+    ASSERT_SDL_ERROR(nullptr != impl->context);
 
     GLint real_major_version{}, real_minor_version{};
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &real_major_version);
@@ -72,17 +91,16 @@ engine::~engine()
 int
 engine::swap_buffers()
 {
-    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(window.get()));
+    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(impl->window));
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
     return EXIT_SUCCESS;
 }
 
-iengine&
+engine&
 engine_instance()
 {
     static engine nano{};
-    iengine& inano = nano;
-    return inano;
+    return nano;
 }
 
 } // namespace nano

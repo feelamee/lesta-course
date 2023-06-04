@@ -5,9 +5,7 @@ add_library(
     ${TARGET} SHARED
 
     src/engine.cpp
-    src/engine.hpp
     src/event.cpp
-    src/raii_wrapper.hpp
     src/shader.cpp
     src/transform.cpp
     src/vertbuf.cpp
@@ -18,6 +16,7 @@ add_library(
     src/error.cpp
     src/utils.cpp
 
+    include/nano/raii_wrapper.hpp
     include/nano/utils.hpp
     include/nano/error.hpp
     include/nano/vertbuf.hpp
@@ -32,7 +31,7 @@ add_library(
     include/nano/vec.hpp
     include/nano/vertex.hpp
     include/nano/color.hpp
-    include/nano/iengine.hpp
+    include/nano/engine.hpp
     include/nano/event.hpp
     include/nano/transform.hpp
 )

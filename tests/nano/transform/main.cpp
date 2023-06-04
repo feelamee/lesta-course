@@ -1,6 +1,6 @@
+#include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/event.hpp>
-#include <nano/iengine.hpp>
 #include <nano/image_loader.hpp>
 #include <nano/shader.hpp>
 #include <nano/shape.hpp>
@@ -9,13 +9,7 @@
 #include <nano/vertbuf.hpp>
 #include <nano/vertex.hpp>
 
-#include <chrono>
-#include <cmath>
-#include <concepts>
-#include <cstdlib>
-#include <filesystem>
 #include <fstream>
-#include <functional>
 #include <iostream>
 #include <vector>
 
@@ -43,7 +37,7 @@ int
 main()
 {
     using namespace nano;
-    iengine& eng = engine_instance();
+    engine& eng = engine_instance();
     eng.initialize();
 
     // clang-format off

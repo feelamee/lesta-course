@@ -250,7 +250,7 @@ shader::compile(type t, const std::string& src)
     GL_CHECK(glCompileShader(shader_handle));
 
     GLint compile_status{ 0 };
-    GL_CHECK(glGetShaderiv(shader_handle, GL_COMPILE_STATUS, &compile_status))
+    GL_CHECK(glGetShaderiv(shader_handle, GL_COMPILE_STATUS, &compile_status));
     if (GL_FALSE == compile_status)
     {
         clear_log_buf();
@@ -308,7 +308,7 @@ shader::link(const shader& p)
 
     GL_CHECK(glLinkProgram(p.handle));
     GLint link_status{ 0 };
-    GL_CHECK(glGetProgramiv(p.handle, GL_LINK_STATUS, &link_status))
+    GL_CHECK(glGetProgramiv(p.handle, GL_LINK_STATUS, &link_status));
     if (GL_FALSE == link_status)
     {
         clear_log_buf();
@@ -331,7 +331,7 @@ shader::validate(const shader& p)
 
     GL_CHECK(glValidateProgram(p.handle));
     GLint validate_status{ 0 };
-    GL_CHECK(glGetProgramiv(p.handle, GL_VALIDATE_STATUS, &validate_status))
+    GL_CHECK(glGetProgramiv(p.handle, GL_VALIDATE_STATUS, &validate_status));
     if (GL_FALSE == validate_status)
     {
         std::memset(log, 0, sizeof(log));

@@ -13,9 +13,10 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 
 option(ADDRESS_SANITIZER ON)
 
+add_library(sanitizer INTERFACE)
+
 if(ADDRESS_SANITIZER)
     message(STATUS "Using address sanitizer for " ${PROJECT_NAME})
-    add_library(sanitizer INTERFACE)
     target_compile_options(sanitizer INTERFACE -fsanitize=address)
     target_link_options(sanitizer INTERFACE -fsanitize=address)
 endif()

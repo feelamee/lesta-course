@@ -37,7 +37,7 @@ extern std::ostream& err_os;
 
 #else
 #define GL_CHECK(expr) (expr)
-#define GL_ASSERT(expr, iferr_expr) (expr)
+#define GL_ASSERT(expr) (expr)
 #define LOG_DEBUG(message)
 #endif
 
@@ -45,7 +45,7 @@ extern std::ostream& err_os;
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            std::cerr << SDL_GetError() << std::endl;                          \
+            LOG_DEBUG(SDL_GetError());                                         \
             return EXIT_FAILURE;                                               \
         }                                                                      \
     }
@@ -54,7 +54,7 @@ extern std::ostream& err_os;
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            std::cerr << SDL_GetError() << std::endl;                          \
+            LOG_DEBUG(SDL_GetError());                                         \
         }                                                                      \
     }
 
