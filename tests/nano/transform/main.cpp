@@ -1,7 +1,7 @@
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/event.hpp>
-#include <nano/image_loader.hpp>
+#include <nano/resource_loader.hpp>
 #include <nano/shader.hpp>
 #include <nano/shape.hpp>
 #include <nano/texture.hpp>
@@ -99,42 +99,62 @@ main()
     }
     err_code = EXIT_FAILURE;
 
-    bool is_rotate = false;
-    bool is_running = true;
+    bool is_rotate{ false };
+    bool is_running{ true };
+    bool is_rotated{ false }; /// save state when mouse focus lost
     while (is_running)
     {
         event ev;
         while (poll_event(&ev))
         {
-            switch (ev.type)
+            switch (ev.t)
             {
-            case event_t::key_down:
-                switch (ev.key.sym.sym)
+            case event::type::window_focus_lost:
+                is_rotated = is_rotate;
+                is_rotate = false;
+                break;
+
+            case event::type::window_focus_gain:
+                is_rotate = is_rotated;
+                break;
+
+            case event::type::window_close_request:
+                is_running = false;
+                break;
+
+            case event::type::key_down:
+                switch (ev.kb.key.keycode)
                 {
-                case keycode::kb_w:
+                case keycode_t::kb_w:
                     tmp.move({ 0, 0.01 });
                     break;
 
-                case keycode::kb_a:
+                case keycode_t::kb_a:
                     tmp.move({ -0.01, 0 });
                     break;
 
-                case keycode::kb_s:
+                case keycode_t::kb_s:
                     tmp.move({ 0, -0.01 });
                     break;
 
-                case keycode::kb_d:
+                case keycode_t::kb_d:
                     tmp.move({ 0.01, 0 });
                     break;
-                case keycode::kb_r:
+                case keycode_t::kb_r:
                     is_rotate = is_rotate ? false : true;
                     break;
+
+                case keycode_t::kb_q:
+                    is_running = false;
+                    break;
+
+                default:
+                    break;
                 }
+
+            default:
                 break;
             }
-            if (ev.key.sym.sym == keycode::kb_q)
-                is_running = false;
-            break;
         }
 
         if (is_rotate)

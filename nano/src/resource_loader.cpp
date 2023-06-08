@@ -1,42 +1,20 @@
-#ifndef IMAGE_LOADER_HPP
-#define IMAGE_LOADER_HPP
+#include <memory>
+#include <nano/resource_loader.hpp>
 
-#include <nano/canvas.hpp>
-#include <nano/color.hpp>
+#include <nano/soundbuf.hpp>
 
-#include <cstdint>
-#include <iosfwd>
-#include <string>
+#include <SDL3/SDL_audio.h>
+
+#include <cstdlib>
+#include <iostream>
+#include <istream>
 
 namespace nano::ppm
 {
 
-enum class fmt
-{
-    P3,
-    P6,
-};
-
-enum limits
-{
-    MAX_IMAGE_SIZE = 1U << 12,
-    MIN_IMAGE_SIZE = 0,
-    MAX_COLOR_VALUE = (1 << 8 * sizeof(color::channel_t)) - 1,
-    MIN_COLOR_VALUE = 0,
-};
-
-enum class err_t
-{
-    no_error,
-    bad_stream,
-    incorrect_format,
-    violation_limits,
-    incorrect_header,
-};
-
 static err_t err;
 
-inline err_t
+err_t
 error()
 {
     err_t ret = err;
@@ -44,7 +22,7 @@ error()
     return ret;
 }
 
-inline std::string
+std::string
 error2str(err_t e)
 {
     switch (e)
@@ -71,7 +49,7 @@ error2str(err_t e)
     }
 }
 
-inline int
+int
 load(std::istream& src, canvas& img)
 {
     std::string fmt;
@@ -103,7 +81,7 @@ load(std::istream& src, canvas& img)
         return EXIT_FAILURE;
     }
     // clang-format on
-    if (not iswspace(sep))
+    if (not std::iswspace(sep))
     {
         err = err_t::incorrect_header;
         return EXIT_FAILURE;
@@ -140,9 +118,8 @@ load(std::istream& src, canvas& img)
     return EXIT_SUCCESS;
 }
 
-template <fmt format>
 int
-dump(std::ostream& dst, const canvas& img)
+dump(std::ostream& dst, const canvas& img, fmt format)
 {
     if (not dst.good())
     {
@@ -157,7 +134,7 @@ dump(std::ostream& dst, const canvas& img)
         << img.width() << " " << img.height() << std::endl
         << max_color_value << std::endl;
 
-    if constexpr (format == fmt::P3)
+    if (format == fmt::P3)
     {
         for (std::size_t i{ 0 }; i < img.height(); ++i)
             for (std::size_t j{ 0 }; j < img.width(); ++j)
@@ -183,4 +160,111 @@ dump(std::ostream& dst, const canvas& img)
 
 } // namespace nano::ppm
 
-#endif // IMAGE_LOADER_HPP
+namespace nano::wav
+{
+
+static err_t err;
+
+err_t
+error()
+{
+    err_t ret = err;
+    err = err_t::no_error;
+    return ret;
+}
+
+std::string
+error2str(err_t e)
+{
+    switch (e)
+    {
+    case err_t::no_error:
+        return "INFO: no errors were occured";
+
+    case err_t::bad_stream:
+        return "ERROR: bad stream was provided in arguments, or fail when "
+               "reading or writing";
+
+    case err_t::calc_length:
+        return "ERROR: failed while calculating length of stream buffer";
+
+    case err_t::internal_read:
+        return std::string("ERROR: failed while reading raw file data to "
+                           "internal buffer:\n") +
+               SDL_GetError();
+
+    case err_t::incorrect_file_structure:
+        return std::string(
+                   "ERROR: failed while reading file wav structure:\n") +
+               SDL_GetError();
+
+    case err_t::unsupported:
+        return "ERROR: unsupported specification data (format or channels)";
+
+    default:
+        return "unknown error type was provided";
+    }
+}
+
+int
+load(std::istream& src, soundbuf& buf)
+{
+    if (not src.good())
+    {
+        err = err_t::bad_stream;
+        return EXIT_FAILURE;
+    }
+    src.seekg(0, std::ios::end);
+    int size = src.tellg();
+    if (-1 == size)
+    {
+        err = err_t::calc_length;
+        return EXIT_FAILURE;
+    }
+    src.seekg(0, std::ios::beg);
+    auto raw_data = new std::uint8_t[size];
+    src.read(reinterpret_cast<char*>(raw_data), size);
+
+    SDL_RWops* sdl_buf = SDL_RWFromMem(raw_data, size);
+    if (nullptr == sdl_buf)
+    {
+        err = err_t::internal_read;
+        delete[] raw_data;
+        return EXIT_FAILURE;
+    }
+
+    SDL_AudioSpec spec;
+    std::uint8_t* buf_data{ nullptr };
+    std::uint32_t buf_len{ 0 };
+    SDL_AudioSpec* res = SDL_LoadWAV_RW(sdl_buf, 1, &spec, &buf_data, &buf_len);
+    buf.data() = buf_data;
+    if (nullptr == res)
+    {
+        err = err_t::incorrect_file_structure;
+        return EXIT_FAILURE;
+    }
+    buf.size(buf_len);
+
+    audio_spec& buf_spec = buf.specification();
+    if (static_cast<int>(spec.channels) > 2)
+    {
+        err = err_t::unsupported;
+        return EXIT_FAILURE;
+    }
+    buf_spec.channel = static_cast<audio_spec::channel_t>(spec.channels);
+    // clang-format off
+    if (spec.format != static_cast<SDL_AudioFormat>(audio_spec::format_t::f32) and
+        spec.format != static_cast<SDL_AudioFormat>(audio_spec::format_t::s16))
+    // clang-format on
+    {
+        err = err_t::unsupported;
+        return EXIT_FAILURE;
+    }
+    buf_spec.fmt = static_cast<audio_spec::format_t>(spec.format);
+    buf_spec.frequence = spec.freq;
+    buf_spec.silence = spec.silence;
+
+    return EXIT_SUCCESS;
+}
+
+} // namespace nano::wav

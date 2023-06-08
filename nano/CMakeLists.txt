@@ -15,7 +15,10 @@ add_library(
     src/canvas.cpp
     src/error.cpp
     src/utils.cpp
+    src/soundbuf.cpp
+    src/resource_loader.cpp
 
+    include/nano/soundbuf.hpp
     include/nano/raii_wrapper.hpp
     include/nano/utils.hpp
     include/nano/error.hpp
@@ -23,7 +26,7 @@ add_library(
     include/nano/shape.hpp
     include/nano/shader.hpp
     include/nano/canvas.hpp
-    include/nano/image_loader.hpp
+    include/nano/resource_loader.hpp
     include/nano/texture.hpp
     include/nano/shape.hpp
     include/nano/vertbuf.hpp
@@ -46,4 +49,5 @@ endif()
 
 
 target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
+target_link_libraries(${TARGET} PUBLIC ImGui)
 target_link_libraries(${TARGET} PUBLIC glad)

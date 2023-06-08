@@ -22,6 +22,8 @@ public:
     int initialize();
     void finalize();
 
+    static void new_frame();
+    static void renderUI();
     int swap_buffers();
 
     void* window();

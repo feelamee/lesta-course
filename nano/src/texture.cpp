@@ -1,7 +1,7 @@
 #include <nano/texture.hpp>
 
 #include <nano/error.hpp>
-#include <nano/image_loader.hpp>
+#include <nano/resource_loader.hpp>
 #include <nano/utils.hpp>
 #include <nano/vec.hpp>
 

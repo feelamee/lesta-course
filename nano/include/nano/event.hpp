@@ -3,34 +3,39 @@
 
 #include <chrono>
 #include <cstdint>
+#include <pulse/def.h>
 
 namespace nano
 {
 
-enum keycode
-{
-    kb_UNKNOWN = 0,
+struct event;
 
-    kb_RETURN = '\r',
-    kb_ESCAPE = '\x1B',
-    kb_BACKSPACE = '\b',
-    kb_TAB = '\t',
-    kb_SPACE = ' ',
-    kb_EXCLAIM = '!',
-    kb_QUOTEDBL = '"',
-    kb_HASH = '#',
-    kb_PERCENT = '%',
-    kb_DOLLAR = '$',
-    kb_AMPERSAND = '&',
-    kb_QUOTE = '\'',
-    kb_LEFTPAREN = '(',
-    kb_RIGHTPAREN = ')',
-    kb_ASTERISK = '*',
-    kb_PLUS = '+',
-    kb_COMMA = ',',
-    kb_MINUS = '-',
-    kb_PERIOD = '.',
-    kb_SLASH = '/',
+int poll_event(event* ev);
+
+enum keycode_t : char
+{
+    kb_unknown = 0,
+
+    kb_return = '\r',
+    kb_escape = '\x1B',
+    kb_backspace = '\b',
+    kb_tab = '\t',
+    kb_space = ' ',
+    kb_exclaim = '!',
+    kb_quotedbl = '"',
+    kb_hash = '#',
+    kb_percent = '%',
+    kb_dollar = '$',
+    kb_ampersand = '&',
+    kb_quote = '\'',
+    kb_leftparen = '(',
+    kb_rightparen = ')',
+    kb_asterisk = '*',
+    kb_plus = '+',
+    kb_comma = ',',
+    kb_minus = '-',
+    kb_period = '.',
+    kb_slash = '/',
     kb_0 = '0',
     kb_1 = '1',
     kb_2 = '2',
@@ -41,24 +46,24 @@ enum keycode
     kb_7 = '7',
     kb_8 = '8',
     kb_9 = '9',
-    kb_COLON = ':',
-    kb_SEMICOLON = ';',
-    kb_LESS = '<',
-    kb_EQUALS = '=',
-    kb_GREATER = '>',
-    kb_QUESTION = '?',
-    kb_AT = '@',
+    kb_colon = ':',
+    kb_semicolon = ';',
+    kb_less = '<',
+    kb_equals = '=',
+    kb_greater = '>',
+    kb_question = '?',
+    kb_at = '@',
 
     /*
        Skip uppercase letters
      */
 
-    kb_LEFTBRACKET = '[',
-    kb_BACKSLASH = '\\',
-    kb_RIGHTBRACKET = ']',
-    kb_CARET = '^',
-    kb_UNDERSCORE = '_',
-    kb_BACKQUOTE = '`',
+    kb_leftbracket = '[',
+    kb_backslash = '\\',
+    kb_rightbracket = ']',
+    kb_caret = '^',
+    kb_underscore = '_',
+    kb_backquote = '`',
     kb_a = 'a',
     kb_b = 'b',
     kb_c = 'c',
@@ -87,51 +92,176 @@ enum keycode
     kb_z = 'z',
 };
 
-enum scancode
+enum scancode_t
 {
 };
 
-struct keysym
+struct event
 {
-    scancode code;
-    keycode sym;
-    std::uint16_t mod;
+    using timestamp_t = std::chrono::duration<std::uint64_t, std::nano>;
+    enum class type;
+    struct keyboard
+    {
+        struct key_t
+        {
+            scancode_t scancode;
+            keycode_t keycode;
+            std::uint16_t mod;
+        };
+
+        type t; /**< event_t::key_down or event_t::key_up */
+        timestamp_t timestamp;
+        bool repeat;
+        key_t key;
+    };
+
+    enum button_state : std::uint8_t
+    {
+        released,
+        pressed,
+    };
+
+    struct mouse_button
+    {
+        enum button_t : std::uint8_t
+        {
+            left = 1,
+            middle,
+            right,
+        };
+
+        type t; /**< event_t::mouse_button_down or event_t::mouse_button_up */
+        timestamp_t timestamp; /**< in nanoseconds */
+
+        // int windowID;          /**< The window with mouse focus, if any */
+
+        int mouseID; /**< The mouse instance id */
+        button_t button;
+        button_state state;
+        std::uint8_t clicks; /**< single-click, double-click, etc. */
+        float x;             /**< relative to window */
+        float y;             /**< relative to window */
+    };
+
+    struct mouse_motion
+    {
+        type t;                /**< event_t::mouse_motion */
+        timestamp_t timestamp; /**< In nanoseconds */
+        int windowID;          /**< The window with mouse focus, if any */
+        int mouseID;           /**< The mouse instance id */
+        button_state state;    /**< The current button state */
+        float x;               /**< X coordinate, relative to window */
+        float y;               /**< Y coordinate, relative to window */
+        float xrel;            /**< The relative motion in the X direction */
+        float yrel;            /**< The relative motion in the Y direction */
+    };
+
+    struct mouse_wheel
+    {
+        enum direction_t
+        {
+            up,
+            down,
+            left,
+            right,
+        };
+
+        type t;                /**< event_t::mouse_wheel */
+        timestamp_t timestamp; /**< in nanoseconds */
+
+        // int windowID;          /**< The window with mouse focus, if any */
+
+        int mouseID; /**< The mouse instance id */
+        float x;     /**< scroll, positive - right, negative - left */
+        float y;     /**< scroll, positive from user, negative toward user */
+        direction_t direction;
+        float mouseX; /**< relative to window */
+        float mouseY; /**< relative to window */
+    };
+
+    struct text_edit
+    {
+        type t;                /**< event::type::text_edit */
+        timestamp_t timestamp; /**< in nanoseconds */
+        int windowID;          /**< The window with keyboard focus, if any */
+        char text[32];         /**< The editing text */
+        std::int32_t start;    /**< The start cursor of selected editing text */
+        std::int32_t length;   /**< The length of selected editing text */
+    };
+
+    struct text_input
+    {
+        type t;                /**< event::type::text_input */
+        timestamp_t timestamp; /**< in nanoseconds */
+        int windowID;          /**< The window with keyboard focus, if any */
+        char text[32];         /**< The input text */
+    };
+
+    struct window
+    {
+        type t;                /**< event::type::window* */
+        timestamp_t timestamp; /**< in nanoseconds */
+        int windowID;
+    };
+
+    struct quit
+    {
+        type t; /**< event_t::quit */
+        timestamp_t timestamp;
+    };
+
+    union
+    {
+        type t;
+        keyboard kb;
+        mouse_button mouse;
+        mouse_motion motion;
+        mouse_wheel wheel;
+        text_edit edit;
+        text_input input;
+        window win;
+        quit exit;
+    };
 };
 
-using timestamp_t = std::chrono::duration<std::uint64_t, std::nano>;
-
-enum class event_t
+/**
+ * @brief this events should match with SDL_EventType
+ */
+enum class event::type
 {
-    unknown = 0,
+    unknown = 0x000,
 
     quit = 0x100,
 
     key_down = 0x300,
     key_up,
-};
+    text_edit,
+    text_input,
+    keymap_change,
 
-struct kb_event
-{
-    event_t type; /**< ::EVENT_KEY_DOWN or ::EVENT_KEY_UP */
-    timestamp_t timestamp;
-    bool repeat;
-    keysym sym; /**< The key that was pressed or released */
-};
+    mouse_motion = 0x400,
+    mouse_key_down,
+    mouse_key_up,
+    mouse_wheel,
 
-struct quit_event
-{
-    event_t type; /**< EVENT_QUIT */
-    timestamp_t timestamp;
+    window_show = 0x202,      /**< Window has been shown */
+    window_hide,              /**< Window has been hidden */
+    window_expose,            /**< Window has been exposed and should be redrawn
+                               */
+    window_move,              /**< Window has been moved to data1, data2 */
+    window_resize,            /**< Window has been resized to data1xdata2 */
+    window_pixel_size_change, /**< The pixel size of the window has
+                                            changed to data1xdata2 */
+    window_minimize,          /**< Window has been minimized */
+    window_maxmimize,         /**< Window has been maximized */
+    window_restore,           /**< Window has been restored to normal size and
+                                            position */
+    window_mouse_enter,       /**< Window has gained mouse focus */
+    window_mouse_leave,       /**< Window has lost mouse focus */
+    window_focus_gain,        /**< Window has gained keyboard focus */
+    window_focus_lost,        /**< Window has lost keyboard focus */
+    window_close_request,     /**< The window manager requests that the */
 };
-
-union event
-{
-    event_t type;
-    kb_event key;
-    quit_event quit;
-};
-
-int poll_event(event* ev);
 
 } // namespace nano
 

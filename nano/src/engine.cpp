@@ -10,6 +10,9 @@
 #define SDL_FUNCTION_POINTER_IS_VOID_POINTER
 #include <SDL3/SDL.h>
 #include <glad/glad.h>
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl3.h>
 
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
@@ -76,12 +79,36 @@ engine::initialize()
 
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
 
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGui_ImplSDL3_InitForOpenGL(impl->window, impl->context);
+    ImGui_ImplOpenGL3_Init("#version 300 es");
+
     return EXIT_SUCCESS;
+}
+
+void
+engine::new_frame()
+{
+    ImGui_ImplSDL3_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+}
+
+void
+engine::renderUI()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void
 engine::finalize()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL3_Shutdown();
+    ImGui::DestroyContext();
 }
 
 engine::~engine()
