@@ -102,13 +102,15 @@ main()
         const char* fragment_shader_src_path =
             "../homework/05-OpenGL-first-step/2-triangle-of-madness/"
             "fragment-shader.frag";
-        std::fstream vertex_shader_stream(vertex_shader_src_path, std::ios::in);
-        std::fstream fragment_shader_stream(fragment_shader_src_path,
-                                            std::ios::in);
+        std::ifstream vertex_shader_stream(vertex_shader_src_path,
+                                           std::ios::binary);
+        std::ifstream fragment_shader_stream(fragment_shader_src_path,
+                                             std::ios::binary);
+
         size_t vertex_shader_src_size =
-                   std::filesystem::file_size(vertex_shader_src_path),
-               fragment_shader_src_size =
-                   std::filesystem::file_size(fragment_shader_src_path);
+            std::filesystem::file_size(vertex_shader_src_path) - 1;
+        size_t fragment_shader_src_size =
+            std::filesystem::file_size(fragment_shader_src_path) - 1;
 
         vertex_shader_src =
             std::shared_ptr<char>(new char[vertex_shader_src_size]{}, deleter);
