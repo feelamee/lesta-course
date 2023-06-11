@@ -112,13 +112,15 @@ triangle_render::rasterize(const vertex& v1, const vertex& v2, const vertex& v3)
 {
     using namespace std::ranges;
 
-    const auto& [v12min, v12max] = minmax(v1, v2, {}, &vertex::y);
-    const auto& [v12maxv3_min, v_ymax] = minmax(v12max, v3, {}, &vertex::y);
-    const auto& [v_ymin, v_ymid] = minmax(v12min, v12maxv3_min, {}, &vertex::y);
+    auto vert_y_less = [](const vertex& lhs, const vertex& rhs)
+    { return lhs.pos.y < rhs.pos.y; };
+    const auto& [v12min, v12max] = minmax(v1, v2, vert_y_less);
+    const auto& [v12maxv3_min, v_ymax] = minmax(v12max, v3, vert_y_less);
+    const auto& [v_ymin, v_ymid] = minmax(v12min, v12maxv3_min, vert_y_less);
 
-    float part21 = 1. / (v_ymax.y - v_ymid.y);
-    float part20 = 1. / (v_ymax.y - v_ymin.y);
-    float part10 = 1. / (v_ymid.y - v_ymin.y);
+    float part21 = 1. / (v_ymax.pos.y - v_ymid.pos.y);
+    float part20 = 1. / (v_ymax.pos.y - v_ymin.pos.y);
+    float part10 = 1. / (v_ymid.pos.y - v_ymin.pos.y);
 
     if (std::isinf(part20))
     {
@@ -154,13 +156,15 @@ triangle_render::get_triangle_vertices(const vertex& v1,
 {
     using namespace std::ranges;
 
-    const auto& [v12min, v12max] = minmax(v1, v2, {}, &vertex::y);
-    const auto& [v12maxv3_min, v_ymax] = minmax(v12max, v3, {}, &vertex::y);
-    const auto& [v_ymin, v_ymid] = minmax(v12min, v12maxv3_min, {}, &vertex::y);
+    auto vert_y_less = [](const vertex& lhs, const vertex& rhs)
+    { return lhs.pos.y < rhs.pos.y; };
+    const auto& [v12min, v12max] = minmax(v1, v2, vert_y_less);
+    const auto& [v12maxv3_min, v_ymax] = minmax(v12max, v3, vert_y_less);
+    const auto& [v_ymin, v_ymid] = minmax(v12min, v12maxv3_min, vert_y_less);
 
-    float part21 = 1. / (v_ymax.y - v_ymid.y);
-    float part20 = 1. / (v_ymax.y - v_ymin.y);
-    float part10 = 1. / (v_ymid.y - v_ymin.y);
+    float part21 = 1. / (v_ymax.pos.y - v_ymid.pos.y);
+    float part20 = 1. / (v_ymax.pos.y - v_ymin.pos.y);
+    float part10 = 1. / (v_ymid.pos.y - v_ymin.pos.y);
 
     std::vector<vertex> vertices;
     if (std::isinf(part20))

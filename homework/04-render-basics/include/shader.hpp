@@ -11,11 +11,9 @@
 
 struct shader
 {
-    virtual vertex
-    vertex_shader(const vertex&) = 0;
+    virtual vertex vertex_shader(const vertex&) = 0;
 
-    virtual color
-    fragment_shader(const vertex&) = 0;
+    virtual color fragment_shader(const vertex&) = 0;
 };
 
 struct texture_shader : shader
@@ -25,11 +23,9 @@ struct texture_shader : shader
         canvas* buf = nullptr;
     } uniform;
 
-    vertex
-    vertex_shader(const vertex& v) override;
+    vertex vertex_shader(const vertex& v) override;
 
-    color
-    fragment_shader(const vertex& v) override;
+    color fragment_shader(const vertex& v) override;
 };
 
 struct dummy : shader
@@ -43,7 +39,7 @@ struct dummy : shader
     color
     fragment_shader(const vertex& v) override
     {
-        return v;
+        return v.rgb;
     }
 };
 
@@ -54,11 +50,9 @@ struct blackwhite : shader
         canvas* buf = nullptr;
     } uniform;
 
-    vertex
-    vertex_shader(const vertex& v) override;
+    vertex vertex_shader(const vertex& v) override;
 
-    color
-    fragment_shader(const vertex& v) override;
+    color fragment_shader(const vertex& v) override;
 };
 
 struct funny_moment : shader
@@ -71,11 +65,9 @@ struct funny_moment : shader
         canvas* buf = nullptr;
     } uniform;
 
-    vertex
-    vertex_shader(const vertex& v) override;
+    vertex vertex_shader(const vertex& v) override;
 
-    color
-    fragment_shader(const vertex& v) override;
+    color fragment_shader(const vertex& v) override;
 };
 
 struct lupa : shader
@@ -89,11 +81,9 @@ struct lupa : shader
         canvas* buf = nullptr;
     } uniform;
 
-    vertex
-    vertex_shader(const vertex& v) override;
+    vertex vertex_shader(const vertex& v) override;
 
-    color
-    fragment_shader(const vertex& v) override;
+    color fragment_shader(const vertex& v) override;
 };
 
 struct blur : shader
@@ -107,11 +97,9 @@ struct blur : shader
         canvas* buf = nullptr;
     } uniform;
 
-    vertex
-    vertex_shader(const vertex& v) override;
+    vertex vertex_shader(const vertex& v) override;
 
-    color
-    fragment_shader(const vertex& v) override;
+    color fragment_shader(const vertex& v) override;
 };
 
 #endif // SHADER_HPP

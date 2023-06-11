@@ -11,8 +11,9 @@ texture_shader::fragment_shader(const vertex& v)
 {
     auto width = (*uniform.buf).width() - 1;
     auto height = (*uniform.buf).height() - 1;
-    color result = (*uniform.buf)(static_cast<position_t>(width * v.tx),
-                                  static_cast<position_t>(height * v.ty));
+    color result =
+        (*uniform.buf)(static_cast<position::type>(height * v.tpos.y),
+                       static_cast<position::type>(width * v.tpos.x));
     return result;
 }
 
@@ -25,12 +26,12 @@ blackwhite::vertex_shader(const vertex& v)
 color
 blackwhite::fragment_shader(const vertex& v)
 {
-    auto avg = (v.r + v.g + v.b) / 3;
+    auto avg = (v.rgb.r + v.rgb.g + v.rgb.b) / 3;
 
-    auto max = std::numeric_limits<color_channel_t<>>::max();
-    return { static_cast<color_channel_t<>>(avg * max),
-             static_cast<color_channel_t<>>(avg * max),
-             static_cast<color_channel_t<>>(avg * max) };
+    auto max = std::numeric_limits<color::channel_t>::max();
+    return { static_cast<color::channel_t>(avg * max),
+             static_cast<color::channel_t>(avg * max),
+             static_cast<color::channel_t>(avg * max) };
 }
 
 vertex
@@ -44,10 +45,10 @@ funny_moment::fragment_shader(const vertex& v)
 {
     const auto width = (*uniform.buf).width() - 1;
     const auto height = (*uniform.buf).height() - 1;
-    const auto x = static_cast<position_t>(v.tx * width);
-    const auto y = static_cast<position_t>(v.ty * height);
-    const int dx = v.x - uniform.mouse_x;
-    const int dy = v.y - uniform.mouse_y;
+    const auto x = static_cast<position::type>(v.tpos.x * width);
+    const auto y = static_cast<position::type>(v.tpos.y * height);
+    const int dx = v.pos.x - uniform.mouse_x;
+    const int dy = v.pos.y - uniform.mouse_y;
     float len_to_mouse = std::sqrt(dx * dx + dy * dy);
 
     float ratio = len_to_mouse / uniform.radius;
@@ -60,7 +61,7 @@ funny_moment::fragment_shader(const vertex& v)
     size_t res_y = std::clamp(static_cast<size_t>(y - dy / ratio),
                               static_cast<size_t>(0),
                               static_cast<size_t>(height));
-    color result = (*uniform.buf)(res_x, res_y);
+    color result = (*uniform.buf)(res_y, res_x);
 
     return result;
 }
@@ -76,13 +77,13 @@ lupa::fragment_shader(const vertex& v)
 {
     const auto width = (*uniform.buf).width() - 1;
     const auto height = (*uniform.buf).height() - 1;
-    const auto x = static_cast<position_t>(v.tx * width);
-    const auto y = static_cast<position_t>(v.ty * height);
-    const int dx = v.x - uniform.mouse_x;
-    const int dy = v.y - uniform.mouse_y;
+    const auto x = static_cast<position::type>(v.tpos.x * width);
+    const auto y = static_cast<position::type>(v.tpos.y * height);
+    const int dx = v.pos.x - uniform.mouse_x;
+    const int dy = v.pos.y - uniform.mouse_y;
     float len_to_mouse = std::sqrt(dx * dx + dy * dy);
 
-    color result = (*uniform.buf)(x, y);
+    color result = (*uniform.buf)(y, x);
     if (std::abs(len_to_mouse - uniform.radius) < 2)
     {
         result.r = 0;
@@ -95,7 +96,7 @@ lupa::fragment_shader(const vertex& v)
             std::clamp((int)(x - dx * uniform.scale), 0, (int)(width - 1));
         size_t res_y =
             std::clamp((int)(y - dy * uniform.scale), 0, (int)(height - 1));
-        result = (*uniform.buf)(res_x, res_y);
+        result = (*uniform.buf)(res_y, res_x);
     }
 
     return result;
@@ -112,13 +113,13 @@ blur::fragment_shader(const vertex& v)
 {
     const auto width = (*uniform.buf).width() - 1;
     const auto height = (*uniform.buf).height() - 1;
-    const auto x = static_cast<position_t>(v.tx * width);
-    const auto y = static_cast<position_t>(v.ty * height);
-    const int dx = v.x - uniform.mouse_x;
-    const int dy = v.y - uniform.mouse_y;
+    const auto x = static_cast<position::type>(v.tpos.x * width);
+    const auto y = static_cast<position::type>(v.tpos.y * height);
+    const int dx = v.pos.x - uniform.mouse_x;
+    const int dy = v.pos.y - uniform.mouse_y;
     float len_to_mouse = std::sqrt(dx * dx + dy * dy);
 
-    color result = (*uniform.buf)(x, y);
+    color result = (*uniform.buf)(y, x);
     if (len_to_mouse < uniform.radius)
     {
         float r{}, g{}, b{};
@@ -135,7 +136,7 @@ blur::fragment_shader(const vertex& v)
             for (size_t j{ j_ }; j < max_j; ++j)
             {
                 // TODO: get directly row to increase perfomance
-                auto& v = (*uniform.buf)(i, j);
+                auto& v = (*uniform.buf)(j, i);
                 r += v.r;
                 g += v.g;
                 b += v.b;

@@ -1,6 +1,7 @@
+#include "SDL_pixels.h"
 #include <color.hpp>
 #include <cstdlib>
-#include <image_loader.hpp>
+#include <resource_loader.hpp>
 #include <shader.hpp>
 #include <triangle_render.hpp>
 
@@ -8,6 +9,7 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <random>
@@ -77,33 +79,36 @@ main()
         return EXIT_FAILURE;
     }
     std::fstream src(img_path, std::ios::in);
+    std::fstream dst("./leotest.ppm", std::ios::out);
     canvas texture;
     ppm::load(src, texture);
 
     canvas img(width, height);
     triangle_render my_renderer(img);
 
-    my_renderer.program = std::make_shared<blur>();
-    auto brush = std::dynamic_pointer_cast<blur>(my_renderer.program);
+    using shader_type = lupa;
+
+    my_renderer.program = std::make_shared<shader_type>();
+    auto brush = std::dynamic_pointer_cast<shader_type>(my_renderer.program);
 
     brush->uniform.buf = &texture;
     std::vector<vertex> rectangle;
     std::vector<size_t> indices;
 
     // clang-format off
-    //                 x           y       r  g  b  tx ty
-    rectangle = { { 0,         0,          0, 0, 0, 0, 0 },
-                  { width - 1, 0,          1, 1, 1, 1, 0 },
-                  { 0,         height - 1, 1, 1, 1, 0, 1 },
-                  { width - 1, height - 1, 1, 1, 1, 1, 1 } };
+    //                 x           y       r    g    b    tx ty
+    rectangle = { { 0,         0,          0,   0,   0,   0, 0 },
+                  { width - 0, 0,          0,   0,   0,   1, 0 },
+                  { 0,         height - 1, 0,   0,   0,   0, 1 },
+                  { width - 1, height - 1, 0,   0,   0,   1, 1 } };
     indices = { 0, 1, 3, 0, 2, 3 };
     // clang-format on
 
     std::shared_ptr sdl_surface(
-        SDL_CreateSurfaceFrom(reinterpret_cast<void*>(&img(0, 0)),
-                              width,
-                              height,
-                              width * sizeof(color),
+        SDL_CreateSurfaceFrom(reinterpret_cast<void*>(img.data()),
+                              img.width(),
+                              img.height(),
+                              img.width() * sizeof(color),
                               SDL_PIXELFORMAT_RGB24),
         SDL_DestroySurface);
     ASSERT_SDL_ERROR(nullptr != sdl_surface);
@@ -129,15 +134,27 @@ main()
                 brush->uniform.radius += 2 * ev.wheel.y;
                 break;
 
+                // case SDL_EVENT_KEY_DOWN:
+                //     switch (ev.key.keysym.sym)
+                //     {
+                //     case SDLK_i: // increase
+                //             brush->uniform.strength += 1;
+                //         break;
+                //     case SDLK_d: // decrease
+                //             if (brush->uniform.strength > 1)
+                //                 brush->uniform.strength -= 1;
+                //         break;
+                //     }
+                //     break;
+
             case SDL_EVENT_KEY_DOWN:
                 switch (ev.key.keysym.sym)
                 {
                 case SDLK_i: // increase
-                    brush->uniform.strength += 1;
+                    brush->uniform.scale += 0.1;
                     break;
                 case SDLK_d: // decrease
-                    if (brush->uniform.strength > 1)
-                        brush->uniform.strength -= 1;
+                    brush->uniform.scale -= 0.1;
                     break;
                 }
                 break;

@@ -10,7 +10,7 @@
 
 #include <canvas.hpp>
 #include <color.hpp>
-#include <image_loader.hpp>
+#include <resource_loader.hpp>
 #include <triangle_render.hpp>
 #include <vertex.hpp>
 
@@ -41,56 +41,68 @@ main()
 void
 lets_fun()
 {
-    if (dump_load_compare() == EXIT_FAILURE)
+    if (dump_load_compare() != EXIT_SUCCESS)
         std::cout << "dump_load_compare FAIL" << std::endl;
+    else
+        std::cout << "dump_load_compare SUCCESS" << std::endl;
 
     draw_lines();
+    std::clog << "lines drawed" << std::endl;
     draw_triangle();
+    std::clog << "draw_triangle" << std::endl;
     draw_triangle_with_indices();
+    std::clog << "draw_triangle_with_indices" << std::endl;
     rasterize_triangle();
+    std::clog << "rasterize_triangle" << std::endl;
     rasterize_triangles();
+    std::clog << "rasterize_triangles" << std::endl;
     rasterize_indexed_triangles();
+    std::clog << "rasterize_indexed_triangles" << std::endl;
     black_white_triangle();
+    std::clog << "black_whie_trangle" << std::endl;
 }
 
 int
 dump_load_compare()
 {
-    std::fstream src("04-0-input-images/canvas-dump-load-test-in.ppm");
-    std::fstream dst("04-0-output-images/canvas-dump-load-test-out.ppm",
-                     std::ios::out | std::ios::in);
+    std::ifstream src("../homework/04-render-basics/leo.ppm", std::ios::binary);
+    std::ofstream dst("04-0-output-images/canvas-dump-load-test-out.ppm",
+                      std::ios::binary);
 
     canvas img1;
+    img1.fill(colors::green);
     int ret = ppm::load(src, img1);
+
     if (ret == EXIT_FAILURE)
     {
-        std::cerr << "file1 read error" << std::endl;
+        std::cerr << ppm::error2str(ppm::error()) << std::endl;
         return EXIT_FAILURE;
     }
 
-    ret = ppm::dump<ppm::fmt::P6>(dst, img1);
+    ret = ppm::dump(dst, img1, ppm::fmt::P6);
     if (ret == EXIT_FAILURE)
     {
-        std::cerr << "file write error" << std::endl;
+        std::cerr << ppm::error2str(ppm::error()) << std::endl;
         return EXIT_FAILURE;
     }
 
-    dst.seekg(0);
+    std::ifstream dst_src("04-0-output-images/canvas-dump-load-test-out.ppm",
+                          std::ios::binary);
     canvas img2;
-    ret = ppm::load(dst, img2);
+    ret = ppm::load(dst_src, img2);
     if (ret == EXIT_FAILURE)
     {
-        std::cerr << "file2 read error" << std::endl;
+        std::cerr << ppm::error2str(ppm::error()) << std::endl;
         return EXIT_FAILURE;
     }
 
-    return img1 != img2;
+    return not(img1 == img2);
 }
 
 void
 draw_lines()
 {
-    std::fstream dst("04-0-output-images/line-render.ppm", std::ios::out);
+    std::ofstream dst("04-0-output-images/line-render.ppm", std::ios::binary);
 
     constexpr size_t w = 480, h = 270;
     canvas img(w, h);
@@ -99,10 +111,10 @@ draw_lines()
 
     for (size_t i = 0; i < 300; ++i)
     {
-        position start{ static_cast<position_t>(rand() % img.width()),
-                        static_cast<position_t>(rand() % img.height()) };
-        position end{ static_cast<position_t>(rand() % img.width()),
-                      static_cast<position_t>(rand() % img.height()) };
+        position start{ static_cast<position::type>(rand() % img.width()),
+                        static_cast<position::type>(rand() % img.height()) };
+        position end{ static_cast<position::type>(rand() % img.width()),
+                      static_cast<position::type>(rand() % img.height()) };
 
         render.draw(start,
                     end,
@@ -111,13 +123,14 @@ draw_lines()
                       static_cast<uint8_t>(rand() % 256) });
     }
 
-    ppm::dump<ppm::fmt::P3>(dst, img);
+    ppm::dump(dst, img, ppm::fmt::P3);
 }
 
 void
 draw_triangle()
 {
-    std::fstream dst("04-0-output-images/triangle-render.ppm", std::ios::out);
+    std::ofstream dst("04-0-output-images/triangle-render.ppm",
+                      std::ios::binary);
     constexpr size_t w = 1080, h = 1080;
 
     canvas img(w, h);
@@ -140,29 +153,29 @@ draw_triangle()
     {
         radius -= radius_step;
         triangles.push_back(
-            { static_cast<position_t>(center.x + radius * cos(angle)),
-              static_cast<position_t>(center.y + radius * sin(angle)) });
+            { static_cast<position::type>(center.x + radius * cos(angle)),
+              static_cast<position::type>(center.y + radius * sin(angle)) });
 
-        triangles.push_back(
-            { static_cast<position_t>(center.x + radius * cos(angle + pi / 6)),
-              static_cast<position_t>(center.y +
-                                      radius * sin(angle + pi / 6)) });
+        triangles.push_back({ static_cast<position::type>(
+                                  center.x + radius * cos(angle + pi / 6)),
+                              static_cast<position::type>(
+                                  center.y + radius * sin(angle + pi / 6)) });
 
-        triangles.push_back(
-            { static_cast<position_t>(center.x + radius * cos(angle + pi / 4)),
-              static_cast<position_t>(center.y +
-                                      radius * sin(angle + pi / 4)) });
+        triangles.push_back({ static_cast<position::type>(
+                                  center.x + radius * cos(angle + pi / 4)),
+                              static_cast<position::type>(
+                                  center.y + radius * sin(angle + pi / 4)) });
     }
 
     render.draw(triangles, { 0, 0, 255 });
-    ppm::dump<ppm::fmt::P6>(dst, img);
+    ppm::dump(dst, img, ppm::fmt::P6);
 }
 
 void
 draw_triangle_with_indices()
 {
-    std::fstream dst("04-0-output-images/triangle-indexed-render.ppm",
-                     std::ios::out);
+    std::ofstream dst("04-0-output-images/triangle-indexed-render.ppm",
+                      std::ios::binary);
     constexpr size_t w = 640, h = 360;
     constexpr color c = { 0, 20, 240 };
 
@@ -176,14 +189,14 @@ draw_triangle_with_indices()
     std::vector<size_t> indexes = { 0, 1, 4, 2, 3, 5 };
     render.clear();
     render.draw(vertexes, indexes, c);
-    ppm::dump<ppm::fmt::P6>(dst, img);
+    ppm::dump(dst, img, ppm::fmt::P6);
 }
 
 void
 rasterize_triangle()
 {
-    std::fstream dst("04-0-output-images/triangle-rasterize.ppm",
-                     std::ios::out);
+    std::ofstream dst("04-0-output-images/triangle-rasterize.ppm",
+                      std::ios::binary);
     constexpr size_t w = 640, h = 360;
 
     canvas img(w, h);
@@ -191,20 +204,20 @@ rasterize_triangle()
     render.clear();
 
     std::vector<vertex> vertices = {
-        { 10, 10, 1, 0, 0 },
-        { 600, 150, 0, 1, 0 },
-        { 200, 300, 0, 0, 1 },
+        { 10, 10, 255, 0, 0 },
+        { 600, 150, 0, 255, 0 },
+        { 200, 300, 0, 0, 255 },
     };
 
     render.rasterize(vertices);
-    ppm::dump<ppm::fmt::P6>(dst, img);
+    ppm::dump(dst, img, ppm::fmt::P6);
 }
 
 void
 rasterize_triangles()
 {
-    std::fstream dst("04-0-output-images/triangles-rasterize-2.ppm",
-                     std::ios::out);
+    std::ofstream dst("04-0-output-images/triangles-rasterize-2.ppm",
+                      std::ios::binary);
     constexpr size_t w = 1080, h = 1080;
 
     canvas img(w, h);
@@ -214,11 +227,10 @@ rasterize_triangles()
     std::vector<vertex> triangles;
     const vertex center{ w / 2., h / 2. };
     size_t radius_max = std::min(w, h) / 2;
-    float r{ 0.0 }, g{ 0.0 }, b{ 0.0 };
+    color::channel_t r{ 0 }, g{ 0 }, b{ 0 };
 
     using std::numbers::pi;
-    constexpr auto max_color_val =
-        std::numeric_limits<color_channel_t<>>::max();
+    constexpr auto max_color_val = std::numeric_limits<color::channel_t>::max();
 
     float angle_max = pi * 12;
     float angle_step = pi / 16;
@@ -232,43 +244,46 @@ rasterize_triangles()
     {
         radius -= radius_step;
 
-        triangles.push_back({ (center.x + radius * cos(angle)),
-                              (center.y + radius * sin(angle)),
-                              r,
-                              g,
-                              b });
+        triangles.push_back(
+            { static_cast<float>((center.pos.x + radius * cos(angle))),
+              static_cast<float>((center.pos.y + radius * sin(angle))),
+              r,
+              g,
+              b });
 
-        triangles.push_back({ (center.x + radius * cos(angle + pi / 6)),
-                              (center.y + radius * sin(angle + pi / 6)),
-                              r,
-                              g,
-                              b });
+        triangles.push_back(
+            { static_cast<float>((center.pos.x + radius * cos(angle + pi / 6))),
+              static_cast<float>((center.pos.y + radius * sin(angle + pi / 6))),
+              r,
+              g,
+              b });
 
-        triangles.push_back({ (center.x + radius * cos(angle + pi / 2)),
-                              (center.y + radius * sin(angle + pi / 2)),
-                              r,
-                              g,
-                              b });
-        r += 1. / max_color_val;
-        g += r / max_color_val;
-        b += g / max_color_val;
-        if (b > 1)
-        {
-            r = 0.;
-            g = 0.;
-            b = 0.;
-        }
+        triangles.push_back(
+            { static_cast<float>((center.pos.x + radius * cos(angle + pi / 2))),
+              static_cast<float>((center.pos.y + radius * sin(angle + pi / 2))),
+              r,
+              g,
+              b });
+        r += 1;
+        g += r;
+        b += g;
+        if (r >= max_color_val)
+            r = 0;
+        if (g >= max_color_val)
+            g = 0;
+        if (b >= max_color_val)
+            b = 0;
     }
 
     render.rasterize(triangles);
-    ppm::dump<ppm::fmt::P3>(dst, img);
+    ppm::dump(dst, img, ppm::fmt::P6);
 }
 
 void
 rasterize_indexed_triangles()
 {
-    std::fstream dst("04-0-output-images/indexed-triangle-rasterize.ppm",
-                     std::ios::out);
+    std::ofstream dst("04-0-output-images/indexed-triangle-rasterize.ppm",
+                      std::ios::binary);
 
     constexpr size_t w = 640, h = 360;
     canvas img(w, h);
@@ -276,22 +291,22 @@ rasterize_indexed_triangles()
     render.clear();
 
     std::vector<vertex> vertices = {
-        { 40, 40, 1, 0., 0. },    { 600, 40, 0., 1., 0 },
-        { 300, 150, 0., 0., 1. }, { 40, 320, 1., 0., 0. },
-        { 600, 320, 0., 1., 0. }, { 300, 150, 0., 0., 1. }
+        { 40, 40, 255, 0, 0 },   { 600, 40, 0, 255, 0 },
+        { 300, 150, 0, 0, 255 }, { 40, 320, 255, 0, 0 },
+        { 600, 320, 0, 255, 0 }, { 300, 150, 0, 0, 255 }
     };
 
     std::vector<size_t> indices = { 0, 3, 2, 1, 4, 5 };
 
     render.rasterize(vertices, indices);
-    ppm::dump<ppm::fmt::P6>(dst, img);
+    ppm::dump(dst, img, ppm::fmt::P6);
 }
 
 void
 black_white_triangle()
 {
-    std::fstream dst("04-0-output-images/black-white-triangle.ppm",
-                     std::ios::out);
+    std::ofstream dst("04-0-output-images/black-white-triangle.ppm",
+                      std::ios::binary);
 
     constexpr size_t w = 640, h = 360;
     canvas img(w, h);
@@ -299,12 +314,12 @@ black_white_triangle()
     render.program = std::make_shared<blackwhite>();
     std::dynamic_pointer_cast<blackwhite>(render.program)->uniform.buf = &img;
 
-    const std::vector<vertex> vertices = { { 40, 40, .6, .2, .6, 0, 0 },
-                                           { 600, 300, .6, .1, .0, 1., 1. },
-                                           { 600, 40, 0., 0., 0., 0., 0. } };
+    const std::vector<vertex> vertices = { { 40, 40, 180, 50, 180, 0, 0 },
+                                           { 600, 300, 180, 25, 0, 1., 1. },
+                                           { 600, 40, 0, 0, 0, 0., 0. } };
 
     const std::vector<size_t> indices = { 0, 2, 1 };
 
     render.rasterize(vertices, indices);
-    ppm::dump<ppm::fmt::P6>(dst, img);
+    ppm::dump(dst, img, ppm::fmt::P3);
 }

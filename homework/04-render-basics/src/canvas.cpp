@@ -1,5 +1,7 @@
 #include <canvas.hpp>
 
+#include <iostream>
+
 std::size_t
 canvas::width() const
 {

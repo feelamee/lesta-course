@@ -5,11 +5,11 @@ file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/04-0-output-images)
 set(TARGET software-render)
 add_library(
     ${TARGET} STATIC
-    src/vertex.cpp
     src/line_render.cpp
     src/triangle_render.cpp
     src/shader.cpp
     src/canvas.cpp
+    src/resource_loader.cpp
 )
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(${TARGET} PUBLIC cxx_std_20)

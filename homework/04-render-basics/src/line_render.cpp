@@ -1,4 +1,4 @@
-#include "line_render.hpp"
+#include <line_render.hpp>
 
 #include <ranges>
 
@@ -59,7 +59,7 @@ line_render::draw(position p1, position p2, color p_color)
 {
     auto&& smpl = line(p1, p2);
     for (auto [i, j] : smpl)
-        buf(i, j) = p_color;
+        buf(j, i) = p_color;
 }
 
 void
@@ -67,9 +67,10 @@ line_render::draw(const std::vector<vertex>& vertices)
 {
     for (auto&& v : vertices)
     {
-        position pos(v);
+        position pos{ .x = static_cast<int>(v.pos.x),
+                      .y = static_cast<int>(v.pos.y) };
         color c{ program->fragment_shader(v) };
-        buf(pos.x, pos.y) = c;
+        buf(pos.y, pos.x) = c;
     }
 }
 
@@ -77,8 +78,8 @@ position
 line_render::interpolate(const position& p1, const position& p2, float t)
 {
     return {
-        static_cast<position_t>(std::lerp(p1.x, p2.x, t)),
-        static_cast<position_t>(std::lerp(p1.y, p2.y, t)),
+        static_cast<position::type>(std::lerp(p1.x, p2.x, t)),
+        static_cast<position::type>(std::lerp(p1.y, p2.y, t)),
     };
 }
 
@@ -87,9 +88,11 @@ line_render::interpolate(const vertex& p1, const vertex& p2, float t)
 {
     using std::lerp;
     return {
-        lerp(p1.x, p2.x, t),   lerp(p1.y, p2.y, t), lerp(p1.r, p2.r, t),
-        lerp(p1.g, p2.g, t),   lerp(p1.b, p2.b, t), lerp(p1.tx, p2.tx, t),
-        lerp(p1.ty, p2.ty, t),
+        { lerp(p1.pos.x, p2.pos.x, t), lerp(p1.pos.y, p2.pos.y, t) },
+        { static_cast<color::channel_t>(lerp(p1.rgb.r, p2.rgb.r, t)),
+          static_cast<color::channel_t>(lerp(p1.rgb.g, p2.rgb.g, t)),
+          static_cast<color::channel_t>(lerp(p1.rgb.b, p2.rgb.b, t)) },
+        { lerp(p1.tpos.x, p2.tpos.x, t), lerp(p1.tpos.y, p2.tpos.y, t) },
     };
 }
 
@@ -97,7 +100,7 @@ std::vector<vertex>
 line_render::line(const vertex& v1, const vertex& v2)
 {
     std::vector<vertex> result;
-    auto p_count{ std::abs(v2.x - v1.x) };
+    auto p_count{ std::abs(v2.pos.x - v1.pos.x) };
     if (p_count < 1.f)
         return { v1 };
 
