@@ -222,47 +222,48 @@ load(std::istream& src, soundbuf& buf)
         return EXIT_FAILURE;
     }
     src.seekg(0, std::ios::beg);
-    auto raw_data = new std::uint8_t[size];
-    src.read(reinterpret_cast<char*>(raw_data), size);
+    auto raw_data = std::make_shared<uint8_t[]>(size);
+    src.read(reinterpret_cast<char*>(raw_data.get()), size);
 
-    SDL_RWops* sdl_buf = SDL_RWFromMem(raw_data, size);
+    SDL_RWops* sdl_buf = SDL_RWFromMem(raw_data.get(), size);
     if (nullptr == sdl_buf)
     {
         err = err_t::internal_read;
-        delete[] raw_data;
         return EXIT_FAILURE;
     }
 
     SDL_AudioSpec spec;
-    std::uint8_t* buf_data{ nullptr };
-    std::uint32_t buf_len{ 0 };
-    SDL_AudioSpec* res = SDL_LoadWAV_RW(sdl_buf, 1, &spec, &buf_data, &buf_len);
-    buf.data() = buf_data;
+    std::uint8_t* soundbuf_data{ nullptr };
+    std::uint32_t soundbuf_len{ 0 };
+    SDL_AudioSpec* res =
+        SDL_LoadWAV_RW(sdl_buf, 1, &spec, &soundbuf_data, &soundbuf_len);
     if (nullptr == res)
     {
         err = err_t::incorrect_file_structure;
         return EXIT_FAILURE;
     }
-    buf.size(buf_len);
 
-    audio_spec& buf_spec = buf.specification();
+    audio_spec soundbuf_spec;
     if (static_cast<int>(spec.channels) > 2)
     {
         err = err_t::unsupported;
         return EXIT_FAILURE;
     }
-    buf_spec.channel = static_cast<audio_spec::channel_t>(spec.channels);
+    soundbuf_spec.channel = static_cast<audio_spec::channel_t>(spec.channels);
     // clang-format off
     if (spec.format != static_cast<SDL_AudioFormat>(audio_spec::format_t::f32) and
         spec.format != static_cast<SDL_AudioFormat>(audio_spec::format_t::s16))
-    // clang-format on
     {
         err = err_t::unsupported;
         return EXIT_FAILURE;
     }
-    buf_spec.fmt = static_cast<audio_spec::format_t>(spec.format);
-    buf_spec.frequence = spec.freq;
-    buf_spec.silence = spec.silence;
+    // clang-format on
+    soundbuf_spec.fmt = static_cast<audio_spec::format_t>(spec.format);
+    soundbuf_spec.frequence = spec.freq;
+    soundbuf_spec.silence = spec.silence;
+
+    buf = soundbuf(
+        std::shared_ptr<uint8_t[]>(soundbuf_data), soundbuf_len, soundbuf_spec);
 
     return EXIT_SUCCESS;
 }

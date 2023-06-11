@@ -9,18 +9,13 @@ add_library(
     src/line_render.cpp
     src/triangle_render.cpp
     src/shader.cpp
+    src/canvas.cpp
 )
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(${TARGET} PUBLIC cxx_std_20)
 target_compile_options(${TARGET} PUBLIC "-O3")
 
-find_package(SDL3 REQUIRED)
-target_link_libraries(${TARGET} PUBLIC SDL3-shared)
-
-find_package(Boost REQUIRED)
-if (NOT Boost_FOUND)
-    message(FATAL_ERROR "Error: find_package(...) did not found boost libs")
-endif()
+target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
 
 add_executable(
   main

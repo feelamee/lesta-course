@@ -3,7 +3,6 @@
 
 #include <chrono>
 #include <cstdint>
-#include <pulse/def.h>
 
 namespace nano
 {

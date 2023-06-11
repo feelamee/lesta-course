@@ -2,6 +2,7 @@
 .cache/
 .vscode/
 build/
+build-win/
 tok*
 scripts/rm-images
 bak/

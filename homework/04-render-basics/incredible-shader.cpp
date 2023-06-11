@@ -70,7 +70,7 @@ main()
         SDL_DestroyRenderer);
     ASSERT_SDL_ERROR(nullptr != sdl_renderer);
 
-    auto img_path = "./04-0-input-images/leo.ppm";
+    auto img_path = "../homework/04-render-basics/leo.ppm";
     if (!std::filesystem::exists(img_path))
     {
         std::cerr << "image " << img_path << " does not exist" << std::endl;

@@ -68,11 +68,11 @@ engine::hot_reload()
         initialize_game = nullptr;
     }
 
-    void* new_libgame_handle = SDL_LoadObject(tmp_libgame.native().c_str());
+    void* new_libgame_handle = SDL_LoadObject(tmp_libgame.string().c_str());
     if (new_libgame_handle == NULL)
     {
         std::cerr << "[SDL_LoadObject] Failed to load shared object:\n"
-                  << tmp_libgame.native() << std::endl;
+                  << tmp_libgame << std::endl;
         std::cerr << SDL_GetError() << std::endl;
         return EXIT_FAILURE;
     }
@@ -87,8 +87,7 @@ engine::hot_reload()
     {
         std::cerr << "[SDL_LoadFunction] Failed to load function "
                   << initialize_game_fname << " or " << finalize_game_fname
-                  << " from shared object " << tmp_libgame.native()
-                  << std::endl;
+                  << " from shared object " << tmp_libgame << std::endl;
         SDL_UnloadObject(libgame_handle);
         libgame_handle = nullptr;
         finalize_game = nullptr;

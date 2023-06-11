@@ -1,25 +1,27 @@
-#include <chrono>
-#include <cstdlib>
-
-#include <assert.h>
-#include <iostream>
-#include <memory>
-#include <thread>
-
-// see ~/code/lesta-course/external/SDL/include/SDL3/SDL_stdinc.h line 795
-#define SDL_FUNCTION_POINTER_IS_VOID_POINTER
-#include <SDL3/SDL.h>
-#include <glad/glad.h>
-#include <imgui.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_sdl3.h>
-
 #include <nano/engine.hpp>
+
 #include <nano/error.hpp>
 #include <nano/event.hpp>
 #include <nano/shader.hpp>
 #include <nano/transform.hpp>
 #include <nano/vertex.hpp>
+
+// see ~/code/lesta-course/external/SDL/include/SDL3/SDL_stdinc.h:795
+#define SDL_FUNCTION_POINTER_IS_VOID_POINTER
+#include <SDL3/SDL.h>
+
+#include <glad/glad.h>
+
+#include <imgui.h>
+#include <imgui_impl_opengl3.h>
+#include <imgui_impl_sdl3.h>
+
+#include <assert.h>
+#include <chrono>
+#include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <thread>
 
 namespace nano
 {
@@ -32,7 +34,10 @@ struct engine::impl_t
     ~impl_t()
     {
         SDL_DestroyWindow(window);
-        TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_DeleteContext(context));
+        if (context)
+        {
+            TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_DeleteContext(context));
+        }
         SDL_Quit();
     }
 };
@@ -67,15 +72,15 @@ engine::initialize()
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 
-    impl->context = SDL_GL_CreateContext(impl->window);
-    ASSERT_SDL_ERROR(nullptr != impl->context);
-
     GLint real_major_version{}, real_minor_version{};
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &real_major_version);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &real_minor_version);
 
     // TODO: extract such values to config
     assert(real_major_version == 3 && real_minor_version == 2);
+
+    impl->context = SDL_GL_CreateContext(impl->window);
+    ASSERT_SDL_ERROR(nullptr != impl->context);
 
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
 

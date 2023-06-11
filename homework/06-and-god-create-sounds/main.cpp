@@ -1,13 +1,12 @@
-#include "SDL_audio.h"
-#include "nano/soundbuf.hpp"
-#include <cstdlib>
-#include <fstream>
 #include <nano/resource_loader.hpp>
+#include <nano/soundbuf.hpp>
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_audio.h>
 
 #include <cstdint>
-#include <experimental/scope>
+#include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -87,33 +86,16 @@ main()
         SDL_Log("%s", SDL_GetError());
         return err;
     }
-    std::experimental::scope_exit sdl_quit(SDL_Quit);
 
     // const char* fn = "../homework/06-and-god-create-sounds/road.wav";
     const char* fn = "../homework/06-and-god-create-sounds/highlands.wav";
-
-    // Uint8* buf{ nullptr };
-    // Uint32 buf_len{ 0 };
-    // SDL_AudioSpec spec;
-    // SDL_AudioSpec* spec_ptr = SDL_LoadWAV(fn, &spec, &buf, &buf_len);
-    // std::unique_ptr<Uint8> buf_unique_ptr(buf);
-
-    // if (nullptr == spec_ptr)
-    // {
-    //     SDL_LogError(SDL_LOG_CATEGORY_AUDIO,
-    //                  "Can't parse and load audio samples from file %s\n",
-    //                  fn);
-    //     return EXIT_FAILURE;
-    // }
-
-    // spec.callback = audio_callback;
-    // spec.userdata = &sbuf;
 
     sound sbuf;
     std::ifstream file(fn);
     if (not file)
     {
         std::cerr << "ERROR: failed while opening file:\n\t" << fn << std::endl;
+        SDL_Quit();
         return EXIT_FAILURE;
     }
     int err_code = nano::wav::load(file, sbuf.buf);
@@ -122,6 +104,7 @@ main()
         using namespace nano::wav;
         std::cerr << "ERROR: failed while loading file:\n\t" << fn << std::endl;
         std::cerr << error2str(error()) << std::endl;
+        SDL_Quit();
         return EXIT_FAILURE;
     }
 
@@ -141,6 +124,7 @@ main()
         SDL_LogError(SDL_LOG_CATEGORY_AUDIO,
                      "Failed to open audio device: %s",
                      SDL_GetError());
+        SDL_Quit();
         return EXIT_FAILURE;
     }
 
@@ -150,6 +134,7 @@ main()
                      "Obtained spec is not equal to desired");
         std::cerr << "obtained: \n" << obtained << std::endl;
         std::cerr << "desired: \n" << spec << std::endl;
+        SDL_Quit();
         return EXIT_FAILURE;
     }
 
@@ -159,6 +144,7 @@ main()
                      "Failed to play audio device %d.\n%s",
                      audio_device,
                      SDL_GetError());
+        SDL_Quit();
         return EXIT_FAILURE;
     }
 
@@ -167,8 +153,9 @@ main()
         char c;
         std::cin >> c;
         if ('q' == c)
-            return EXIT_SUCCESS;
+            break;
     }
 
-    return 0;
+    SDL_Quit();
+    return EXIT_SUCCESS;
 }

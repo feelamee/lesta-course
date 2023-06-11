@@ -11,21 +11,31 @@ soundbuf::soundbuf()
     spec.silence = {};
 }
 
+soundbuf::soundbuf(std::shared_ptr<uint8_t[]> p_buf,
+                   int p_size,
+                   const audio_spec& p_spec)
+{
+    buf = p_buf;
+    size(p_size);
+    spec = p_spec;
+}
+
 soundbuf::~soundbuf()
 {
-    if (nullptr != buf)
-        delete[] buf;
+}
+
+soundbuf::soundbuf(const soundbuf& other)
+{
+    buf = other.buf;
+    size(other.size());
+    spec = other.spec;
 }
 
 soundbuf::soundbuf(soundbuf&& other)
 {
-    if (nullptr != buf)
-        delete[] buf;
-
     buf = other.buf;
     size(other.size());
     other.buf = nullptr;
-
     spec = other.spec;
 }
 
@@ -53,16 +63,16 @@ soundbuf::size(int s)
         m_size = 0;
 }
 
-std::uint8_t*&
+std::uint8_t*
 soundbuf::data()
 {
-    return buf;
+    return buf.get();
 }
 
 const std::uint8_t* const
 soundbuf::data() const
 {
-    return buf;
+    return buf.get();
 }
 
 audio_spec&

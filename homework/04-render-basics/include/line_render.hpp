@@ -6,10 +6,8 @@
 #include "shader.hpp"
 #include "vertex.hpp"
 
-#include <boost/numeric/ublas/matrix.hpp>
 #include <ranges>
 #include <vector>
-using namespace boost::numeric;
 
 class line_render : public render
 {
@@ -26,24 +24,19 @@ public:
 
     void clear(color = colors::black) override;
 
-    canvas&
-    data() override;
+    canvas& data() override;
 
     std::vector<position> line(position, position) override;
 
-    std::vector<vertex>
-    line(const vertex& v1, const vertex& v2);
+    std::vector<vertex> line(const vertex& v1, const vertex& v2);
 
     void draw(position, position, color) override;
 
-    void
-    draw(const std::vector<vertex>&);
+    void draw(const std::vector<vertex>&);
 
-    static position
-    interpolate(const position&, const position&, float);
+    static position interpolate(const position&, const position&, float);
 
-    static vertex
-    interpolate(const vertex&, const vertex&, float);
+    static vertex interpolate(const vertex&, const vertex&, float);
 };
 
 #endif // LINE_RENDER_HPP

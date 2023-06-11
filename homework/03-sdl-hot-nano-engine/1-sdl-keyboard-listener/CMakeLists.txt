@@ -10,8 +10,7 @@ add_library(
 target_include_directories(1-nano-engine PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/engine/include)
 target_compile_features(1-nano-engine PUBLIC cxx_std_20)
 
-find_package(SDL3 REQUIRED)
-target_link_libraries(1-nano-engine PUBLIC SDL3-shared)
+target_link_libraries(1-nano-engine PUBLIC SDL3::SDL3-shared)
 
 add_executable(
     1-game 

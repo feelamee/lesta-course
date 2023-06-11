@@ -4,8 +4,9 @@
 #include "canvas.hpp"
 #include "color.hpp"
 
-#include <boost/numeric/ublas/storage.hpp>
+#include <cassert>
 #include <cstdint>
+#include <iostream>
 #include <ranges>
 #include <string>
 
@@ -46,11 +47,11 @@ load(std::istream& src, canvas& img)
         !iswspace(sep))
         return EXIT_FAILURE;
 
-    img.resize(width, height, false);
+    img.resize(width, height);
 
     if (fmt == "P6")
     {
-        src.read(reinterpret_cast<char*>(img.data().data().begin()),
+        src.read(reinterpret_cast<char*>(img.data()),
                  img.width() * img.height() * sizeof(color));
     }
     else
@@ -93,7 +94,7 @@ dump(std::ostream& dst, const canvas& img)
     }
     else // fmt == fmt::P6
     {
-        dst.write(reinterpret_cast<const char*>(img.data().data().begin()),
+        dst.write(reinterpret_cast<const char*>(img.data()),
                   img.width() * img.height() * sizeof(color));
     }
 

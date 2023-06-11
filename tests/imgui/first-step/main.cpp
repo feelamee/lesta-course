@@ -15,18 +15,20 @@
 #include <ranges>
 #include <vector>
 
-#include <SDL3/SDL.h>
-#include <glad/glad.h>
 #include <imgui.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_sdl3.h>
 
 int
 main()
 {
     using namespace nano;
     engine& eng = engine_instance();
-    eng.initialize();
+    int err_code = eng.initialize();
+    if (EXIT_SUCCESS != err_code)
+    {
+        LOG_DEBUG("Failed while initializing engine");
+        return err_code;
+    }
+
     ImGuiIO& io = ImGui::GetIO();
     ImGui::StyleColorsDark();
 
@@ -38,13 +40,22 @@ main()
 
     while (is_running)
     {
-        SDL_Event ev;
-        while (SDL_PollEvent(&ev))
+        event ev;
+        while (poll_event(&ev))
         {
-            ImGui_ImplSDL3_ProcessEvent(&ev);
-            if (ev.key.keysym.sym == SDLK_q)
+            switch (ev.t)
             {
+            case event::type::key_up:
+                if (ev.kb.key.keycode == keycode_t::kb_q)
+                    is_running = false;
+                break;
+
+            case event::type::window_close_request:
                 is_running = false;
+                break;
+
+            default:
+                break;
             }
         }
 
@@ -52,7 +63,7 @@ main()
 
         if (show_demo_window)
         {
-            ImGui::ShowDemoWindow(&show_demo_window);
+            // ImGui::ShowDemoWindow(&show_demo_window);
         }
 
         if (show_another_window)

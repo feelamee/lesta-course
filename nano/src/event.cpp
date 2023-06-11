@@ -1,8 +1,12 @@
-#include <chrono>
 #include <nano/event.hpp>
 
 #include <SDL3/SDL_events.h>
+
+#include <algorithm>
+#include <chrono>
 #include <ratio>
+
+#include <imgui_impl_sdl3.h>
 
 namespace nano
 {
@@ -10,6 +14,9 @@ namespace nano
 void
 convert_sdl_event(SDL_Event* sdl_ev, event* ev)
 {
+    if (not sdl_ev or not ev)
+        return;
+
     using ev_t = event::type;
     ev->t = static_cast<ev_t>(sdl_ev->type);
     ev->kb.timestamp = event::timestamp_t(sdl_ev->key.timestamp);
@@ -91,6 +98,7 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
 
     default:
         ev->t = ev_t::unknown;
+        break;
     }
 }
 
@@ -106,6 +114,8 @@ poll_event(event* ev)
         return 0;
 
     convert_sdl_event(&sdl_ev, ev);
+    ImGui_ImplSDL3_ProcessEvent(&sdl_ev);
+
     return 1;
 }
 

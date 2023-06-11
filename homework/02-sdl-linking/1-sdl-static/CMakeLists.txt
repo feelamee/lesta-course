@@ -17,4 +17,4 @@ add_executable(
 
 target_compile_features(${TARGET} PRIVATE cxx_std_20)
 target_include_directories(${TARGET} PRIVATE ${SDL3_INCLUDE_DIR})
-target_link_libraries(${TARGET} PRIVATE ${SDL3_LIB})
+target_link_libraries(${TARGET} PRIVATE SDL3::SDL3-shared)

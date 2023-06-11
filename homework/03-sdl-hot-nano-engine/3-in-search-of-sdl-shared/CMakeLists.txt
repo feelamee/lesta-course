@@ -11,8 +11,7 @@ add_library(
 target_include_directories(${TARGET_LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/engine/include)
 target_compile_features(${TARGET_LIB} PUBLIC cxx_std_20)
 
-find_package(SDL3 REQUIRED)
-target_link_libraries(${TARGET_LIB} PUBLIC SDL3-shared)
+target_link_libraries(${TARGET_LIB} PUBLIC SDL3::SDL3-shared)
 
 set(TARGET_EXE 3-game)
 add_executable(

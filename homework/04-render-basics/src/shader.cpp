@@ -54,8 +54,12 @@ funny_moment::fragment_shader(const vertex& v)
     if (uniform.radius < 0.001 or ratio < 0.001)
         ratio = std::numeric_limits<float>::max();
 
-    size_t res_x = std::clamp(static_cast<size_t>(x - dx / ratio), 0UL, width),
-           res_y = std::clamp(static_cast<size_t>(y - dy / ratio), 0UL, height);
+    size_t res_x = std::clamp(static_cast<size_t>(x - dx / ratio),
+                              static_cast<size_t>(0),
+                              static_cast<size_t>(width));
+    size_t res_y = std::clamp(static_cast<size_t>(y - dy / ratio),
+                              static_cast<size_t>(0),
+                              static_cast<size_t>(height));
     color result = (*uniform.buf)(res_x, res_y);
 
     return result;

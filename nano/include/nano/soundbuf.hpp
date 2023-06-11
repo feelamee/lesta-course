@@ -33,15 +33,14 @@ class soundbuf
 {
 public:
     soundbuf();
+    soundbuf(std::shared_ptr<uint8_t[]>, int, const audio_spec& = {});
 
-    soundbuf(const soundbuf&) = delete;
-    soundbuf& operator=(const soundbuf&) = delete;
-
+    soundbuf(const soundbuf&);
     soundbuf(soundbuf&&);
     soundbuf& operator=(soundbuf);
 
     ~soundbuf();
-    std::uint8_t*& data();
+    std::uint8_t* data();
     const std::uint8_t* const data() const;
 
     int size() const;
@@ -52,7 +51,7 @@ public:
 
 private:
     audio_spec spec;
-    std::uint8_t* buf{ nullptr };
+    std::shared_ptr<std::uint8_t[]> buf;
     int m_size{ 0 };
 };
 
