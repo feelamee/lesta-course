@@ -1,11 +1,11 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
-#include <glad/glad.h>
-
 #include <filesystem>
 #include <iosfwd>
 #include <string_view>
+
+#include <glad/glad.h>
 
 namespace nano
 {

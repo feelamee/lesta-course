@@ -48,6 +48,7 @@ struct sound
     size_t position = 0;
 };
 #pragma pack(pop)
+
 void
 audio_callback(void* userdata, std::uint8_t* stream, int len)
 {
@@ -59,7 +60,7 @@ audio_callback(void* userdata, std::uint8_t* stream, int len)
     {
         SDL_MixAudioFormat(
             stream,
-            buf->buf.data() + buf->position,
+            &buf->buf.data()[buf->position],
             static_cast<SDL_AudioFormat>(buf->buf.specification().fmt),
             len,
             SDL_MIX_MAXVOLUME);
@@ -69,7 +70,7 @@ audio_callback(void* userdata, std::uint8_t* stream, int len)
     {
         SDL_MixAudioFormat(
             stream,
-            buf->buf.data() + buf->position,
+            &buf->buf.data()[buf->position],
             static_cast<SDL_AudioFormat>(buf->buf.specification().fmt),
             left,
             SDL_MIX_MAXVOLUME);
@@ -91,7 +92,7 @@ main()
     const char* fn = "../homework/06-and-god-create-sounds/highlands.wav";
 
     sound sbuf;
-    std::ifstream file(fn);
+    std::ifstream file(fn, std::ios::binary);
     if (not file)
     {
         std::cerr << "ERROR: failed while opening file:\n\t" << fn << std::endl;
@@ -99,11 +100,11 @@ main()
         return EXIT_FAILURE;
     }
     int err_code = nano::wav::load(file, sbuf.buf);
-    if (EXIT_FAILURE == err_code)
+    if (EXIT_SUCCESS != err_code)
     {
         using namespace nano::wav;
         std::cerr << "ERROR: failed while loading file:\n\t" << fn << std::endl;
-        std::cerr << error2str(error()) << std::endl;
+        std::cerr << error2str(err_code) << std::endl;
         SDL_Quit();
         return EXIT_FAILURE;
     }
@@ -118,7 +119,6 @@ main()
     spec.userdata = &sbuf;
     SDL_AudioDeviceID audio_device =
         SDL_OpenAudioDevice(nullptr, 0, &spec, &obtained, 0);
-
     if (0 == audio_device)
     {
         SDL_LogError(SDL_LOG_CATEGORY_AUDIO,

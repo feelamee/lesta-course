@@ -28,6 +28,10 @@ struct color
 };
 #pragma pack(pop)
 
+static_assert(sizeof(color) == 3,
+              "Color is packed structure with 3 field 1 byte each");
+static_assert(alignof(color) == 1);
+
 namespace colors
 {
 static constexpr auto min = std::numeric_limits<color::channel_t>::min();

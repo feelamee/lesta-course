@@ -25,18 +25,16 @@ enum limits
     MIN_COLOR_VALUE = 0,
 };
 
-enum class err_t
+enum err_t
 {
-    no_error,
-    bad_stream,
+    no_error = 0,
+    bad_stream = -4,
     incorrect_format,
     violation_limits,
     incorrect_header,
 };
 
-err_t error();
-
-std::string error2str(err_t e);
+std::string error2str(int e);
 
 int load(std::istream& src, canvas& img);
 
@@ -47,19 +45,17 @@ int dump(std::ostream& dst, const canvas& img, fmt format);
 namespace nano::wav
 {
 
-enum class err_t
+enum err_t
 {
-    no_error,
-    bad_stream,
+    no_error = 0,
+    bad_stream = -5,
     calc_length,
     internal_read,
     incorrect_file_structure,
     unsupported,
 };
 
-err_t error();
-
-std::string error2str(err_t);
+std::string error2str(int);
 
 int load(std::istream& src, soundbuf& buf);
 

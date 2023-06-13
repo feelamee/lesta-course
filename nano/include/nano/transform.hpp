@@ -15,8 +15,8 @@ public:
      */
     // clang-format off
     transform2D(float m_00, float m_01, float m_02,
-              float m_10, float m_11, float m_12,
-              float m_20, float m_21, float m_22);
+                float m_10, float m_11, float m_12,
+                float m_20, float m_21, float m_22);
     // clang-format on
     transform2D() = default;
 
@@ -45,8 +45,8 @@ public:
                                  const transform2D& rhs);
 
 public:
-    static constexpr size_t width = 3;
-    static constexpr size_t height = 3;
+    inline static constexpr std::size_t width = 3;
+    inline static constexpr std::size_t height = 3;
 
 private:
     // clang-format off

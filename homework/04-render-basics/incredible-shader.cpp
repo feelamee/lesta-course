@@ -78,8 +78,7 @@ main()
         std::cerr << "image " << img_path << " does not exist" << std::endl;
         return EXIT_FAILURE;
     }
-    std::fstream src(img_path, std::ios::in);
-    std::fstream dst("./leotest.ppm", std::ios::out);
+    std::ifstream src(img_path);
     canvas texture;
     ppm::load(src, texture);
 
@@ -91,6 +90,7 @@ main()
     my_renderer.program = std::make_shared<shader_type>();
     auto brush = std::dynamic_pointer_cast<shader_type>(my_renderer.program);
 
+    // brush->uniform.buf = &texture;
     brush->uniform.buf = &texture;
     std::vector<vertex> rectangle;
     std::vector<size_t> indices;

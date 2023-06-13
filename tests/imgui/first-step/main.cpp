@@ -15,13 +15,13 @@
 #include <ranges>
 #include <vector>
 
-#include <imgui.h>
+// #include <imgui.h>
 
 int
 main()
 {
     using namespace nano;
-    engine& eng = engine_instance();
+    engine& eng = engine::instance();
     int err_code = eng.initialize();
     if (EXIT_SUCCESS != err_code)
     {
@@ -34,7 +34,7 @@ main()
 
     bool is_running = true;
 
-    bool show_demo_window = false;
+    bool show_demo_window = true;
     bool show_another_window = true;
     int exit_code{ EXIT_FAILURE };
 
@@ -63,7 +63,7 @@ main()
 
         if (show_demo_window)
         {
-            // ImGui::ShowDemoWindow(&show_demo_window);
+            ImGui::ShowDemoWindow(&show_demo_window);
         }
 
         if (show_another_window)

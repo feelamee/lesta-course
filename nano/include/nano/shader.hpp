@@ -5,6 +5,7 @@
 #include <nano/transform.hpp>
 
 #include <filesystem>
+#include <format>
 #include <string>
 #include <unordered_map>
 
@@ -33,6 +34,10 @@ public:
 
     int load(const std::filesystem::path& frag_fn,
              const std::filesystem::path& vert_fn);
+
+    int load_from_src(type t, const std::string& sources);
+
+    int load_from_src(const std::string& frag_src, const std::string& vert_src);
 
     int uniform(const std::string&, const texture2D&);
     int uniform(const std::string&, const transform2D&);
@@ -64,6 +69,22 @@ private:
     std::unordered_map<std::string, location_t> uniforms;
     unsigned int handle{ 0 };
 };
+
+namespace shaders
+{
+namespace vert
+{
+std::string transform_src(const std::string& transform_arg_name);
+} // namespace vert
+
+namespace frag
+{
+std::string texture_src(const std::string& texture_arg_name);
+} // namespace frag
+
+int transform_texture(shader& result, const texture2D& tex);
+
+} // namespace shaders
 
 } // namespace nano
 

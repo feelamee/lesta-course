@@ -40,8 +40,8 @@ public:
     soundbuf& operator=(soundbuf);
 
     ~soundbuf();
-    std::uint8_t* data();
-    const std::uint8_t* const data() const;
+    std::shared_ptr<std::uint8_t[]> data();
+    const std::shared_ptr<std::uint8_t[]> data() const;
 
     int size() const;
     void size(int s);

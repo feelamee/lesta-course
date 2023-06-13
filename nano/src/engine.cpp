@@ -6,13 +6,9 @@
 #include <nano/transform.hpp>
 #include <nano/vertex.hpp>
 
-// see ~/code/lesta-course/external/SDL/include/SDL3/SDL_stdinc.h:795
 #define SDL_FUNCTION_POINTER_IS_VOID_POINTER
 #include <SDL3/SDL.h>
-
 #include <glad/glad.h>
-
-#include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 
@@ -42,127 +38,6 @@ struct engine::impl_t
     }
 };
 
-void*
-engine::window()
-{
-    return impl->window;
-}
-void*
-engine::context()
-{
-    return impl->context;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
-static const char*
-source_to_strv(GLenum source)
-{
-    switch (source)
-    {
-    case GL_DEBUG_SOURCE_API:
-        return "API";
-    case GL_DEBUG_SOURCE_SHADER_COMPILER:
-        return "SHADER_COMPILER";
-    case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-        return "WINDOW_SYSTEM";
-    case GL_DEBUG_SOURCE_THIRD_PARTY:
-        return "THIRD_PARTY";
-    case GL_DEBUG_SOURCE_APPLICATION:
-        return "APPLICATION";
-    case GL_DEBUG_SOURCE_OTHER:
-        return "OTHER";
-    }
-    return "unknown";
-}
-
-static const char*
-type_to_strv(GLenum type)
-{
-    switch (type)
-    {
-    case GL_DEBUG_TYPE_ERROR:
-        return "ERROR";
-    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-        return "DEPRECATED_BEHAVIOR";
-    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-        return "UNDEFINED_BEHAVIOR";
-    case GL_DEBUG_TYPE_PERFORMANCE:
-        return "PERFORMANCE";
-    case GL_DEBUG_TYPE_PORTABILITY:
-        return "PORTABILITY";
-    case GL_DEBUG_TYPE_MARKER:
-        return "MARKER";
-    case GL_DEBUG_TYPE_PUSH_GROUP:
-        return "PUSH_GROUP";
-    case GL_DEBUG_TYPE_POP_GROUP:
-        return "POP_GROUP";
-    case GL_DEBUG_TYPE_OTHER:
-        return "OTHER";
-    }
-    return "unknown";
-}
-
-static const char*
-severity_to_strv(GLenum severity)
-{
-    switch (severity)
-    {
-    case GL_DEBUG_SEVERITY_HIGH:
-        return "HIGH";
-    case GL_DEBUG_SEVERITY_MEDIUM:
-        return "MEDIUM";
-    case GL_DEBUG_SEVERITY_LOW:
-        return "LOW";
-    case GL_DEBUG_SEVERITY_NOTIFICATION:
-        return "NOTIFICATION";
-    }
-    return "unknown";
-}
-
-// 30Kb on my system, too much for stack
-static std::array<char, GL_MAX_DEBUG_MESSAGE_LENGTH> local_log_buff;
-
-static void APIENTRY
-callback_opengl_debug(GLenum source,
-                      GLenum type,
-                      GLuint id,
-                      GLenum severity,
-                      GLsizei length,
-                      const GLchar* message,
-                      [[maybe_unused]] const void* userParam)
-{
-    // The memory formessageis owned and managed by the GL, and should onlybe
-    // considered valid for the duration of the function call.The behavior of
-    // calling any GL or window system function from within thecallback function
-    // is undefined and may lead to program termination.Care must also be taken
-    // in securing debug callbacks for use with asynchronousdebug output by
-    // multi-threaded GL implementations.  Section 18.8 describes thisin further
-    // detail.
-
-    auto& buff{ local_log_buff };
-    int num_chars = std::snprintf(buff.data(),
-                                  buff.size(),
-                                  "%s %s %d %s %.*s\n",
-                                  source_to_strv(source),
-                                  type_to_strv(type),
-                                  id,
-                                  severity_to_strv(severity),
-                                  length,
-                                  message);
-
-    if (num_chars > 0)
-    {
-        // Use https://en.cppreference.com/w/cpp/io/basic_osyncstream
-        // to fix possible data races
-        // now we use GL_DEBUG_OUTPUT_SYNCHRONOUS to garantie call in main
-        // thread
-        std::cerr.write(buff.data(), num_chars);
-    }
-}
-
-//////////////////////////////////////////////////////////////////////////////
-
 int
 engine::initialize()
 {
@@ -170,11 +45,8 @@ engine::initialize()
     int err_code = SDL_Init(SDL_INIT_EVERYTHING);
     ASSERT_SDL_ERROR(EXIT_SUCCESS == err_code);
 
-    // TODO: extract such values to config
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_DEBUG_FLAG);
-    constexpr size_t w = 720, h = 480;
-
-    impl->window = SDL_CreateWindow("test", w, h, SDL_WINDOW_OPENGL);
+    impl->window = SDL_CreateWindow(
+        "test", window.width, window.height, SDL_WINDOW_OPENGL);
     ASSERT_SDL_ERROR(nullptr != impl->window);
 
     // TODO: extract such values to config
@@ -188,10 +60,6 @@ engine::initialize()
 
     // TODO: extract such values to config
     assert(real_major_version == 3 && real_minor_version == 2);
-
-    glDebugMessageCallback(callback_opengl_debug, nullptr);
-    glDebugMessageControl(
-        GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
 
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context);
@@ -243,7 +111,7 @@ engine::swap_buffers()
 }
 
 engine&
-engine_instance()
+engine::instance()
 {
     static engine nano{};
     return nano;

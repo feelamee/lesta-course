@@ -21,8 +21,8 @@ public:
 
     primitive_t primitive_type() const;
     std::size_t points_count() const;
-    const texture2D& get_texture() const;
-    const transform2D& get_transform() const;
+    const texture2D& texture() const;
+    const transform2D& transform() const;
 
     void move(const vec2f& offset);
     void scale(const vec2f& scale);
@@ -30,18 +30,23 @@ public:
     using radian = float;
     void rotate(radian angle);
 
-    vec2f get_origin() const;
-    vec2f get_position() const;
-    radian get_rotation() const;
-    vec2f get_factor() const;
+    vec2f origin() const;
+    vec2f position() const;
+    radian rotation() const;
+    vec2f factor() const;
+
+    void origin(const vec2f& p_origin);
+    void position(const vec2f& p_posiiton);
+    void rotation(radian p_rotation);
+    void factor(const vec2f& p_factor);
 
 private:
     vertbuf vertices;
-    vec2f origin{ 0, 0 };
-    vec2f position{ 0, 0 };
-    radian rotation{ 0 };
-    vec2f factor{ 1., 1. };
-    mutable transform2D m_transform;
+    vec2f m_origin{ 0, 0 };
+    vec2f m_position{ 0, 0 };
+    radian m_rotation{ 0 };
+    vec2f m_factor{ 1., 1. };
+    mutable transform2D m_transform{};
     const texture2D& m_texture;
     color fill{ colors::white };
     mutable bool transform_need_update{ false };

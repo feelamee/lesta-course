@@ -99,6 +99,7 @@ struct event
 {
     using timestamp_t = std::chrono::duration<std::uint64_t, std::nano>;
     enum class type;
+
     struct keyboard
     {
         struct key_t
@@ -108,8 +109,8 @@ struct event
             std::uint16_t mod;
         };
 
-        type t; /**< event_t::key_down or event_t::key_up */
-        timestamp_t timestamp;
+        type t;                /**< event_t::key_down or event_t::key_up */
+        timestamp_t timestamp; /**< in nanoseconds */
         bool repeat;
         key_t key;
     };

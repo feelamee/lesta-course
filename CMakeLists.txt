@@ -16,7 +16,7 @@ option(ADDRESS_SANITIZER ON)
 add_library(sanitizer INTERFACE)
 
 if(ADDRESS_SANITIZER)
-    message(STATUS "Using address sanitizer for " ${PROJECT_NAME})
+    message(STATUS "Using address sanitizer")
     target_compile_options(sanitizer INTERFACE -fsanitize=address)
     target_link_options(sanitizer INTERFACE -fsanitize=address)
 endif()

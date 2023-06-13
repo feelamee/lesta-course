@@ -36,13 +36,4 @@ extract_file(std::string& dst, const std::filesystem::path& filename)
     return src.good() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-void
-print(const std::ranges::range auto& r)
-{
-    err_os << "(range: " << std::size(r) << ')' << "[ ";
-    for (const auto& i : r)
-        err_os << i << " ";
-    err_os << ']' << std::endl;
-}
-
 } // namespace nano

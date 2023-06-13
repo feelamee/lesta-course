@@ -94,6 +94,45 @@ shader::type2str(type t)
 int
 shader::load(type t, const std::filesystem::path& filename)
 {
+    std::string src;
+    int err_code = extract_file(src, filename);
+    if (EXIT_FAILURE == err_code)
+    {
+        LOG_DEBUG("Fail when loading file: " + path2str(filename));
+        return EXIT_FAILURE;
+    }
+
+    err_code = load_from_src(t, src);
+
+    return err_code;
+}
+
+int
+shader::load(const std::filesystem::path& frag_fn,
+             const std::filesystem::path& vert_fn)
+{
+    int err_code = load(type::fragment, frag_fn);
+    if (EXIT_FAILURE == err_code)
+    {
+        LOG_DEBUG("Fail when loading fragment shader from: " +
+                  path2str(frag_fn));
+        return EXIT_FAILURE;
+    }
+    err_code = EXIT_FAILURE;
+
+    err_code = load(type::vertex, vert_fn);
+    if (EXIT_FAILURE == err_code)
+    {
+        LOG_DEBUG("Fail when loading vertex shader from: " + path2str(vert_fn));
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+
+int
+shader::load_from_src(type t, const std::string& sources)
+{
     if (is_attached(t, *this))
     {
         LOG_DEBUG("Shader of such type is already attached: " + type2str(t) +
@@ -105,43 +144,29 @@ shader::load(type t, const std::filesystem::path& filename)
         GL_CHECK(handle = glCreateProgram());
     }
 
-    std::string src;
-    int err_code = nano::extract_file(src, filename);
+    int err_code = compile(t, sources);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading file: " + path2str(filename));
-        return EXIT_FAILURE;
-    }
-    err_code = EXIT_FAILURE;
-
-    err_code = compile(t, src);
-    if (EXIT_FAILURE == err_code)
-    {
-        LOG_DEBUG("Fail when compiling shader source from: " +
-                  path2str(filename));
+        LOG_DEBUG("Fail when compiling shader source");
     }
 
     return err_code;
 }
 
 int
-shader::load(const std::filesystem::path& frag_filename,
-             const std::filesystem::path& vert_filename)
+shader::load_from_src(const std::string& frag_src, const std::string& vert_src)
 {
-    int err_code = load(type::fragment, frag_filename);
+    int err_code = load_from_src(type::fragment, frag_src);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading fragment shader from: " +
-                  path2str(frag_filename));
+        LOG_DEBUG("Fail when loading fragment shader from");
         return EXIT_FAILURE;
     }
-    err_code = EXIT_FAILURE;
 
-    err_code = load(type::vertex, vert_filename);
+    err_code = load_from_src(type::vertex, vert_src);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading vertex shader from: " +
-                  path2str(vert_filename));
+        LOG_DEBUG("Fail when loading vertex shader");
         return EXIT_FAILURE;
     }
 
@@ -375,5 +400,96 @@ shader::active()
     GL_CHECK(glGetIntegerv(GL_CURRENT_PROGRAM, &cur));
     return cur;
 }
+
+namespace shaders
+{
+
+namespace vert
+{
+
+std::string
+transform_src(const std::string& transform_arg_name)
+{
+    return std::format(R"(
+                #version 320 es
+
+                layout (location = 0) in vec2 p_pos;
+                layout (location = 1) in vec3 p_color;
+                layout (location = 2) in vec2 p_tpos;
+
+                uniform mat3 {0};
+
+                out vec3 color;
+                out vec2 tpos;
+
+                void main()
+                {{
+                    gl_Position = vec4(vec3(p_pos, 1.) * u_matrix, 1);
+                    color = p_color;
+                    tpos = p_tpos;
+                }}
+                                )",
+                       transform_arg_name);
+}
+
+} // namespace vert
+
+namespace frag
+{
+std::string
+texture_src(const std::string& texture_arg_name)
+{
+    return std::format(R"(
+                #version 320 es
+                precision mediump float;
+
+                in vec2 tpos;
+
+                out vec4 color;
+
+                uniform sampler2D {0};
+
+                void main()
+                {{
+                    color = texture(u_texture, tpos);
+                }}
+                )",
+                       texture_arg_name);
+}
+
+} // namespace frag
+
+#define TEST_ERROR(err, msg)                                                   \
+    {                                                                          \
+        if (EXIT_FAILURE == (err))                                             \
+        {                                                                      \
+            LOG_DEBUG((msg));                                                  \
+            return EXIT_FAILURE;                                               \
+        }                                                                      \
+        err_code = EXIT_FAILURE;                                               \
+    }
+
+int
+transform_texture(shader& result, const texture2D& tex)
+{
+    int err_code =
+        result.load_from_src(shaders::frag::texture_src("u_texture"),
+                             shaders::vert::transform_src("u_matrix"));
+
+    TEST_ERROR(err_code, "Shader program loading failed");
+
+    err_code = shader::link(result);
+    TEST_ERROR(err_code, "Shader program linking failed");
+
+    err_code = shader::validate(result);
+    TEST_ERROR(err_code, "Shader program validation failure");
+
+    err_code = result.uniform("u_texture", tex);
+    TEST_ERROR(err_code, "Setting uniform u_texture failure");
+
+    return EXIT_SUCCESS;
+}
+
+} // namespace shaders
 
 } // namespace nano

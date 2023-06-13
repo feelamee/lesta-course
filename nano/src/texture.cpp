@@ -5,10 +5,10 @@
 #include <nano/utils.hpp>
 #include <nano/vec.hpp>
 
-#include <glad/glad.h>
-
 #include <cstdlib>
 #include <fstream>
+
+#include <iostream>
 
 namespace nano
 {
@@ -79,6 +79,7 @@ texture2D::load(const canvas& image)
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_handle));
 
     set_size(image.width(), image.height());
+    GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, alignof(color)));
     GL_ASSERT(glTexImage2D(GL_TEXTURE_2D,
                            0,
                            GL_RGB,
@@ -89,13 +90,10 @@ texture2D::load(const canvas& image)
                            GL_UNSIGNED_BYTE,
                            image.data()));
 
-    // TODO: add methods for this
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
     GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 
-    // because glIsTexture return GL_FALSE while texture is not binded firstly
-    glBindTexture(GL_TEXTURE_2D, m_handle);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
 
     return EXIT_SUCCESS;
 }
@@ -103,7 +101,7 @@ texture2D::load(const canvas& image)
 int
 texture2D::load(const std::filesystem::path& filename)
 {
-    std::ifstream file(filename);
+    std::ifstream file(filename, std::ios::binary);
     if (not file)
     {
         LOG_DEBUG("Failed opening file: " + path2str(filename));
@@ -112,16 +110,16 @@ texture2D::load(const std::filesystem::path& filename)
 
     canvas img;
     int err_code = ppm::load(file, img);
-    if (EXIT_FAILURE == err_code)
+    if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("Fail" + ppm::error2str(ppm::error()) +
-                  " when loading canvas from: " + path2str(filename));
+        LOG_DEBUG(ppm::error2str(err_code) +
+                  "\n    Fail when loading canvas from: " + path2str(filename));
         return EXIT_FAILURE;
     }
     err_code = EXIT_FAILURE;
 
     err_code = load(img);
-    if (EXIT_FAILURE == err_code)
+    if (EXIT_SUCCESS != err_code)
     {
         LOG_DEBUG("Failed loading texture from canvas from file: " +
                   path2str(filename));

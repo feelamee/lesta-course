@@ -11,8 +11,8 @@ namespace nano
 
 // clang-format off
 transform2D::transform2D(float m_00, float m_01, float m_02,
-                     float m_10, float m_11, float m_12,
-                     float m_20, float m_21, float m_22)
+                         float m_10, float m_11, float m_12,
+                         float m_20, float m_21, float m_22)
     : mat{m_00, m_01, m_02,
           m_10, m_11, m_12,
           m_20, m_21, m_22,}
@@ -48,19 +48,23 @@ transform2D&
 transform2D::combine(const transform2D& other)
 {
 
+    auto lhs = *this;
     auto& mat = *this;
     // clang-format off
-    mat(0, 0) = mat(0, 0) * other(0, 0) + mat(1, 0) * other(0, 1) + mat(2, 0) * other(0, 2);
-    mat(1, 0) = mat(0, 0) * other(1, 0) + mat(1, 0) * other(1, 1) + mat(2, 0) * other(1, 2);
-    mat(2, 0) = mat(0, 0) * other(2, 0) + mat(1, 0) * other(2, 1) + mat(2, 0) * other(2, 2);
+    mat(0, 0) = lhs(0, 0) * other(0, 0) + lhs(1, 0) * other(0, 1) + lhs(2, 0) * other(0, 2);
+    mat(1, 0) = lhs(0, 0) * other(1, 0) + lhs(1, 0) * other(1, 1) + lhs(2, 0) * other(1, 2);
+    // mat(2, 0) = lhs(0, 0) * other(2, 0) + lhs(1, 0) * other(2, 1) + lhs(2, 0) * other(2, 2);
+    mat(2, 0) = 0;
 
-    mat(0, 1) = mat(0, 1) * other(0, 0) + mat(1, 1) * other(0, 1) + mat(2, 1) * other(0, 2);
-    mat(1, 1) = mat(0, 1) * other(1, 0) + mat(1, 1) * other(1, 1) + mat(2, 1) * other(1, 2);
-    mat(2, 1) = mat(0, 1) * other(2, 0) + mat(1, 1) * other(2, 1) + mat(2, 1) * other(2, 2);
+    mat(0, 1) = lhs(0, 1) * other(0, 0) + lhs(1, 1) * other(0, 1) + lhs(2, 1) * other(0, 2);
+    mat(1, 1) = lhs(0, 1) * other(1, 0) + lhs(1, 1) * other(1, 1) + lhs(2, 1) * other(1, 2);
+    // mat(2, 1) = lhs(0, 1) * other(2, 0) + lhs(1, 1) * other(2, 1) + lhs(2, 1) * other(2, 2);
+    mat(2, 1) = 0;
 
-    mat(0, 2) = mat(0, 2) * other(0, 0) + mat(1, 2) * other(0, 1) + mat(2, 2) * other(0, 2);
-    mat(1, 2) = mat(0, 2) * other(1, 0) + mat(1, 2) * other(1, 1) + mat(2, 2) * other(1, 2);
-    mat(2, 2) = mat(0, 2) * other(2, 0) + mat(1, 2) * other(2, 1) + mat(2, 2) * other(2, 2);
+    mat(0, 2) = lhs(0, 2) * other(0, 0) + lhs(1, 2) * other(0, 1) + lhs(2, 2) * other(0, 2);
+    mat(1, 2) = lhs(0, 2) * other(1, 0) + lhs(1, 2) * other(1, 1) + lhs(2, 2) * other(1, 2);
+    // mat(2, 2) = lhs(0, 2) * other(2, 0) + lhs(1, 2) * other(2, 1) + lhs(2, 2) * other(2, 2);
+    mat(2, 2) = 1;
     // clang-format on
 
     return *this;
@@ -81,7 +85,7 @@ transform2D::move(const vec2f& offset)
     const transform2D moving = {
                     1, 0, offset.x,
                     0, 1, offset.y,
-                    0, 0,          1};
+                    0, 0,        1};
     // clang-format on
 
     return combine(moving);
@@ -100,9 +104,9 @@ transform2D::scale(const vec2f& scale)
 {
     // clang-format off
     const transform2D scaling = {
-                    scale.x, 0,         0,
-                    0,         scale.y, 0,
-                    0,         0,         1};
+                    scale.x, 0,       0,
+                    0,       scale.y, 0,
+                    0,       0,       1};
     // clang-format on
 
     return combine(scaling);
@@ -145,9 +149,9 @@ transform2D::rotate(radian angle)
     const float sin = std::sin(angle);
 
     // clang-format off
-    const transform2D rot{cos, -sin, 0,
-                        sin,  cos, 0,
-                          0,    0, 1};
+    const transform2D rot{ cos,  sin, 0,
+                          -sin,  cos, 0,
+                             0,    0, 1};
     // clang-format on
 
     return combine(rot);

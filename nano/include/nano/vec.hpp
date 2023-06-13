@@ -27,6 +27,14 @@ struct vec2
         *this = *this + other;
         return *this;
     }
+
+    vec2<T>&
+    operator=(const vec2<T>& other)
+    {
+        x = other.x;
+        y = other.y;
+        return *this;
+    }
 };
 using vec2f = vec2<float>;
 using vec2i = vec2<int>;

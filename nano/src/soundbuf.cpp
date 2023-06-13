@@ -63,16 +63,16 @@ soundbuf::size(int s)
         m_size = 0;
 }
 
-std::uint8_t*
+std::shared_ptr<std::uint8_t[]>
 soundbuf::data()
 {
-    return buf.get();
+    return buf;
 }
 
-const std::uint8_t* const
+const std::shared_ptr<std::uint8_t[]>
 soundbuf::data() const
 {
-    return buf.get();
+    return buf;
 }
 
 audio_spec&

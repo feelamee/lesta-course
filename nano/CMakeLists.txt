@@ -47,7 +47,6 @@ target_compile_options(${TARGET} PUBLIC -DNANO_DEBUG)
 target_compile_options(${TARGET} PUBLIC -g)
 endif()
 
-
 target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
 target_link_libraries(${TARGET} PUBLIC ImGui)
 target_link_libraries(${TARGET} PUBLIC glad)

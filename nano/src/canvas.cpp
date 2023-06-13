@@ -62,7 +62,7 @@ canvas::resize(std::size_t width, std::size_t height)
 void
 canvas::transpose()
 {
-    // can be better if use swap without creating new matrix
+    // TODO: can be better if use swap without creating new matrix
     std::vector<color> new_buf(width() * height());
     for (std::size_t i{ 0 }; i < width(); ++i)
         for (std::size_t j{ 0 }; j < height(); ++j)

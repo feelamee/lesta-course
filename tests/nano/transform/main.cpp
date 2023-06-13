@@ -1,3 +1,4 @@
+#include "nano/transform.hpp"
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/event.hpp>
@@ -5,99 +6,54 @@
 #include <nano/shader.hpp>
 #include <nano/shape.hpp>
 #include <nano/texture.hpp>
+#include <nano/utils.hpp>
 #include <nano/vec.hpp>
 #include <nano/vertbuf.hpp>
 #include <nano/vertex.hpp>
 
 #include <fstream>
 #include <iostream>
+#include <numeric>
 #include <vector>
 
-void
-print(const std::ranges::range auto& r)
-{
-    for (const auto& i : r)
-        std::cout << i << " ";
-    std::cout << std::endl;
-}
-
-template <typename T>
-void
-print(const T* r, std::size_t w, std::size_t h)
-{
-    for (auto i{ 0 }; i < w; ++i)
-    {
-        for (auto j{ 0 }; j < h; ++j)
-            std::cout << r[i * h + j] << " ";
-        std::cout << std::endl;
+#define TEST_ERROR(err, msg)                                                   \
+    {                                                                          \
+        if (EXIT_FAILURE == (err))                                             \
+        {                                                                      \
+            LOG_DEBUG((msg));                                                  \
+            return EXIT_FAILURE;                                               \
+        }                                                                      \
+        err_code = EXIT_FAILURE;                                               \
     }
-}
 
 int
 main()
 {
     using namespace nano;
-    engine& eng = engine_instance();
+    engine& eng = engine::instance();
     eng.initialize();
-
-    // clang-format off
-    vertbuf buf(
-        primitive_t::triangle_strip,
-        {
-          {{-.3,  .3},   {0, 0, 0},    {0, 0}},
-          {{ .3,  .3},   {0, 0, 0},    {0, 1}},
-          {{-.3, -.3},   {0, 0, 0},    {1, 0}},
-          {{ .3, -.3},   {0, 0, 0},    {1, 1}},
-        });
-    // clang-format on
 
     texture2D tex;
     tex.load("../tests/nano/transform/leo.ppm");
+    const float tex_ratio = (float)tex.width() / tex.height();
 
-    shape tmp(buf, tex);
-    tmp.scale({ 747. / 1328, 720. / 480 });
+    // clang-format off
+    vertbuf buf(primitive_t::triangle_strip,
+                {
+                    { {  .3*tex_ratio, -.3 }, { 0, 0, 0 }, { 1, 1 } },
+                    { { -.3*tex_ratio, -.3 }, { 0, 0, 0 }, { 0, 1 } },
+                    { {  .3*tex_ratio,  .3 }, { 0, 0, 0 }, { 1, 0 } },
+                    { { -.3*tex_ratio,  .3 }, { 0, 0, 0 }, { 0, 0 } },
+                });
+    // clang-format on
+
+    shape sprite(buf, tex);
+    sprite.scale({ 2, 2 * (float)eng.window.width / eng.window.height });
 
     shader program;
-    int err_code = program.load("../tests/nano/transform/fragment-shader.frag",
-                                "../tests/nano/transform/vertex-shader.vert");
-    if (EXIT_FAILURE == err_code)
-    {
-        LOG_DEBUG("Shader program loading failed");
-        return EXIT_FAILURE;
-    }
-    err_code = EXIT_FAILURE;
-
-    err_code = shader::link(program);
-    if (EXIT_FAILURE == err_code)
-    {
-        LOG_DEBUG("Shader program linking failed");
-        return EXIT_FAILURE;
-    }
-    err_code = EXIT_FAILURE;
-
-    err_code = shader::validate(program);
-    if (EXIT_FAILURE == err_code)
-    {
-        LOG_DEBUG("Shader program validation failure");
-        return EXIT_FAILURE;
-    }
-    err_code = EXIT_FAILURE;
-
-    err_code = program.uniform("u_texture", tmp.get_texture());
-    if (EXIT_FAILURE == err_code)
-    {
-        LOG_DEBUG("Setting uniform u_texture failure");
-        return EXIT_FAILURE;
-    }
-    err_code = EXIT_FAILURE;
-
-    err_code = shader::use(program);
-    if (EXIT_FAILURE == err_code)
-    {
-        LOG_DEBUG("Shader program use failure");
-        return EXIT_FAILURE;
-    }
-    err_code = EXIT_FAILURE;
+    int err_code = shaders::transform_texture(program, sprite.texture());
+    TEST_ERROR(err_code, "Fail while setting up shader program");
+    shader::use(program);
 
     bool is_rotate{ false };
     bool is_running{ true };
@@ -126,22 +82,30 @@ main()
                 switch (ev.kb.key.keycode)
                 {
                 case keycode_t::kb_w:
-                    tmp.move({ 0, 0.01 });
+                    sprite.move({ 0, 0.01 });
                     break;
 
                 case keycode_t::kb_a:
-                    tmp.move({ -0.01, 0 });
+                    sprite.move({ -0.01, 0 });
                     break;
 
                 case keycode_t::kb_s:
-                    tmp.move({ 0, -0.01 });
+                    sprite.move({ 0, -0.01 });
                     break;
 
                 case keycode_t::kb_d:
-                    tmp.move({ 0.01, 0 });
+                    sprite.move({ 0.01, 0 });
                     break;
                 case keycode_t::kb_r:
-                    is_rotate = is_rotate ? false : true;
+                    is_rotate = not is_rotate;
+                    break;
+
+                case keycode_t::kb_h:
+                    sprite.rotate(-0.1);
+                    break;
+
+                case keycode_t::kb_l:
+                    sprite.rotate(0.1);
                     break;
 
                 case keycode_t::kb_q:
@@ -161,12 +125,12 @@ main()
         {
             auto time =
                 std::chrono::system_clock::now().time_since_epoch().count();
-            tmp.rotate(time);
+            sprite.rotate(time / 1e20);
         }
 
-        render(tmp);
+        program.uniform("u_matrix", sprite.transform());
+        render(sprite);
         eng.swap_buffers();
-        program.uniform("u_matrix", tmp.get_transform());
     }
 
     eng.finalize();

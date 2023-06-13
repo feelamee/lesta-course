@@ -1,6 +1,5 @@
 #include <nano/shape.hpp>
 
-#include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/transform.hpp>
 
@@ -32,22 +31,19 @@ shape::data()
 void
 shape::move(const vec2f& offset)
 {
-    position += offset;
-    transform_need_update = true;
+    position(m_position + offset);
 }
 
 void
 shape::scale(const vec2f& scale)
 {
-    factor = { factor.x * scale.x, factor.y * scale.y };
-    transform_need_update = true;
+    factor({ m_factor.x * scale.x, m_factor.y * scale.y });
 }
 
 void
 shape::rotate(radian angle)
 {
-    rotation += angle;
-    transform_need_update = true;
+    rotation(m_rotation + angle);
 }
 
 primitive_t
@@ -63,58 +59,75 @@ shape::points_count() const
 }
 
 const texture2D&
-shape::get_texture() const
+shape::texture() const
 {
     return m_texture;
 }
 
 const transform2D&
-shape::get_transform() const
+shape::transform() const
 {
     if (transform_need_update)
     {
-        const float sin = std::sin(rotation);
-        const float cos = std::cos(rotation);
+        transform2D new_tr;
+        new_tr.rotate(rotation()).move(position()).scale(factor());
+        m_transform = new_tr;
 
-        const float _00 = factor.x * cos;
-        const float _11 = factor.y * cos;
-        const float _01 = factor.y * sin;
-        const float _10 = -factor.x * sin;
-        const float _02 = -origin.x * _00 - origin.y * _01 + position.x;
-        const float _12 = -origin.x * _10 - origin.y * _11 + position.y;
-
-        // clang-format off
-        m_transform = transform2D(_00, _01, _02,
-                                _10, _11, _12,
-                                  0,   0,   1);
-        // clang-format on
         transform_need_update = false;
     }
     return m_transform;
 }
 
 vec2f
-shape::get_origin() const
+shape::origin() const
 {
-    return origin;
+    return m_origin;
 }
 
 vec2f
-shape::get_position() const
+shape::position() const
 {
-    return position;
+    return m_position;
 }
 
 shape::radian
-shape::get_rotation() const
+shape::rotation() const
 {
-    return rotation;
+    return m_rotation;
 }
 
 vec2f
-shape::get_factor() const
+shape::factor() const
 {
-    return factor;
+    return m_factor;
+}
+
+void
+shape::origin(const vec2f& p_origin)
+{
+    m_origin = p_origin;
+    transform_need_update = true;
+}
+
+void
+shape::position(const vec2f& p_posiiton)
+{
+    m_position = p_posiiton;
+    transform_need_update = true;
+}
+
+void
+shape::rotation(radian p_rotation)
+{
+    m_rotation = p_rotation;
+    transform_need_update = true;
+}
+
+void
+shape::factor(const vec2f& p_factor)
+{
+    m_factor = p_factor;
+    transform_need_update = true;
 }
 
 void
@@ -125,7 +138,7 @@ render(const shape& p_shape)
     GL_CHECK(glEnableVertexAttribArray(0));
 
     GL_CHECK(glVertexAttribPointer(1,
-                                   4,
+                                   3,
                                    GL_UNSIGNED_BYTE,
                                    GL_FALSE,
                                    sizeof(vertex),

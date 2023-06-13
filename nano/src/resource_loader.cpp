@@ -12,18 +12,8 @@
 namespace nano::ppm
 {
 
-static err_t err;
-
-err_t
-error()
-{
-    err_t ret = err;
-    err = err_t::no_error;
-    return ret;
-}
-
 std::string
-error2str(err_t e)
+error2str(int e)
 {
     switch (e)
     {
@@ -62,13 +52,11 @@ load(std::istream& src, canvas& img)
 
     if (not src.good())
     {
-        err = err_t::bad_stream;
-        return EXIT_FAILURE;
+        return err_t::bad_stream;
     }
     if (fmt != "P6" and fmt != "P3")
     {
-        err = err_t::incorrect_format;
-        return EXIT_FAILURE;
+        return err_t::incorrect_format;
     }
     // clang-format off
     if (width > limits::MAX_IMAGE_SIZE or
@@ -77,14 +65,12 @@ load(std::istream& src, canvas& img)
         height < limits::MIN_IMAGE_SIZE or
         max_color_val != limits::MAX_COLOR_VALUE)
     {
-        err = err_t::violation_limits;
-        return EXIT_FAILURE;
+        return err_t::violation_limits;
     }
     // clang-format on
     if (not std::iswspace(sep))
     {
-        err = err_t::incorrect_header;
-        return EXIT_FAILURE;
+        return err_t::incorrect_header;
     }
 
     img.resize(static_cast<std::size_t>(width),
@@ -108,14 +94,13 @@ load(std::istream& src, canvas& img)
             }
     }
 
-    img.transpose();
+    // img.transpose();
 
-    if (not src)
+    if (src.bad())
     {
-        err = err_t::bad_stream;
-        return EXIT_FAILURE;
+        return err_t::bad_stream;
     }
-    return EXIT_SUCCESS;
+    return err_t::no_error;
 }
 
 int
@@ -123,25 +108,24 @@ dump(std::ostream& dst, const canvas& img, fmt format)
 {
     if (not dst.good())
     {
-        err = err_t::bad_stream;
-        return EXIT_FAILURE;
+        return err_t::bad_stream;
     }
 
     const std::size_t max_color_value =
         (1 << (8 * sizeof(color::channel_t))) - 1;
 
-    dst << (format == fmt::P3 ? "P3" : "P6") << std::endl
-        << img.width() << " " << img.height() << std::endl
-        << max_color_value << std::endl;
+    dst << (format == fmt::P3 ? "P3" : "P6") << '\n'
+        << img.width() << " " << img.height() << '\n'
+        << max_color_value << '\n';
 
     if (format == fmt::P3)
     {
         for (std::size_t i{ 0 }; i < img.height(); ++i)
             for (std::size_t j{ 0 }; j < img.width(); ++j)
             {
-                dst << static_cast<std::size_t>(img(i, j).r) << " "
-                    << static_cast<std::size_t>(img(i, j).g) << " "
-                    << static_cast<std::size_t>(img(i, j).b) << std::endl;
+                dst << static_cast<std::size_t>(img(i, j).r) << ' '
+                    << static_cast<std::size_t>(img(i, j).g) << ' '
+                    << static_cast<std::size_t>(img(i, j).b) << '\n';
             }
     }
     else // fmt == fmt::P6
@@ -150,12 +134,11 @@ dump(std::ostream& dst, const canvas& img, fmt format)
                   img.width() * img.height() * sizeof(color));
     }
 
-    if (not dst)
+    if (dst.bad())
     {
-        err = err_t::bad_stream;
-        return EXIT_FAILURE;
+        return err_t::bad_stream;
     }
-    return EXIT_SUCCESS;
+    return err_t::no_error;
 }
 
 } // namespace nano::ppm
@@ -163,18 +146,8 @@ dump(std::ostream& dst, const canvas& img, fmt format)
 namespace nano::wav
 {
 
-static err_t err;
-
-err_t
-error()
-{
-    err_t ret = err;
-    err = err_t::no_error;
-    return ret;
-}
-
 std::string
-error2str(err_t e)
+error2str(int e)
 {
     switch (e)
     {
@@ -211,15 +184,13 @@ load(std::istream& src, soundbuf& buf)
 {
     if (not src.good())
     {
-        err = err_t::bad_stream;
-        return EXIT_FAILURE;
+        return err_t::bad_stream;
     }
     src.seekg(0, std::ios::end);
     int size = src.tellg();
     if (-1 == size)
     {
-        err = err_t::calc_length;
-        return EXIT_FAILURE;
+        return err_t::calc_length;
     }
     src.seekg(0, std::ios::beg);
     auto raw_data = std::make_shared<uint8_t[]>(size);
@@ -228,8 +199,7 @@ load(std::istream& src, soundbuf& buf)
     SDL_RWops* sdl_buf = SDL_RWFromMem(raw_data.get(), size);
     if (nullptr == sdl_buf)
     {
-        err = err_t::internal_read;
-        return EXIT_FAILURE;
+        return err_t::internal_read;
     }
 
     SDL_AudioSpec spec;
@@ -239,23 +209,20 @@ load(std::istream& src, soundbuf& buf)
         SDL_LoadWAV_RW(sdl_buf, 1, &spec, &soundbuf_data, &soundbuf_len);
     if (nullptr == res)
     {
-        err = err_t::incorrect_file_structure;
-        return EXIT_FAILURE;
+        return err_t::incorrect_file_structure;
     }
 
     audio_spec soundbuf_spec;
     if (static_cast<int>(spec.channels) > 2)
     {
-        err = err_t::unsupported;
-        return EXIT_FAILURE;
+        return err_t::unsupported;
     }
     soundbuf_spec.channel = static_cast<audio_spec::channel_t>(spec.channels);
     // clang-format off
     if (spec.format != static_cast<SDL_AudioFormat>(audio_spec::format_t::f32) and
         spec.format != static_cast<SDL_AudioFormat>(audio_spec::format_t::s16))
     {
-        err = err_t::unsupported;
-        return EXIT_FAILURE;
+        return err_t::unsupported;
     }
     // clang-format on
     soundbuf_spec.fmt = static_cast<audio_spec::format_t>(spec.format);
@@ -265,7 +232,7 @@ load(std::istream& src, soundbuf& buf)
     buf = soundbuf(
         std::shared_ptr<uint8_t[]>(soundbuf_data), soundbuf_len, soundbuf_spec);
 
-    return EXIT_SUCCESS;
+    return err_t::no_error;
 }
 
 } // namespace nano::wav

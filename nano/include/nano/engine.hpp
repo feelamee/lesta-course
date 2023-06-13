@@ -8,6 +8,8 @@
 #include <nano/vec.hpp>
 #include <nano/vertbuf.hpp>
 
+#include <imgui.h>
+
 #include <memory>
 #include <vector>
 
@@ -19,6 +21,12 @@ struct vertex;
 class engine final
 {
 public:
+    struct window_t
+    {
+        static constexpr std::size_t width{ 720 };
+        static constexpr std::size_t height{ 960 };
+    } window;
+
     int initialize();
     void finalize();
 
@@ -26,8 +34,7 @@ public:
     static void renderUI();
     int swap_buffers();
 
-    void* window();
-    void* context();
+    static engine& instance();
 
     engine() = default;
     ~engine();
@@ -36,8 +43,6 @@ private:
     struct impl_t;
     std::shared_ptr<impl_t> impl;
 };
-
-engine& engine_instance();
 
 } // namespace nano
 
