@@ -1,6 +1,5 @@
 #include <nano/texture.hpp>
 
-#include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/resource_loader.hpp>
 #include <nano/utils.hpp>
@@ -61,38 +60,12 @@ void
 texture2D::size(std::size_t w, std::size_t h)
 {
     m_size = { w, h };
-
-    auto& win_size = engine::instance().window.size;
-    m_relsize.x = width() / win_size.x;
-    m_relsize.y = height() / win_size.y;
 }
 
 void
 texture2D::size(vec2s size)
 {
     m_size = size;
-
-    auto& win_size = engine::instance().window.size;
-    m_relsize.x = width() / win_size.x;
-    m_relsize.y = height() / win_size.y;
-}
-
-vec2f
-texture2D::relsize() const
-{
-    return m_relsize;
-}
-
-vec2f::type
-texture2D::relwidth() const
-{
-    return m_relsize.x;
-}
-
-vec2f::type
-texture2D::relheight() const
-{
-    return m_relsize.y;
 }
 
 int

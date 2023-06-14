@@ -34,10 +34,6 @@ public:
     vec2s::type width() const;
     vec2s::type height() const;
 
-    vec2f relsize() const;
-    vec2f::type relwidth() const;
-    vec2f::type relheight() const;
-
     static void remove(const texture2D&);
     static bool exist(const texture2D&);
     static int bind(const texture2D&);
@@ -46,7 +42,6 @@ public:
 private:
     std::uint32_t m_handle{ 0 };
     vec2s m_size{ 0, 0 };
-    vec2f m_relsize{ 0, 0 };
 };
 
 } // namespace nano

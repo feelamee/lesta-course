@@ -2,6 +2,8 @@
 #define VEC_HPP
 
 #include <assert.h>
+#include <cmath>
+#include <concepts>
 #include <ranges>
 
 namespace nano
@@ -35,6 +37,13 @@ struct vec2
         y = other.y;
         return *this;
     }
+
+    vec2<float>
+    normalized()
+    {
+        float xy_sqrt = std::sqrt(x * x + y * y);
+        return { x / xy_sqrt, y / xy_sqrt };
+    }
 };
 using vec2f = vec2<float>;
 using vec2i = vec2<int>;
@@ -48,6 +57,13 @@ struct vec3
     T x;
     T y;
     T z;
+
+    vec3<T>
+    normalized()
+    {
+        T xyz_sqrt = std::sqrt(x * x + y * y + z * z);
+        return { x / xyz_sqrt, y / xyz_sqrt, z / xyz_sqrt };
+    }
 };
 using vec3f = vec3<float>;
 

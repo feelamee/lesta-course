@@ -31,7 +31,6 @@ main()
     // int err_code = tex.load("./test.ppm");
     TEST_ERROR(err_code, "Fail while loading texture");
     sprite s(tex);
-    s.scale(0.5, 0.5);
 
     shader program;
     err_code = shaders::transform_texture(program, s.texture());

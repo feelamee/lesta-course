@@ -17,7 +17,9 @@ shape::shape(const vertbuf& p_vertbuf, const texture2D& p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
-    origin({ 0, texture().relheight() });
+    auto& win_size = engine::instance().window.size;
+    scale(1, win_size.x / win_size.y);
+    origin({ 0, texture().size().normalized().y });
 }
 
 const vertex*
