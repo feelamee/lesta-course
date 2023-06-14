@@ -8,11 +8,6 @@
 #include <nano/vec.hpp>
 #include <nano/vertbuf.hpp>
 
-#include <imgui.h>
-
-#include <memory>
-#include <vector>
-
 namespace nano
 {
 
@@ -23,8 +18,7 @@ class engine final
 public:
     struct window_t
     {
-        static constexpr std::size_t width{ 720 };
-        static constexpr std::size_t height{ 960 };
+        static constexpr vec2f size{ 720, 960 };
     } window;
 
     int initialize();

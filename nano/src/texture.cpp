@@ -1,5 +1,6 @@
 #include <nano/texture.hpp>
 
+#include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/resource_loader.hpp>
 #include <nano/utils.hpp>
@@ -20,15 +21,13 @@ texture2D::texture2D(const canvas& img)
 
 texture2D::texture2D(texture2D&& other) noexcept
 {
-    m_handle = other.m_handle;
-    m_size = other.m_size;
+    std::swap(*this, other);
 }
 
 texture2D&
 texture2D::operator=(texture2D&& other) noexcept
 {
-    m_handle = other.m_handle;
-    m_size = other.m_size;
+    std::swap(*this, other);
     return *this;
 }
 
@@ -59,15 +58,41 @@ texture2D::height() const
 }
 
 void
-texture2D::set_size(std::size_t width, std::size_t height)
+texture2D::size(std::size_t w, std::size_t h)
 {
-    m_size = { width, height };
+    m_size = { w, h };
+
+    auto& win_size = engine::instance().window.size;
+    m_relsize.x = width() / win_size.x;
+    m_relsize.y = height() / win_size.y;
 }
 
 void
-texture2D::set_size(vec2s size)
+texture2D::size(vec2s size)
 {
     m_size = size;
+
+    auto& win_size = engine::instance().window.size;
+    m_relsize.x = width() / win_size.x;
+    m_relsize.y = height() / win_size.y;
+}
+
+vec2f
+texture2D::relsize() const
+{
+    return m_relsize;
+}
+
+vec2f::type
+texture2D::relwidth() const
+{
+    return m_relsize.x;
+}
+
+vec2f::type
+texture2D::relheight() const
+{
+    return m_relsize.y;
 }
 
 int
@@ -78,7 +103,7 @@ texture2D::load(const canvas& image)
     GL_CHECK(glGenTextures(1, &m_handle));
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_handle));
 
-    set_size(image.width(), image.height());
+    size(image.width(), image.height());
     GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, alignof(color)));
     GL_ASSERT(glTexImage2D(GL_TEXTURE_2D,
                            0,

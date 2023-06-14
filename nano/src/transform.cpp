@@ -120,48 +120,26 @@ transform2D::scaled(const vec2f& scale)
     return ret;
 }
 
-///////////////////////////////
-// vec2f
-// move_point(const vec2f& point)
-// {
-// }
-
-// vec2f
-// scale_point(const vec2f& point)
-// {
-// }
-
-// vec2f
-// rotate_point(const vec2f& point)
-// {
-// }
-
-// vec2f
-// transform_point(const vec2f& point)
-// {
-// }
-///////////////////////////////
-
 transform2D&
-transform2D::rotate(radian angle)
+transform2D::rotate(radian angle, const vec2f origin)
 {
     const float cos = std::cos(angle);
     const float sin = std::sin(angle);
 
     // clang-format off
-    const transform2D rot{ cos,  sin, 0,
-                          -sin,  cos, 0,
-                             0,    0, 1};
+    const transform2D rot{ cos,  sin, origin.x * (1-cos) - origin.y * sin,
+                          -sin,  cos, origin.y * (1-cos) + origin.x * sin,
+                           0,    0,   1};
     // clang-format on
 
     return combine(rot);
 }
 
 transform2D
-transform2D::rotated(radian angle)
+transform2D::rotated(radian angle, const vec2f origin)
 {
     transform2D ret = (*this);
-    ret.rotate(angle);
+    ret.rotate(angle, origin);
     return ret;
 }
 

@@ -27,19 +27,15 @@ public:
     float operator()(std::size_t row, std::size_t col) const;
 
     transform2D& move(const vec2f& offset);
-    // vec2f move_point(const vec2f& point);
     transform2D moved(const vec2f& offset);
 
     transform2D& scale(const vec2f& scale);
-    // vec2f scale_point(const vec2f& point);
     transform2D scaled(const vec2f& scale);
 
     using radian = float;
-    transform2D& rotate(radian angle);
-    // vec2f rotate_point(const vec2f& point);
-    transform2D rotated(radian angle);
+    transform2D& rotate(radian angle, const vec2f origin = { 0, 0 });
+    transform2D rotated(radian angle, const vec2f origin = { 0, 0 });
 
-    // vec2f transform_point(const vec2f& point);
     transform2D& combine(const transform2D& other);
     friend transform2D operator*(const transform2D& lhs,
                                  const transform2D& rhs);

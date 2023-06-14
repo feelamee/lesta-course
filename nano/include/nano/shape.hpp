@@ -2,8 +2,6 @@
 #define SHAPE_HPP
 
 #include <nano/color.hpp>
-#include <nano/rect.hpp>
-#include <nano/shader.hpp>
 #include <nano/texture.hpp>
 #include <nano/transform.hpp>
 #include <nano/vertbuf.hpp>
@@ -26,6 +24,9 @@ public:
 
     void move(const vec2f& offset);
     void scale(const vec2f& scale);
+
+    void move(vec2f::type offset_x, vec2f::type offset_y);
+    void scale(vec2f::type scale_x, vec2f::type scale_y);
 
     using radian = float;
     void rotate(radian angle);

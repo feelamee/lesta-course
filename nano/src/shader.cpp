@@ -11,7 +11,6 @@
 #include <filesystem>
 #include <fstream>
 #include <ranges>
-#include <system_error>
 
 namespace nano
 {
@@ -410,51 +409,52 @@ namespace vert
 std::string
 transform_src(const std::string& transform_arg_name)
 {
-    return std::format(R"(
-                #version 320 es
+    // so, std::format does not supports by mingw, thats why...
+    return R"(
+            #version 320 es
 
-                layout (location = 0) in vec2 p_pos;
-                layout (location = 1) in vec3 p_color;
-                layout (location = 2) in vec2 p_tpos;
+            layout (location = 0) in vec2 p_pos;
+            layout (location = 1) in vec3 p_color;
+            layout (location = 2) in vec2 p_tpos;
 
-                uniform mat3 {0};
+            uniform mat3 )" +
+           transform_arg_name + R"(;
 
-                out vec3 color;
-                out vec2 tpos;
+            out vec3 color;
+            out vec2 tpos;
 
-                void main()
-                {{
-                    gl_Position = vec4(vec3(p_pos, 1.) * u_matrix, 1);
-                    color = p_color;
-                    tpos = p_tpos;
-                }}
-                                )",
-                       transform_arg_name);
+            void main()
+            {{
+                gl_Position = vec4(vec3(p_pos, 1.) * u_matrix, 1);
+                color = p_color;
+                tpos = p_tpos;
+            }})";
 }
 
 } // namespace vert
 
 namespace frag
 {
+
 std::string
 texture_src(const std::string& texture_arg_name)
 {
-    return std::format(R"(
-                #version 320 es
-                precision mediump float;
+    return R"(
+            #version 320 es
+            precision mediump float;
 
-                in vec2 tpos;
+            in vec2 tpos;
 
-                out vec4 color;
+            out vec4 color;
 
-                uniform sampler2D {0};
+            uniform sampler2D )" +
+           texture_arg_name + R"(;
 
-                void main()
-                {{
-                    color = texture(u_texture, tpos);
-                }}
-                )",
-                       texture_arg_name);
+            void main()
+            {{
+                color = texture(u_texture, tpos);
+            }}
+            )";
 }
 
 } // namespace frag

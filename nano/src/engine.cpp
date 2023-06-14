@@ -15,9 +15,7 @@
 #include <assert.h>
 #include <chrono>
 #include <cstdlib>
-#include <iostream>
 #include <memory>
-#include <thread>
 
 namespace nano
 {
@@ -46,7 +44,7 @@ engine::initialize()
     ASSERT_SDL_ERROR(EXIT_SUCCESS == err_code);
 
     impl->window = SDL_CreateWindow(
-        "test", window.width, window.height, SDL_WINDOW_OPENGL);
+        "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);
     ASSERT_SDL_ERROR(nullptr != impl->window);
 
     // TODO: extract such values to config

@@ -29,11 +29,14 @@ public:
     int load(const std::filesystem::path&);
 
     vec2s size() const;
-    std::size_t width() const;
-    std::size_t height() const;
+    void size(vec2s);
+    void size(vec2s::type, vec2s::type);
+    vec2s::type width() const;
+    vec2s::type height() const;
 
-    void set_size(vec2s);
-    void set_size(vec2s::type, vec2s::type);
+    vec2f relsize() const;
+    vec2f::type relwidth() const;
+    vec2f::type relheight() const;
 
     static void remove(const texture2D&);
     static bool exist(const texture2D&);
@@ -43,6 +46,7 @@ public:
 private:
     std::uint32_t m_handle{ 0 };
     vec2s m_size{ 0, 0 };
+    vec2f m_relsize{ 0, 0 };
 };
 
 } // namespace nano

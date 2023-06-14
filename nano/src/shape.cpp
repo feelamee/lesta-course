@@ -1,5 +1,8 @@
+#include "nano/texture.hpp"
+#include <iostream>
 #include <nano/shape.hpp>
 
+#include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/transform.hpp>
 
@@ -14,6 +17,7 @@ shape::shape(const vertbuf& p_vertbuf, const texture2D& p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
+    origin({ 0, texture().relheight() });
 }
 
 const vertex*
@@ -70,7 +74,7 @@ shape::transform() const
     if (transform_need_update)
     {
         transform2D new_tr;
-        new_tr.rotate(rotation()).move(position()).scale(factor());
+        new_tr.rotate(rotation(), origin()).move(position()).scale(factor());
         m_transform = new_tr;
 
         transform_need_update = false;
@@ -128,6 +132,18 @@ shape::factor(const vec2f& p_factor)
 {
     m_factor = p_factor;
     transform_need_update = true;
+}
+
+void
+shape::move(vec2f::type offset_x, vec2f::type offset_y)
+{
+    move({ offset_x, offset_y });
+}
+
+void
+shape::scale(vec2f::type scale_x, vec2f::type scale_y)
+{
+    scale({ scale_x, scale_y });
 }
 
 void
