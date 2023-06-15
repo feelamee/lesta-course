@@ -32,8 +32,8 @@ public:
     int initialize(int init_flags);
     void finalize();
 
-    static void new_frame();
-    static void renderUI();
+    void new_frame();
+    void renderUI();
     int swap_buffers();
 
     static engine& instance();
@@ -44,6 +44,7 @@ public:
 private:
     struct impl_t;
     std::shared_ptr<impl_t> impl;
+    int flags;
 };
 
 } // namespace nano

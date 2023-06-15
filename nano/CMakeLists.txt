@@ -51,6 +51,8 @@ target_compile_options(${TARGET} PUBLIC -DNANO_DEBUG)
 target_compile_options(${TARGET} PUBLIC -g)
 endif()
 
+find_package(OpenGL REQUIRED)
 target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
+target_link_libraries(${TARGET} PUBLIC OpenGL::GL)
 target_link_libraries(${TARGET} PUBLIC ImGui)
 target_link_libraries(${TARGET} PUBLIC glad)

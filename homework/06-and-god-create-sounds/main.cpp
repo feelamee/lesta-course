@@ -76,5 +76,6 @@ main()
         }
     }
 
+    eng.finalize();
     return EXIT_SUCCESS;
 }

@@ -61,7 +61,7 @@ main()
             }
         }
 
-        engine::new_frame();
+        eng.new_frame();
 
         if (show_demo_window)
         {
@@ -85,7 +85,7 @@ main()
             ImGui::End();
         }
 
-        engine::renderUI();
+        eng.renderUI();
         eng.swap_buffers();
     }
 
