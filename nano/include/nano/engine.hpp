@@ -16,12 +16,20 @@ struct vertex;
 class engine final
 {
 public:
+    enum flag
+    {
+        video = 0x00000020,
+        audio = 0x00000010,
+        events = 0x00004000,
+        all = video | audio | events
+    };
+
     struct window_t
     {
         static constexpr vec2f size{ 720, 960 };
     } window;
 
-    int initialize();
+    int initialize(int init_flags);
     void finalize();
 
     static void new_frame();

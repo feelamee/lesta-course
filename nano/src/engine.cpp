@@ -37,11 +37,16 @@ struct engine::impl_t
 };
 
 int
-engine::initialize()
+engine::initialize(int init_flags)
 {
     impl = std::make_shared<impl_t>();
-    int err_code = SDL_Init(SDL_INIT_EVERYTHING);
+    int err_code = SDL_Init(init_flags);
     ASSERT_SDL_ERROR(EXIT_SUCCESS == err_code);
+
+    if (not(flag::video & init_flags))
+    {
+        return EXIT_SUCCESS;
+    }
 
     impl->window = SDL_CreateWindow(
         "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);

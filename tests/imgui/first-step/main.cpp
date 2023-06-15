@@ -24,7 +24,7 @@ main()
 {
     using namespace nano;
     engine& eng = engine::instance();
-    int err_code = eng.initialize();
+    int err_code = eng.initialize(engine::flag::events | engine::flag::video);
     if (EXIT_SUCCESS != err_code)
     {
         LOG_DEBUG("Failed while initializing engine");

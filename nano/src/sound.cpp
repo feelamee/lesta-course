@@ -1,4 +1,3 @@
-#include "SDL_log.h"
 #include <cstdlib>
 #include <nano/sound.hpp>
 
@@ -6,6 +5,7 @@
 #include <nano/resource_loader.hpp>
 
 #include <SDL3/SDL_audio.h>
+#include <SDL3/SDL_log.h>
 
 #include <algorithm>
 #include <fstream>
@@ -13,6 +13,34 @@
 
 namespace nano
 {
+
+static bool
+operator==(const SDL_AudioSpec& lhs, const SDL_AudioSpec& rhs)
+{
+    // clang-format off
+    return lhs.format == rhs.format &&
+           lhs.channels == rhs.channels &&
+           lhs.freq == rhs.freq &&
+           lhs.silence == rhs.silence &&
+           lhs.callback == rhs.callback;
+    // clang-format on
+}
+
+static std::ostream&
+operator<<(std::ostream& o, const SDL_AudioSpec& spec)
+{
+    std::string tab(4, ' ');
+    o << tab << "freq: " << spec.freq << '\n'
+      << tab << "format: " << std::hex << spec.format << '\n'
+      << tab << "channels: " << std::dec << int(spec.channels) << '\n'
+      << tab << "silence: " << int(spec.silence) << '\n'
+      << tab << "samples: " << spec.samples << '\n'
+      << tab << "size: " << spec.size << '\n'
+      << tab << "callback: " << reinterpret_cast<const void*>(spec.callback)
+      << '\n'
+      << tab << "userdata: " << spec.userdata << std::endl;
+    return o;
+}
 
 int
 sound::load(const std::filesystem::path& fn)
@@ -39,6 +67,7 @@ sound::load(const std::filesystem::path& fn)
         LOG_DEBUG("ERROR: failed while loading sound from soundbuf");
         return EXIT_FAILURE;
     }
+
     return EXIT_SUCCESS;
 }
 
@@ -66,6 +95,15 @@ sound::load(const soundbuf& p_buf, std::size_t p_position)
         SDL_LogError(SDL_LOG_CATEGORY_AUDIO,
                      "Failed to open audio device: %s",
                      SDL_GetError());
+        return EXIT_FAILURE;
+    }
+
+    if (obtained != spec)
+    {
+        SDL_LogError(SDL_LOG_CATEGORY_AUDIO,
+                     "Obtained spec is not equal to desired");
+        err_os << "obtained: \n" << obtained << std::endl;
+        err_os << "desired: \n" << spec << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -101,28 +139,37 @@ sound::size() const
     return std::clamp(buf.size(), 0, std::numeric_limits<int>::max());
 }
 
-int
-sound::advance(std::size_t distance)
+// TODO: implement
+sound::msduration
+sound::advance(msduration dur)
 {
-    std::size_t old = position();
-    position(std::clamp(position() + distance, position(), size()));
-    return position() - old;
+    // std::size_t old = position();
+    // position(std::clamp(position() + dur, position(), size()));
+    // return position() - old;
+    return dur;
 }
 
 void
-sound::play() const
+sound::play()
 {
     SDL_PlayAudioDevice(audio_deviceID);
 }
 
 void
-sound::pause() const
+sound::pause()
 {
     SDL_PauseAudioDevice(audio_deviceID);
 }
 
 void
-sound::toggle() const
+sound::stop()
+{
+    SDL_PauseAudioDevice(audio_deviceID);
+    position(0);
+}
+
+void
+sound::toggle()
 {
     SDL_AudioStatus status = SDL_GetAudioDeviceStatus(audio_deviceID);
     if (SDL_AUDIO_STOPPED == status or SDL_AUDIO_PAUSED == status)
@@ -150,9 +197,7 @@ sound::spec() const
 void
 sound::volume(int val)
 {
-    m_volume = std::clamp(static_cast<std::uint8_t>(val),
-                          std::numeric_limits<std::uint8_t>::min(),
-                          std::numeric_limits<std::uint8_t>::max());
+    m_volume = std::clamp(val, 0, SDL_MIX_MAXVOLUME);
 }
 
 int
@@ -166,21 +211,22 @@ sound::audio_callback(void* userdata, std::uint8_t* stream, int len)
 {
     auto buf = static_cast<sound*>(userdata);
     std::fill_n(stream, len, buf->spec().silence);
-    int left = buf->size() - buf->position();
+    int pos = buf->position();
+    int left = buf->size() - pos;
 
     if (left > len)
     {
         SDL_MixAudioFormat(stream,
-                           &buf->data()[buf->position()],
+                           &buf->data()[pos],
                            static_cast<SDL_AudioFormat>(buf->buf.spec().fmt),
                            len,
                            buf->volume());
-        buf->advance(len);
+        buf->position(pos + len);
     }
     else
     {
         SDL_MixAudioFormat(stream,
-                           &buf->data()[buf->position()],
+                           &buf->data()[pos],
                            static_cast<SDL_AudioFormat>(buf->buf.spec().fmt),
                            left,
                            buf->volume());

@@ -1,6 +1,7 @@
 #ifndef SOUND_HPP
 #define SOUND_HPP
 
+#include <chrono>
 #include <nano/soundbuf.hpp>
 
 #include <filesystem>
@@ -25,12 +26,15 @@ public:
 
     void position(std::size_t p_position);
     std::size_t position() const;
-    int advance(std::size_t distance);
+
+    using msduration = std::chrono::duration<std::int64_t, std::milli>;
+    msduration advance(msduration dur);
 
     status_t status() const;
-    void play() const;
-    void pause() const;
-    void toggle() const;
+    void stop();
+    void play();
+    void pause();
+    void toggle();
 
     void volume(int val);
     int volume() const;
@@ -45,7 +49,7 @@ public:
     static void audio_callback(void* userdata, std::uint8_t* stream, int len);
 
 private:
-    std::uint32_t audio_deviceID;
+    std::uint32_t audio_deviceID{ 0 };
     soundbuf buf;
     std::size_t m_position{ 0 };
     std::uint8_t m_volume{ 0 };

@@ -24,7 +24,7 @@ main()
 {
     using namespace nano;
     engine& eng = engine::instance();
-    eng.initialize();
+    eng.initialize(engine::flag::events | engine::flag::video);
 
     texture2D tex;
     int err_code = tex.load("../tests/nano/transform/leo.ppm");
