@@ -18,7 +18,9 @@ add_library(
     src/soundbuf.cpp
     src/resource_loader.cpp
     src/sprite.cpp
+    src/sound.cpp
 
+    include/nano/sound.hpp
     include/nano/sprite.hpp
     include/nano/soundbuf.hpp
     include/nano/raii_wrapper.hpp

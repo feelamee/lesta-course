@@ -23,35 +23,38 @@ struct audio_spec
         f32 = 0x8120,
     };
 
-    unsigned int frequence;
-    format_t fmt;
-    channel_t channel;
-    std::uint8_t silence;
+    unsigned int frequence{ 0 };
+    format_t fmt{ format_t::unknown };
+    channel_t channel{ channel_t::unknown };
+    std::uint8_t silence{ 0 };
 };
 
 class soundbuf
 {
 public:
-    soundbuf();
-    soundbuf(std::shared_ptr<uint8_t[]>, int, const audio_spec& = {});
+    soundbuf() = default;
+    ~soundbuf() = default;
+
+    using bufdata_t = std::uint8_t;
+    using buf_t = std::shared_ptr<bufdata_t[]>;
+
+    soundbuf(buf_t, int, const audio_spec& = {});
 
     soundbuf(const soundbuf&);
-    soundbuf(soundbuf&&);
     soundbuf& operator=(soundbuf);
 
-    ~soundbuf();
-    std::shared_ptr<std::uint8_t[]> data();
-    const std::shared_ptr<std::uint8_t[]> data() const;
+    buf_t data();
+    const buf_t data() const;
 
     int size() const;
     void size(int s);
 
-    audio_spec& specification();
-    const audio_spec& specification() const;
+    audio_spec& spec();
+    const audio_spec& spec() const;
 
 private:
-    audio_spec spec;
-    std::shared_ptr<std::uint8_t[]> buf;
+    audio_spec m_spec;
+    buf_t buf;
     int m_size{ 0 };
 };
 

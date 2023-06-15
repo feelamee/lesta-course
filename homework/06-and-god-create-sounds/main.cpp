@@ -19,9 +19,6 @@ operator==(const SDL_AudioSpec& lhs, const SDL_AudioSpec& rhs)
            lhs.freq == rhs.freq &&
            lhs.silence == rhs.silence &&
            lhs.callback == rhs.callback;
-           //lhs.samples == rhs.samples;
-           //lhs.size == rhs.size;   // sizeof audio buffer size,
-                                         // we dont know it when create desired spec
     // clang-format on
 }
 
@@ -53,28 +50,25 @@ void
 audio_callback(void* userdata, std::uint8_t* stream, int len)
 {
     auto buf = (sound*)userdata;
-    std::fill_n(stream, len, 0);
+    std::fill_n(stream, len, buf->buf.spec().silence);
     int left = buf->buf.size() - buf->position;
 
     if (left > len)
     {
-        SDL_MixAudioFormat(
-            stream,
-            &buf->buf.data()[buf->position],
-            static_cast<SDL_AudioFormat>(buf->buf.specification().fmt),
-            len,
-            SDL_MIX_MAXVOLUME);
+        SDL_MixAudioFormat(stream,
+                           &buf->buf.data()[buf->position],
+                           static_cast<SDL_AudioFormat>(buf->buf.spec().fmt),
+                           len,
+                           SDL_MIX_MAXVOLUME);
         buf->position += len;
     }
     else
     {
-        SDL_MixAudioFormat(
-            stream,
-            &buf->buf.data()[buf->position],
-            static_cast<SDL_AudioFormat>(buf->buf.specification().fmt),
-            left,
-            SDL_MIX_MAXVOLUME);
-        buf->position = 0;
+        SDL_MixAudioFormat(stream,
+                           &buf->buf.data()[buf->position],
+                           static_cast<SDL_AudioFormat>(buf->buf.spec().fmt),
+                           left,
+                           SDL_MIX_MAXVOLUME);
     }
 }
 
@@ -109,7 +103,7 @@ main()
         return EXIT_FAILURE;
     }
 
-    const nano::audio_spec& _spec = sbuf.buf.specification();
+    const nano::audio_spec& _spec = sbuf.buf.spec();
     SDL_AudioSpec obtained;
     SDL_AudioSpec spec{ .freq = static_cast<int>(_spec.frequence),
                         .format = static_cast<SDL_AudioFormat>(_spec.fmt),

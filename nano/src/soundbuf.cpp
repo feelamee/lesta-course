@@ -1,42 +1,25 @@
+#include <cstdint>
+#include <limits>
 #include <nano/soundbuf.hpp>
+
+#include <algorithm>
+#include <climits>
 
 namespace nano
 {
 
-soundbuf::soundbuf()
-{
-    spec.channel = audio_spec::channel_t::unknown;
-    spec.fmt = audio_spec::format_t::unknown;
-    spec.frequence = {};
-    spec.silence = {};
-}
-
-soundbuf::soundbuf(std::shared_ptr<uint8_t[]> p_buf,
-                   int p_size,
-                   const audio_spec& p_spec)
+soundbuf::soundbuf(buf_t p_buf, int p_size, const audio_spec& p_spec)
 {
     buf = p_buf;
     size(p_size);
-    spec = p_spec;
-}
-
-soundbuf::~soundbuf()
-{
+    m_spec = p_spec;
 }
 
 soundbuf::soundbuf(const soundbuf& other)
 {
     buf = other.buf;
     size(other.size());
-    spec = other.spec;
-}
-
-soundbuf::soundbuf(soundbuf&& other)
-{
-    buf = other.buf;
-    size(other.size());
-    other.buf = nullptr;
-    spec = other.spec;
+    m_spec = other.m_spec;
 }
 
 soundbuf&
@@ -44,7 +27,7 @@ soundbuf::operator=(soundbuf other)
 {
     std::swap(this->buf, other.buf);
     std::swap(this->m_size, other.m_size);
-    std::swap(this->spec, other.spec);
+    std::swap(this->m_spec, other.m_spec);
     return *this;
 }
 
@@ -57,34 +40,31 @@ soundbuf::size() const
 void
 soundbuf::size(int s)
 {
-    if (s >= 0)
-        m_size = s;
-    else
-        m_size = 0;
+    m_size = std::clamp(s, 0, std::numeric_limits<int>::max());
 }
 
-std::shared_ptr<std::uint8_t[]>
+soundbuf::buf_t
 soundbuf::data()
 {
     return buf;
 }
 
-const std::shared_ptr<std::uint8_t[]>
+const soundbuf::buf_t
 soundbuf::data() const
 {
     return buf;
 }
 
 audio_spec&
-soundbuf::specification()
+soundbuf::spec()
 {
-    return spec;
+    return m_spec;
 }
 
 const audio_spec&
-soundbuf::specification() const
+soundbuf::spec() const
 {
-    return spec;
+    return m_spec;
 }
 
 } // namespace nano
