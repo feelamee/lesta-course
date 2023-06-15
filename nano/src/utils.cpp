@@ -20,14 +20,15 @@ extract_file(std::string& dst, const std::filesystem::path& filename)
     const std::size_t size = std::filesystem::file_size(filename, err_code);
     if (err_code.default_error_condition())
     {
-        LOG_DEBUG(err_code.message() + ": " + path2str(filename));
+        LOG_DEBUG(
+            "%s: %s", err_code.message().c_str(), path2str(filename).c_str());
         return EXIT_FAILURE;
     }
 
     std::ifstream src(filename);
     if (not src)
     {
-        LOG_DEBUG("error opening file: " + path2str(filename));
+        LOG_DEBUG("error opening file: %s", path2str(filename).c_str());
         return EXIT_FAILURE;
     }
     dst.resize(size);

@@ -26,29 +26,14 @@ operator==(const SDL_AudioSpec& lhs, const SDL_AudioSpec& rhs)
     // clang-format on
 }
 
-static std::ostream&
-operator<<(std::ostream& o, const SDL_AudioSpec& spec)
-{
-    std::string tab(4, ' ');
-    o << tab << "freq: " << spec.freq << '\n'
-      << tab << "format: " << std::hex << spec.format << '\n'
-      << tab << "channels: " << std::dec << int(spec.channels) << '\n'
-      << tab << "silence: " << int(spec.silence) << '\n'
-      << tab << "samples: " << spec.samples << '\n'
-      << tab << "size: " << spec.size << '\n'
-      << tab << "callback: " << reinterpret_cast<const void*>(spec.callback)
-      << '\n'
-      << tab << "userdata: " << spec.userdata << std::endl;
-    return o;
-}
-
 int
 sound::load(const std::filesystem::path& fn)
 {
     std::ifstream file(fn, std::ios::binary);
     if (not file)
     {
-        LOG_DEBUG("ERROR: failed while opening file:    " + fn.string());
+        LOG_DEBUG("ERROR: failed while opening file:    %s",
+                  fn.string().c_str());
         return EXIT_FAILURE;
     }
 
@@ -56,8 +41,9 @@ sound::load(const std::filesystem::path& fn)
     int err_code = nano::wav::load(file, buf);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("ERROR: failed while loading file:\n    " + fn.string() +
-                  "\n    " + nano::wav::error2str(err_code));
+        LOG_DEBUG("ERROR: failed while loading file    %s:\n    %s",
+                  fn.string().c_str(),
+                  nano::wav::error2str(err_code).c_str());
         return EXIT_FAILURE;
     }
 
@@ -102,8 +88,6 @@ sound::load(const soundbuf& p_buf, std::size_t p_position)
     {
         SDL_LogError(SDL_LOG_CATEGORY_AUDIO,
                      "Obtained spec is not equal to desired");
-        err_os << "obtained: \n" << obtained << std::endl;
-        err_os << "desired: \n" << spec << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -143,28 +127,25 @@ sound::size() const
 sound::msduration
 sound::advance(msduration dur)
 {
-    // std::size_t old = position();
-    // position(std::clamp(position() + dur, position(), size()));
-    // return position() - old;
-    return dur;
+    return {};
 }
 
 void
 sound::play()
 {
-    SDL_PlayAudioDevice(audio_deviceID);
+    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PlayAudioDevice(audio_deviceID));
 }
 
 void
 sound::pause()
 {
-    SDL_PauseAudioDevice(audio_deviceID);
+    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PauseAudioDevice(audio_deviceID));
 }
 
 void
 sound::stop()
 {
-    SDL_PauseAudioDevice(audio_deviceID);
+    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PauseAudioDevice(audio_deviceID));
     position(0);
 }
 

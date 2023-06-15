@@ -55,12 +55,12 @@ engine::initialize(int init_flags)
     ASSERT_SDL_ERROR(nullptr != impl->window);
 
     // TODO: extract such values to config
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 
 #ifdef __WINDOWS__
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-                        SDL_GL_CONTEXT_PROFILE_CORE);
+                        SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
 #else
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 #endif
@@ -70,7 +70,7 @@ engine::initialize(int init_flags)
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &real_minor_version);
 
     // TODO: extract such values to config
-    assert(real_major_version == 2 && real_minor_version == 1);
+    assert(real_major_version == 3 && real_minor_version == 2);
 
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context);

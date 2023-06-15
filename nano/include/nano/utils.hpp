@@ -16,10 +16,10 @@ int extract_file(std::string&, const std::filesystem::path&);
 void
 print(const std::ranges::range auto& r)
 {
-    err_os << "(range: " << std::size(r) << ')' << "[ ";
+    fprintf(err_os, "(range: %UL )[ ", std::size(r));
     for (const auto& i : r)
-        err_os << i << " ";
-    err_os << ']' << std::endl;
+        fprintf(err_os, "%d ", i);
+    fprintf(err_os, "]\n");
 }
 
 } // namespace nano

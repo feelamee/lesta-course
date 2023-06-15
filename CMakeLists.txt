@@ -5,11 +5,29 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/external)
 
+option(BUILD_NANO "enable building of nano engine" ON)
+
+if (BUILD_NANO OR BUILD_ALL)
 add_subdirectory(${CMAKE_SOURCE_DIR}/nano)
+endif()
 
+option(BUILD_HW "enable building of homework" ON)
+
+if (BUILD_HW OR BUILD_ALL)
 add_subdirectory(${CMAKE_SOURCE_DIR}/homework)
+endif()
 
+option (BUILD_TESTS "enable building of tests" ON)
+
+if (BUILD_TESTS OR BUILD_ALL)
 add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
+endif()
+
+option (BUILD_TETRIS "enable building of tetris game" ON)
+
+if (BUILD_TETRIS OR BUILD_ALL)
+add_subdirectory(${CMAKE_SOURCE_DIR}/tetris)
+endif()
 
 option(ADDRESS_SANITIZER ON)
 

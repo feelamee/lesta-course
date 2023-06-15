@@ -1,6 +1,7 @@
 project(nano)
 
 set(TARGET ${PROJECT_NAME})
+set(imgui ${CMAKE_SOURCE_DIR}/external/imgui)
 add_library(
     ${TARGET} SHARED
 
@@ -41,6 +42,26 @@ add_library(
     include/nano/engine.hpp
     include/nano/event.hpp
     include/nano/transform.hpp
+
+    # creating separate static lib from Dear ImGui occurs multiply definition on windows
+    # in addition this method is recommended by Dear ImGui Developers
+    ${imgui}/imconfig.h
+    ${imgui}/imgui.cpp
+    ${imgui}/imgui.h
+    ${imgui}/imgui_demo.cpp
+    ${imgui}/imgui_draw.cpp
+    ${imgui}/imgui_tables.cpp
+    ${imgui}/imgui_widgets.cpp
+    ${imgui}/imgui_internal.h
+    ${imgui}/imstb_rectpack.h
+    ${imgui}/imstb_textedit.h
+    ${imgui}/imstb_truetype.h
+
+    ${imgui}/backends/imgui_impl_opengl3.h
+    ${imgui}/backends/imgui_impl_opengl3.cpp
+
+    ${imgui}/backends/imgui_impl_sdl3.h
+    ${imgui}/backends/imgui_impl_sdl3.cpp
 )
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(${TARGET} PUBLIC cxx_std_20)
@@ -54,5 +75,8 @@ endif()
 find_package(OpenGL REQUIRED)
 target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
 target_link_libraries(${TARGET} PUBLIC OpenGL::GL)
-target_link_libraries(${TARGET} PUBLIC ImGui)
 target_link_libraries(${TARGET} PUBLIC glad)
+
+target_include_directories(${TARGET} PUBLIC ${imgui})
+target_include_directories(${TARGET} PUBLIC ${imgui}/backends)
+target_compile_definitions(${TARGET} PRIVATE -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM)

@@ -102,7 +102,7 @@ texture2D::load(const std::filesystem::path& filename)
     std::ifstream file(filename, std::ios::binary);
     if (not file)
     {
-        LOG_DEBUG("Failed opening file: " + path2str(filename));
+        LOG_DEBUG("Failed opening file: %s", path2str(filename).c_str());
         return EXIT_FAILURE;
     }
 
@@ -110,8 +110,9 @@ texture2D::load(const std::filesystem::path& filename)
     int err_code = ppm::load(file, img);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG(ppm::error2str(err_code) +
-                  "\n    Fail when loading canvas from: " + path2str(filename));
+        LOG_DEBUG("%s\n    Fail when loading canvas from: %s",
+                  ppm::error2str(err_code).c_str(),
+                  path2str(filename).c_str());
         return EXIT_FAILURE;
     }
     err_code = EXIT_FAILURE;
@@ -119,8 +120,8 @@ texture2D::load(const std::filesystem::path& filename)
     err_code = load(img);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("Failed loading texture from canvas from file: " +
-                  path2str(filename));
+        LOG_DEBUG("Failed loading texture from canvas from file: %s",
+                  path2str(filename).c_str());
         return EXIT_FAILURE;
     }
 

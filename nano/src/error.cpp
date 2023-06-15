@@ -6,7 +6,7 @@
 namespace nano
 {
 
-std::ostream& err_os = std::cerr;
+FILE* err_os = stderr;
 
 int
 gl_check(const std::filesystem::path& file,
@@ -81,12 +81,15 @@ gl_check(const std::filesystem::path& file,
         }
         }
 
-        err_os << "[DEBUG: " << file.string() << ":" << line << "]:"
-               << "\n    An internal OpenGL call failed"
-               << "\n    Expression:\n        " << expression
-               << "\n    Error description:\n        " << error << "\n        "
-               << description << '\n'
-               << std::endl;
+        fprintf(err_os,
+                "[DEBUG: %s : %d ]:"
+                "\n    An internal OpenGL call failed"
+                "\n    Expression:\n        %s"
+                "\n    Error description:\n        %s\n",
+                file.string().c_str(),
+                line,
+                expression.data(),
+                description.c_str());
 
         error_code = glGetError();
     } while (GL_NO_ERROR != error_code);

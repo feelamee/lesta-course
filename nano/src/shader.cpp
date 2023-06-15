@@ -1,4 +1,3 @@
-#include "nano/texture.hpp"
 #include <nano/shader.hpp>
 
 #include <nano/error.hpp>
@@ -97,7 +96,7 @@ shader::load(type t, const std::filesystem::path& filename)
     int err_code = extract_file(src, filename);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading file: " + path2str(filename));
+        LOG_DEBUG("Fail when loading file: %s", path2str(filename).c_str());
         return EXIT_FAILURE;
     }
 
@@ -113,8 +112,8 @@ shader::load(const std::filesystem::path& frag_fn,
     int err_code = load(type::fragment, frag_fn);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading fragment shader from: " +
-                  path2str(frag_fn));
+        LOG_DEBUG("Fail when loading fragment shader from: %s",
+                  path2str(frag_fn).c_str());
         return EXIT_FAILURE;
     }
     err_code = EXIT_FAILURE;
@@ -122,7 +121,8 @@ shader::load(const std::filesystem::path& frag_fn,
     err_code = load(type::vertex, vert_fn);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading vertex shader from: " + path2str(vert_fn));
+        LOG_DEBUG("Fail when loading vertex shader from: %s",
+                  path2str(vert_fn).c_str());
         return EXIT_FAILURE;
     }
 
@@ -134,8 +134,9 @@ shader::load_from_src(type t, const std::string& sources)
 {
     if (is_attached(t, *this))
     {
-        LOG_DEBUG("Shader of such type is already attached: " + type2str(t) +
-                  ". Call shader::remove before");
+        LOG_DEBUG("Shader of such type is already attached: %s"
+                  ". Call shader::remove before",
+                  type2str(t).c_str());
         return EXIT_FAILURE;
     }
     if (not exist(*this))
@@ -184,7 +185,7 @@ shader::uniform(const std::string& name, const texture2D& tex)
     int location = uniform_location(name);
     if (location < 0)
     {
-        LOG_DEBUG("Failed getting location of uniform: " + name);
+        LOG_DEBUG("Failed getting location of uniform: %s", name.c_str());
         return EXIT_FAILURE;
     }
 
@@ -213,7 +214,7 @@ shader::uniform(const std::string& name, const transform2D& tr)
     int location = uniform_location(name);
     if (location < 0)
     {
-        LOG_DEBUG("Failed getting location of uniform: " + name);
+        LOG_DEBUG("Failed getting location of uniform: %s", name.c_str());
         return EXIT_FAILURE;
     }
 
@@ -279,7 +280,7 @@ shader::compile(type t, const std::string& src)
     {
         clear_log_buf();
         glGetShaderInfoLog(shader_handle, sizeof(log), nullptr, log);
-        LOG_DEBUG(log);
+        LOG_DEBUG("%s", log);
         GL_CHECK(glDeleteShader(shader_handle));
         return EXIT_FAILURE;
     }
@@ -337,7 +338,7 @@ shader::link(const shader& p)
     {
         clear_log_buf();
         glGetProgramInfoLog(p.handle, sizeof(log), nullptr, log);
-        LOG_DEBUG(log);
+        LOG_DEBUG("%s", log);
         return EXIT_FAILURE;
     }
 
@@ -360,7 +361,7 @@ shader::validate(const shader& p)
     {
         std::memset(log, 0, sizeof(log));
         glGetProgramInfoLog(p.handle, sizeof(log), nullptr, log);
-        LOG_DEBUG(log);
+        LOG_DEBUG("%s", log);
         return EXIT_FAILURE;
     }
 
@@ -459,16 +460,6 @@ texture_src(const std::string& texture_arg_name)
 
 } // namespace frag
 
-#define TEST_ERROR(err, msg)                                                   \
-    {                                                                          \
-        if (EXIT_FAILURE == (err))                                             \
-        {                                                                      \
-            LOG_DEBUG((msg));                                                  \
-            return EXIT_FAILURE;                                               \
-        }                                                                      \
-        err_code = EXIT_FAILURE;                                               \
-    }
-
 int
 transform_texture(shader& result, const texture2D& tex)
 {
@@ -476,16 +467,16 @@ transform_texture(shader& result, const texture2D& tex)
         result.load_from_src(shaders::frag::texture_src("u_texture"),
                              shaders::vert::transform_src("u_matrix"));
 
-    TEST_ERROR(err_code, "Shader program loading failed");
+    ASSERT_ERROR(err_code, "Shader program loading failed");
 
     err_code = shader::link(result);
-    TEST_ERROR(err_code, "Shader program linking failed");
+    ASSERT_ERROR(err_code, "Shader program linking failed");
 
     err_code = shader::validate(result);
-    TEST_ERROR(err_code, "Shader program validation failure");
+    ASSERT_ERROR(err_code, "Shader program validation failure");
 
     err_code = result.uniform("u_texture", tex);
-    TEST_ERROR(err_code, "Setting uniform u_texture failure");
+    ASSERT_ERROR(err_code, "Setting uniform u_texture failure");
 
     return EXIT_SUCCESS;
 }

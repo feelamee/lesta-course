@@ -9,7 +9,7 @@
 
 namespace nano
 {
-extern std::ostream& err_os;
+extern FILE* err_os;
 }
 
 #ifdef NANO_DEBUG
@@ -28,11 +28,20 @@ extern std::ostream& err_os;
         }                                                                      \
     }
 
-#define LOG_DEBUG(message)                                                     \
+#define LOG_DEBUG(...)                                                         \
     {                                                                          \
-        nano::err_os << "[DEBUG: " << __FILE__ << ":" << __LINE__              \
-                     << "]:\n    " << (message) << '\n'                        \
-                     << std::endl;                                             \
+        fprintf(nano::err_os, "[DEBUG: %s: %d]:\n    ", __FILE__, __LINE__);   \
+        fprintf(nano::err_os, __VA_ARGS__);                                    \
+    }
+
+#define ASSERT_ERROR(err, ...)                                                 \
+    {                                                                          \
+        if (EXIT_FAILURE == (err))                                             \
+        {                                                                      \
+            LOG_DEBUG(__VA_ARGS__);                                            \
+            return EXIT_FAILURE;                                               \
+        }                                                                      \
+        (err) = EXIT_FAILURE;                                                  \
     }
 
 #else
@@ -45,7 +54,7 @@ extern std::ostream& err_os;
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG(SDL_GetError());                                         \
+            LOG_DEBUG("%s", SDL_GetError());                                   \
             return EXIT_FAILURE;                                               \
         }                                                                      \
     }
@@ -54,7 +63,7 @@ extern std::ostream& err_os;
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG(SDL_GetError());                                         \
+            LOG_DEBUG("%s", SDL_GetError());                                   \
         }                                                                      \
     }
 

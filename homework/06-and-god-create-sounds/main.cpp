@@ -14,33 +14,23 @@
 #include <iostream>
 #include <memory>
 
-#define TEST_ERROR(err, msg)                                                   \
-    {                                                                          \
-        if (EXIT_FAILURE == (err))                                             \
-        {                                                                      \
-            LOG_DEBUG((msg));                                                  \
-            return EXIT_FAILURE;                                               \
-        }                                                                      \
-        err_code = EXIT_FAILURE;                                               \
-    }
-
 int
 main()
 {
     nano::engine& eng = nano::engine::instance();
     int err_code = eng.initialize(nano::engine::flag::audio);
-    TEST_ERROR(err_code, "Fail while initialising engine");
+    ASSERT_ERROR(err_code, "Fail while initialising engine");
 
     std::filesystem::path fn(
         "../homework/06-and-god-create-sounds/highlands.wav");
     nano::sound music;
     err_code = music.load(fn);
-    TEST_ERROR(err_code, "Fail while loading sound from: " + fn.string());
+    ASSERT_ERROR(err_code, "Fail while loading sound from: %s", fn.c_str());
 
     std::filesystem::path fn2("../homework/06-and-god-create-sounds/road.wav");
     nano::sound road_music;
     err_code = road_music.load(fn2);
-    TEST_ERROR(err_code, "Fail while loading sound from: " + fn2.string());
+    ASSERT_ERROR(err_code, "Fail while loading sound from: %s", fn2.c_str());
 
     music.volume(50);
     road_music.volume(50);

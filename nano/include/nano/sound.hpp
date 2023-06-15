@@ -32,6 +32,7 @@ public:
 
     status_t status() const;
     void stop();
+    void extracted();
     void play();
     void pause();
     void toggle();

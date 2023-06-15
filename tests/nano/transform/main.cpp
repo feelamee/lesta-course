@@ -16,7 +16,7 @@
             LOG_DEBUG((msg));                                                  \
             return EXIT_FAILURE;                                               \
         }                                                                      \
-        err_code = EXIT_FAILURE;                                               \
+        (err) = EXIT_FAILURE;                                                  \
     }
 
 int
