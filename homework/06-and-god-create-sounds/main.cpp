@@ -25,12 +25,14 @@ main()
         "../homework/06-and-god-create-sounds/highlands.wav");
     nano::sound music;
     err_code = music.load(fn);
-    ASSERT_ERROR(err_code, "Fail while loading sound from: %s", fn.c_str());
+    ASSERT_ERROR(
+        err_code, "Fail while loading sound from: %s", fn.string().c_str());
 
     std::filesystem::path fn2("../homework/06-and-god-create-sounds/road.wav");
     nano::sound road_music;
     err_code = road_music.load(fn2);
-    ASSERT_ERROR(err_code, "Fail while loading sound from: %s", fn2.c_str());
+    ASSERT_ERROR(
+        err_code, "Fail while loading sound from: %s", fn2.string().c_str());
 
     music.volume(50);
     road_music.volume(50);
