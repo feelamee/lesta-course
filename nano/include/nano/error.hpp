@@ -22,7 +22,7 @@ extern FILE* err_os;
 #define GL_ASSERT(expr)                                                        \
     {                                                                          \
         expr;                                                                  \
-        if (EXIT_FAILURE == gl_check(__FILE__, __LINE__, #expr))               \
+        if (EXIT_SUCCESS != gl_check(__FILE__, __LINE__, #expr))               \
         {                                                                      \
             return EXIT_FAILURE;                                               \
         }                                                                      \
@@ -36,7 +36,7 @@ extern FILE* err_os;
 
 #define ASSERT_ERROR(err, ...)                                                 \
     {                                                                          \
-        if (EXIT_FAILURE == (err))                                             \
+        if (EXIT_SUCCESS != (err))                                             \
         {                                                                      \
             LOG_DEBUG(__VA_ARGS__);                                            \
             return EXIT_FAILURE;                                               \
@@ -50,12 +50,12 @@ extern FILE* err_os;
 #define LOG_DEBUG(message)
 #endif
 
-#define ASSERT_SDL_ERROR(expr)                                                 \
+#define ASSERT_SDL_ERROR(expr, ret)                                            \
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG("%s", SDL_GetError());                                   \
-            return EXIT_FAILURE;                                               \
+            LOG_DEBUG("%s\n", SDL_GetError());                                 \
+            return (ret);                                                      \
         }                                                                      \
     }
 
@@ -63,7 +63,7 @@ extern FILE* err_os;
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG("%s", SDL_GetError());                                   \
+            LOG_DEBUG("%s\n", SDL_GetError());                                 \
         }                                                                      \
     }
 

@@ -34,6 +34,8 @@ public:
     vec2s::type width() const;
     vec2s::type height() const;
 
+    std::uint32_t handle() const;
+
     static void remove(const texture2D&);
     static bool exist(const texture2D&);
     static int bind(const texture2D&);

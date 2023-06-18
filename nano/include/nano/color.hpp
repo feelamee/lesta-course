@@ -2,6 +2,7 @@
 #define COLOR_HPP
 
 #include <cstdint>
+#include <cstring>
 #include <numeric>
 
 namespace nano
@@ -12,9 +13,9 @@ namespace nano
 struct color
 {
     using channel_t = std::uint8_t;
-    channel_t r;
-    channel_t g;
-    channel_t b;
+    channel_t r{ 0 };
+    channel_t g{ 0 };
+    channel_t b{ 0 };
 
     friend bool
     operator==(color lhs, color rhs)
@@ -24,6 +25,28 @@ struct color
                lhs.g == rhs.g &&
                lhs.b == rhs.b;
         // clang-format on
+    }
+
+    static std::uint32_t
+    hex(color c)
+    {
+        std::uint32_t ret{ 0 };
+        ret = (int)c.r << 0;
+        ret |= (int)c.g << 8;
+        ret |= (int)c.b << 16;
+        ret |= 255 << 24;
+
+        return ret;
+    }
+
+    static color
+    hex(std::uint32_t p_hex)
+    {
+        color ret{};
+        ret.r = (p_hex >> 16) & 0xFF;
+        ret.g = (p_hex >> 8) & 0xFF;
+        ret.b = (p_hex >> 0) & 0xFF;
+        return ret;
     }
 };
 #pragma pack(pop)

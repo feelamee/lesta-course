@@ -28,7 +28,7 @@ extract_file(std::string& dst, const std::filesystem::path& filename)
     std::ifstream src(filename);
     if (not src)
     {
-        LOG_DEBUG("error opening file: %s", path2str(filename).c_str());
+        LOG_DEBUG("Error opening file: %s", path2str(filename).c_str());
         return EXIT_FAILURE;
     }
     dst.resize(size);

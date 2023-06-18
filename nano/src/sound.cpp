@@ -32,7 +32,7 @@ sound::load(const std::filesystem::path& fn)
     std::ifstream file(fn, std::ios::binary);
     if (not file)
     {
-        LOG_DEBUG("ERROR: failed while opening file:    %s",
+        LOG_DEBUG("ERROR: failed while opening file:    %s\n",
                   fn.string().c_str());
         return EXIT_FAILURE;
     }
@@ -41,7 +41,7 @@ sound::load(const std::filesystem::path& fn)
     int err_code = nano::wav::load(file, buf);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("ERROR: failed while loading file    %s:\n    %s",
+        LOG_DEBUG("ERROR: failed while loading file    %s:\n    %s\n",
                   fn.string().c_str(),
                   nano::wav::error2str(err_code).c_str());
         return EXIT_FAILURE;
@@ -50,7 +50,7 @@ sound::load(const std::filesystem::path& fn)
     err_code = load(buf);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("ERROR: failed while loading sound from soundbuf");
+        LOG_DEBUG("ERROR: failed while loading sound from soundbuf\n");
         return EXIT_FAILURE;
     }
 
@@ -79,7 +79,7 @@ sound::load(const soundbuf& p_buf, std::size_t p_position)
     if (0 == audio_deviceID)
     {
         SDL_LogError(SDL_LOG_CATEGORY_AUDIO,
-                     "Failed to open audio device: %s",
+                     "Failed to open audio device: %s\n",
                      SDL_GetError());
         return EXIT_FAILURE;
     }
@@ -87,7 +87,7 @@ sound::load(const soundbuf& p_buf, std::size_t p_position)
     if (obtained != spec)
     {
         SDL_LogError(SDL_LOG_CATEGORY_AUDIO,
-                     "Obtained spec is not equal to desired");
+                     "Obtained spec is not equal to desired\n");
         return EXIT_FAILURE;
     }
 
@@ -211,6 +211,10 @@ sound::audio_callback(void* userdata, std::uint8_t* stream, int len)
                            static_cast<SDL_AudioFormat>(buf->buf.spec().fmt),
                            left,
                            buf->volume());
+        if (buf->loop)
+        {
+            buf->position(0);
+        }
     }
 }
 

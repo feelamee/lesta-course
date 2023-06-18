@@ -56,6 +56,12 @@ texture2D::height() const
     return m_size.y;
 }
 
+std::uint32_t
+texture2D::handle() const
+{
+    return m_handle;
+}
+
 void
 texture2D::size(std::size_t w, std::size_t h)
 {
@@ -77,7 +83,6 @@ texture2D::load(const canvas& image)
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_handle));
 
     size(image.width(), image.height());
-    GL_CHECK(glPixelStorei(GL_UNPACK_ALIGNMENT, alignof(color)));
     GL_ASSERT(glTexImage2D(GL_TEXTURE_2D,
                            0,
                            GL_RGB,
@@ -99,20 +104,12 @@ texture2D::load(const canvas& image)
 int
 texture2D::load(const std::filesystem::path& filename)
 {
-    std::ifstream file(filename, std::ios::binary);
-    if (not file)
-    {
-        LOG_DEBUG("Failed opening file: %s", path2str(filename).c_str());
-        return EXIT_FAILURE;
-    }
-
     canvas img;
-    int err_code = ppm::load(file, img);
+    int err_code = image::load(filename, img);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("%s\n    Fail when loading canvas from: %s",
-                  ppm::error2str(err_code).c_str(),
-                  path2str(filename).c_str());
+        LOG_DEBUG("Fail when loading canvas\n    %s\n",
+                  image::error2str(err_code).c_str());
         return EXIT_FAILURE;
     }
     err_code = EXIT_FAILURE;
@@ -120,8 +117,7 @@ texture2D::load(const std::filesystem::path& filename)
     err_code = load(img);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("Failed loading texture from canvas from file: %s",
-                  path2str(filename).c_str());
+        LOG_DEBUG("Failed loading texture from canvas\n");
         return EXIT_FAILURE;
     }
 
@@ -141,7 +137,7 @@ texture2D::bind(const texture2D& t)
 {
     if (not exist(t))
     {
-        LOG_DEBUG("Texture does not exist.");
+        LOG_DEBUG("Texture does not exist.\n");
         return EXIT_FAILURE;
     }
     GL_CHECK(glBindTexture(GL_TEXTURE_2D, t.m_handle));

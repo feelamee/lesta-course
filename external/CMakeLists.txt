@@ -8,3 +8,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/glad
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/Catch2
                  ${CMAKE_BINARY_DIR}/lib/Catch2)
+
+set(SDL3IMAGE_VENDORED ON)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/SDL_image
+                 ${CMAKE_BINARY_DIR}/lib/SDL_image)

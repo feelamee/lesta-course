@@ -27,7 +27,7 @@ main()
     int err_code = eng.initialize(engine::flag::events | engine::flag::video);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("Failed while initializing engine");
+        LOG_DEBUG("Failed while initializing engine\n");
         return err_code;
     }
 

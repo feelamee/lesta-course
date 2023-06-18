@@ -43,7 +43,7 @@ engine::initialize(int init_flags)
 
     impl = std::make_shared<impl_t>();
     int err_code = SDL_Init(init_flags);
-    ASSERT_SDL_ERROR(EXIT_SUCCESS == err_code);
+    ASSERT_SDL_ERROR(EXIT_SUCCESS == err_code, EXIT_FAILURE);
 
     if (not(flag::video & flags))
     {
@@ -52,7 +52,7 @@ engine::initialize(int init_flags)
 
     impl->window = SDL_CreateWindow(
         "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);
-    ASSERT_SDL_ERROR(nullptr != impl->window);
+    ASSERT_SDL_ERROR(nullptr != impl->window, EXIT_FAILURE);
 
     // TODO: extract such values to config
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -73,15 +73,28 @@ engine::initialize(int init_flags)
     assert(real_major_version == 3 && real_minor_version == 2);
 
     impl->context = SDL_GL_CreateContext(impl->window);
-    ASSERT_SDL_ERROR(nullptr != impl->context);
+    ASSERT_SDL_ERROR(nullptr != impl->context, EXIT_FAILURE);
 
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
 
     IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+    ImGuiContext* imgui_ctx = ImGui::CreateContext();
+    if (nullptr == imgui_ctx)
+    {
+        LOG_DEBUG("Failed while creating Dear ImGui context\n");
+        return EXIT_FAILURE;
+    }
 
-    ImGui_ImplSDL3_InitForOpenGL(impl->window, impl->context);
-    ImGui_ImplOpenGL3_Init("#version 300 es");
+    // TODO: implement this methods by yourself
+    bool err = not ImGui_ImplSDL3_InitForOpenGL(impl->window, impl->context);
+    ASSERT_ERROR(err, "Failed while initializing SDL3 for OpenGL\n");
+
+#ifdef __WINDOWS__
+    err = ImGui_ImplOpenGL3_Init("#version 300");
+#else
+    err = ImGui_ImplOpenGL3_Init("#version 300 es");
+#endif
+    ASSERT_ERROR(err, "Failed while initializing OpenGL\n");
 
     return EXIT_SUCCESS;
 }
@@ -92,6 +105,7 @@ engine::new_frame()
     if (not(flag::video & flags))
         return;
 
+    // TODO: implement this methods by yourself
     ImGui_ImplSDL3_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
@@ -104,6 +118,7 @@ engine::renderUI()
         return;
 
     ImGui::Render();
+    // TODO: implement this methods by yourself
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
@@ -113,6 +128,7 @@ engine::finalize()
     if (not(flag::video & flags))
         return;
 
+    // TODO: implement this methods by yourself
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();

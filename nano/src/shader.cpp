@@ -96,7 +96,7 @@ shader::load(type t, const std::filesystem::path& filename)
     int err_code = extract_file(src, filename);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading file: %s", path2str(filename).c_str());
+        LOG_DEBUG("Fail when loading file: %s\n", path2str(filename).c_str());
         return EXIT_FAILURE;
     }
 
@@ -112,7 +112,7 @@ shader::load(const std::filesystem::path& frag_fn,
     int err_code = load(type::fragment, frag_fn);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading fragment shader from: %s",
+        LOG_DEBUG("Fail when loading fragment shader from: %s\n",
                   path2str(frag_fn).c_str());
         return EXIT_FAILURE;
     }
@@ -121,7 +121,7 @@ shader::load(const std::filesystem::path& frag_fn,
     err_code = load(type::vertex, vert_fn);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading vertex shader from: %s",
+        LOG_DEBUG("Fail when loading vertex shader from: %s\n",
                   path2str(vert_fn).c_str());
         return EXIT_FAILURE;
     }
@@ -134,7 +134,7 @@ shader::load_from_src(type t, const std::string& sources)
 {
     if (is_attached(t, *this))
     {
-        LOG_DEBUG("Shader of such type is already attached: %s"
+        LOG_DEBUG("Shader of such type is already attached: %s\n"
                   ". Call shader::remove before",
                   type2str(t).c_str());
         return EXIT_FAILURE;
@@ -147,7 +147,7 @@ shader::load_from_src(type t, const std::string& sources)
     int err_code = compile(t, sources);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when compiling shader source");
+        LOG_DEBUG("Fail when compiling shader source\n");
     }
 
     return err_code;
@@ -159,14 +159,14 @@ shader::load_from_src(const std::string& frag_src, const std::string& vert_src)
     int err_code = load_from_src(type::fragment, frag_src);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading fragment shader from");
+        LOG_DEBUG("Fail when loading fragment shader from\n");
         return EXIT_FAILURE;
     }
 
     err_code = load_from_src(type::vertex, vert_src);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG("Fail when loading vertex shader");
+        LOG_DEBUG("Fail when loading vertex shader\n");
         return EXIT_FAILURE;
     }
 
@@ -178,14 +178,14 @@ shader::uniform(const std::string& name, const texture2D& tex)
 {
     if (not texture2D::exist(tex))
     {
-        LOG_DEBUG("Texture does not exist.");
+        LOG_DEBUG("Texture does not exist.\n");
         return EXIT_FAILURE;
     }
 
     int location = uniform_location(name);
     if (location < 0)
     {
-        LOG_DEBUG("Failed getting location of uniform: %s", name.c_str());
+        LOG_DEBUG("Failed getting location of uniform: %s\n", name.c_str());
         return EXIT_FAILURE;
     }
 
@@ -194,7 +194,7 @@ shader::uniform(const std::string& name, const texture2D& tex)
     {
         if (textures.size() + 1 >= texture2D::max_active())
         {
-            LOG_DEBUG("Failed because all textures units are already used");
+            LOG_DEBUG("Failed because all textures units are already used\n");
             return EXIT_FAILURE;
         }
     }
@@ -214,7 +214,7 @@ shader::uniform(const std::string& name, const transform2D& tr)
     int location = uniform_location(name);
     if (location < 0)
     {
-        LOG_DEBUG("Failed getting location of uniform: %s", name.c_str());
+        LOG_DEBUG("Failed getting location of uniform: %s\n", name.c_str());
         return EXIT_FAILURE;
     }
 
@@ -264,7 +264,7 @@ shader::compile(type t, const std::string& src)
     GL_CHECK(shader_handle = glCreateShader(static_cast<GLenum>(t)));
     if (0 == shader_handle)
     {
-        LOG_DEBUG("Failed creating of shader handle.");
+        LOG_DEBUG("Failed creating of shader handle.\n");
         return EXIT_FAILURE;
     }
 
@@ -280,7 +280,7 @@ shader::compile(type t, const std::string& src)
     {
         clear_log_buf();
         glGetShaderInfoLog(shader_handle, sizeof(log), nullptr, log);
-        LOG_DEBUG("%s", log);
+        LOG_DEBUG("%s\n", log);
         GL_CHECK(glDeleteShader(shader_handle));
         return EXIT_FAILURE;
     }
@@ -312,7 +312,7 @@ shader::use(const shader& p)
 {
     if (not exist(p))
     {
-        LOG_DEBUG("Program does not exist");
+        LOG_DEBUG("Program does not exist\n");
         return EXIT_FAILURE;
     }
 
@@ -327,7 +327,7 @@ shader::link(const shader& p)
 {
     if (not exist(p))
     {
-        LOG_DEBUG("Program does not exist");
+        LOG_DEBUG("Program does not exist\n");
         return EXIT_FAILURE;
     }
 
@@ -338,7 +338,7 @@ shader::link(const shader& p)
     {
         clear_log_buf();
         glGetProgramInfoLog(p.handle, sizeof(log), nullptr, log);
-        LOG_DEBUG("%s", log);
+        LOG_DEBUG("%s\n", log);
         return EXIT_FAILURE;
     }
 
@@ -350,7 +350,7 @@ shader::validate(const shader& p)
 {
     if (not exist(p))
     {
-        LOG_DEBUG("Program does not exist");
+        LOG_DEBUG("Program does not exist\n");
         return EXIT_FAILURE;
     }
 
@@ -361,7 +361,7 @@ shader::validate(const shader& p)
     {
         std::memset(log, 0, sizeof(log));
         glGetProgramInfoLog(p.handle, sizeof(log), nullptr, log);
-        LOG_DEBUG("%s", log);
+        LOG_DEBUG("%s\n", log);
         return EXIT_FAILURE;
     }
 

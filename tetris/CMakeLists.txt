@@ -7,3 +7,4 @@ add_executable(
   main.cpp
 )
 target_link_libraries(${target} PUBLIC nano)
+target_link_libraries(${target} PUBLIC sanitizer)

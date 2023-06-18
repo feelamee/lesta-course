@@ -1,9 +1,11 @@
-#include <memory>
 #include <nano/resource_loader.hpp>
 
+#include <nano/error.hpp>
 #include <nano/soundbuf.hpp>
+#include <nano/utils.hpp>
 
 #include <SDL3/SDL_audio.h>
+#include <SDL3/SDL_image.h>
 
 #include <cstdlib>
 #include <iostream>
@@ -142,6 +144,57 @@ dump(std::ostream& dst, const canvas& img, fmt format)
 }
 
 } // namespace nano::ppm
+
+namespace nano::image
+{
+
+std::string
+error2str(int err)
+{
+    switch (err)
+    {
+    case err_t::no_error:
+        return "INFO: no errors were occured";
+
+    case err_t::internal_load:
+        return "ERROR: Internal loading image error";
+
+    case err_t::convert_pixelformat:
+        return "ERROR: Convertiong pixels format error";
+
+    default:
+        return {};
+    }
+}
+
+int
+load(const std::filesystem::path& fn, canvas& buf)
+{
+    SDL_Surface* img = IMG_Load(fn.string().c_str());
+    ASSERT_SDL_ERROR(nullptr != img, err_t::internal_load);
+
+    SDL_Surface* new_img{ nullptr };
+    if (SDL_PIXELFORMAT_RGB24 != img->format->format)
+    {
+        LOG_DEBUG("Unsupported pixel format in image loaded from: %s\n",
+                  path2str(fn).c_str());
+        LOG_DEBUG("Trying to convert...\n");
+        new_img = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_RGB24);
+        ASSERT_SDL_ERROR(nullptr != new_img, err_t::convert_pixelformat);
+        LOG_DEBUG("Successful converting pixel format\n");
+        SDL_DestroySurface(img);
+        img = new_img;
+    }
+
+    buf.resize(img->w, img->h);
+    std::memcpy(
+        buf.data(), img->pixels, buf.height() * buf.width() * sizeof(color));
+    SDL_DestroySurface(img);
+
+    return err_t::no_error;
+}
+
+} // namespace nano::image
 
 namespace nano::wav
 {

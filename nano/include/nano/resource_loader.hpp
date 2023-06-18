@@ -1,6 +1,7 @@
 #ifndef IMAGE_LOADER_HPP
 #define IMAGE_LOADER_HPP
 
+#include <filesystem>
 #include <nano/canvas.hpp>
 #include <nano/soundbuf.hpp>
 
@@ -41,6 +42,21 @@ int load(std::istream& src, canvas& img);
 int dump(std::ostream& dst, const canvas& img, fmt format);
 
 } // namespace nano::ppm
+
+namespace nano::image
+{
+enum err_t
+{
+    no_error = 0,
+    internal_load = -2,
+    convert_pixelformat,
+};
+
+std::string error2str(int);
+
+int load(const std::filesystem::path& fn, canvas& buf);
+
+} // namespace nano::image
 
 namespace nano::wav
 {

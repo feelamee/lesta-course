@@ -26,7 +26,7 @@ public:
 
     struct window_t
     {
-        static constexpr vec2f size{ 720, 960 };
+        vec2f size{ 720, 960 };
     } window;
 
     int initialize(int init_flags);

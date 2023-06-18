@@ -66,16 +66,19 @@ add_library(
 target_include_directories(${TARGET} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_compile_features(${TARGET} PUBLIC cxx_std_20)
 
-option(NANO_DEBUG "Debug macro for libnano-engine" ON)
+option(NANO_DEBUG "Debug macro for libnano" ON)
 if (NANO_DEBUG)
 target_compile_options(${TARGET} PUBLIC -DNANO_DEBUG)
 target_compile_options(${TARGET} PUBLIC -g)
 endif()
 
 find_package(OpenGL REQUIRED)
-target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
 target_link_libraries(${TARGET} PUBLIC OpenGL::GL)
 target_link_libraries(${TARGET} PUBLIC glad)
+target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
+target_link_libraries(${TARGET} PUBLIC SDL3_image::SDL3_image)
+
+target_link_libraries(${TARGET} PUBLIC sanitizer)
 
 target_include_directories(${TARGET} PUBLIC ${imgui})
 target_include_directories(${TARGET} PUBLIC ${imgui}/backends)

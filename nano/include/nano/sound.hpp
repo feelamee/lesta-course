@@ -49,6 +49,8 @@ public:
 
     static void audio_callback(void* userdata, std::uint8_t* stream, int len);
 
+    bool loop{ false };
+
 private:
     std::uint32_t audio_deviceID{ 0 };
     soundbuf buf;
