@@ -87,14 +87,17 @@ engine::initialize(int init_flags)
 
     // TODO: implement this methods by yourself
     bool err = not ImGui_ImplSDL3_InitForOpenGL(impl->window, impl->context);
-    ASSERT_ERROR(err, "Failed while initializing SDL3 for OpenGL\n");
+    if (err)
+    {
+        LOG_DEBUG("Failed while initializing SDL3 for OpenGL\n");
+        return EXIT_FAILURE;
+    }
 
 #ifdef __WINDOWS__
-    err = ImGui_ImplOpenGL3_Init("#version 300");
+    ImGui_ImplOpenGL3_Init("#version 300");
 #else
-    err = ImGui_ImplOpenGL3_Init("#version 300 es");
+    ImGui_ImplOpenGL3_Init("#version 300 es");
 #endif
-    ASSERT_ERROR(err, "Failed while initializing OpenGL\n");
 
     return EXIT_SUCCESS;
 }

@@ -165,6 +165,7 @@ error2str(int err)
     default:
         return {};
     }
+    return {};
 }
 
 int
@@ -246,7 +247,7 @@ load(std::istream& src, soundbuf& buf)
         return err_t::calc_length;
     }
     src.seekg(0, std::ios::beg);
-    auto raw_data = std::make_shared<uint8_t[]>(size);
+    auto raw_data = std::make_shared<soundbuf::bufdata_t[]>(size);
     src.read(reinterpret_cast<char*>(raw_data.get()), size);
 
     SDL_RWops* sdl_buf = SDL_RWFromMem(raw_data.get(), size);
@@ -282,8 +283,17 @@ load(std::istream& src, soundbuf& buf)
     soundbuf_spec.frequence = spec.freq;
     soundbuf_spec.silence = spec.silence;
 
-    buf = soundbuf(
-        std::shared_ptr<uint8_t[]>(soundbuf_data), soundbuf_len, soundbuf_spec);
+    // SDL use malloc for allocating memory,
+    // that's why if I will use delete[] from shared_ptr<std::uint8_t[]>,
+    // this will cause alloc-dealloc-mismatch
+    buf = soundbuf(soundbuf::buf_t(soundbuf_data,
+                                   [](auto&& p)
+                                   {
+                                       if (p)
+                                           free(p);
+                                   }),
+                   soundbuf_len,
+                   soundbuf_spec);
 
     return err_t::no_error;
 }
