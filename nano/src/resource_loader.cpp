@@ -175,7 +175,7 @@ load(const std::filesystem::path& fn, canvas& buf)
     ASSERT_SDL_ERROR(nullptr != img, err_t::internal_load);
 
     SDL_Surface* new_img{ nullptr };
-    if (SDL_PIXELFORMAT_RGB24 != img->format->format)
+    if (SDL_PIXELFORMAT_RGBA8888 != img->format->format)
     {
         LOG_DEBUG("Unsupported pixel format in image loaded from: %s\n",
                   path2str(fn).c_str());

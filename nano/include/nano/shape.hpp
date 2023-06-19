@@ -2,6 +2,7 @@
 #define SHAPE_HPP
 
 #include <nano/color.hpp>
+#include <nano/drawable.hpp>
 #include <nano/texture2D.hpp>
 #include <nano/transform2D.hpp>
 #include <nano/vertbuf.hpp>
@@ -9,7 +10,7 @@
 namespace nano
 {
 
-class shape
+class shape : drawable
 {
 public:
     shape(const vertbuf&, const texture2D&);
@@ -40,6 +41,7 @@ public:
     void position(const vec2f& p_posiiton);
     void rotation(radian p_rotation);
     void factor(const vec2f& p_factor);
+    void draw(const state& = {}) const override;
 
 private:
     vertbuf vertices;
@@ -52,8 +54,6 @@ private:
     color fill{ colors::white };
     mutable bool transform_need_update{ false };
 };
-
-void render(const shape&);
 
 } // namespace nano
 

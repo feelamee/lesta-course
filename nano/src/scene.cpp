@@ -53,7 +53,7 @@ scene::process()
 }
 
 void
-scene::draw(const drawable::state& attrs)
+scene::draw(const drawable::state& attrs) const
 {
     using std::placeholders::_1;
     auto&& binder = std::bind(&node::draw, _1, attrs);

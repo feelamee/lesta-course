@@ -42,7 +42,7 @@ public:
     int uniform(const std::string&, const transform2D&);
 
     using location_t = int;
-    location_t uniform_location(const std::string&);
+    location_t uniform_location(const std::string&) const;
 
     void bind_textures() const;
 
@@ -51,7 +51,7 @@ public:
     static int validate(const shader&);
     static bool exist(const shader&);
     static bool is_attached(type, const shader&);
-    static unsigned int active();
+    static int active();
     static void remove(shader&);
 
     struct state_guard;
@@ -65,7 +65,7 @@ private:
     constexpr static std::size_t max_count{ 2 };
 
     std::unordered_map<location_t, const texture2D&> textures;
-    std::unordered_map<std::string, location_t> uniforms;
+    mutable std::unordered_map<std::string, location_t> uniforms;
     unsigned int handle{ 0 };
 };
 
@@ -81,7 +81,9 @@ namespace frag
 std::string texture_src(const std::string& texture_arg_name);
 } // namespace frag
 
-int transform_texture(shader& result, const texture2D& tex);
+int transform_texture(shader& result,
+                      const texture2D& tex = {},
+                      const transform2D& tr = {});
 
 } // namespace shaders
 

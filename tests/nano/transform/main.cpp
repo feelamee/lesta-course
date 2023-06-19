@@ -22,9 +22,8 @@ main()
     sprite s(tex);
 
     shader program;
-    err_code = shaders::transform_texture(program, s.texture());
+    err_code = shaders::transform_texture(program);
     ASSERT_ERROR(err_code, "Fail while setting up shader program");
-    shader::use(program);
 
     bool is_rotate{ false };
     bool is_running{ true };
@@ -99,8 +98,7 @@ main()
             s.rotate(time / 1e20);
         }
 
-        program.uniform("u_matrix", s.transform());
-        render(s);
+        s.draw({ &program });
         eng->swap_buffers();
     }
 

@@ -1,3 +1,5 @@
+#include "nano/texture2D.hpp"
+#include <cstdlib>
 #include <nano/shape.hpp>
 
 #include <nano/engine.hpp>
@@ -147,27 +149,23 @@ shape::scale(vec2f::type scale_x, vec2f::type scale_y)
 }
 
 void
-render(const shape& p_shape)
+shape::draw(const state& s) const
 {
-    GL_CHECK(glVertexAttribPointer(
-        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->pos));
-    GL_CHECK(glEnableVertexAttribArray(0));
+    transform2D tr = s.transform;
+    tr.combine(transform());
 
-    GL_CHECK(glVertexAttribPointer(1,
-                                   3,
-                                   GL_UNSIGNED_BYTE,
-                                   GL_FALSE,
-                                   sizeof(vertex),
-                                   &p_shape.data()->rgb));
-    GL_CHECK(glEnableVertexAttribArray(1));
-
-    GL_CHECK(glVertexAttribPointer(
-        2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &p_shape.data()->tpos));
-    GL_CHECK(glEnableVertexAttribArray(2));
-
-    GL_CHECK(glDrawArrays(static_cast<GLenum>(p_shape.primitive_type()),
-                          0,
-                          p_shape.points_count()));
+    if (s.program)
+    {
+        s.program->uniform("u_texture", texture());
+        s.program->uniform("u_matrix", tr);
+        shader::use(*s.program);
+    }
+    else
+    {
+        LOG_DEBUG("Shader need for draw sprite");
+        return;
+    };
+    vertices.bind_vbo();
 }
 
 } // namespace nano

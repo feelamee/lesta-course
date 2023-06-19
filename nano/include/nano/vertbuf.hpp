@@ -27,6 +27,7 @@ public:
 
     std::size_t size() const;
     primitive_t primitive_type() const;
+    void bind_vbo() const;
 
     vertex* data();
     const vertex* data() const;

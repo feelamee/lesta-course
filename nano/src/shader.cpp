@@ -1,3 +1,5 @@
+#include "nano/texture2D.hpp"
+#include "nano/transform2D.hpp"
 #include <nano/shader.hpp>
 
 #include <nano/error.hpp>
@@ -37,7 +39,7 @@ struct shader::state_guard
         }
     }
 
-    std::uint32_t prev_handle{ 0 };
+    std::int32_t prev_handle{ 0 };
     std::uint32_t cur_handle{ 0 };
 };
 
@@ -223,7 +225,7 @@ shader::uniform(const std::string& name, const transform2D& tr)
 }
 
 shader::location_t
-shader::uniform_location(const std::string& name)
+shader::uniform_location(const std::string& name) const
 {
     location_t location{ -1 };
     auto it = uniforms.find(name);
@@ -392,7 +394,7 @@ shader::is_attached(type t, const shader& p)
     return false;
 }
 
-unsigned int
+int
 shader::active()
 {
     GLint cur{ 0 };
@@ -460,7 +462,7 @@ texture_src(const std::string& texture_arg_name)
 } // namespace frag
 
 int
-transform_texture(shader& result, const texture2D& tex)
+transform_texture(shader& result, const texture2D& tex, const transform2D& tr)
 {
     int err_code =
         result.load_from_src(shaders::frag::texture_src("u_texture"),
@@ -474,8 +476,14 @@ transform_texture(shader& result, const texture2D& tex)
     err_code = shader::validate(result);
     ASSERT_ERROR(err_code, "Shader program validation failure");
 
-    err_code = result.uniform("u_texture", tex);
-    ASSERT_ERROR(err_code, "Setting uniform u_texture failure");
+    if (texture2D::exist(tex))
+    {
+        err_code = result.uniform("u_texture", tex);
+        ASSERT_ERROR(err_code, "Setting uniform u_texture failure");
+    }
+
+    err_code = result.uniform("u_matrix", tr);
+    ASSERT_ERROR(err_code, "Setting uniform u_matrix failure");
 
     return EXIT_SUCCESS;
 }

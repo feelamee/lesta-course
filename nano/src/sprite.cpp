@@ -18,6 +18,7 @@ sprite::sprite(const texture2D& tex)
                 tex)
 {
 }
+
 // clang-format on
 
 } // namespace nano

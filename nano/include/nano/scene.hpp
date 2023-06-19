@@ -35,7 +35,7 @@ struct scene : node
 
     virtual void process() override;
 
-    virtual void draw(const drawable::state& attrs) override;
+    virtual void draw(const drawable::state& attrs) const override;
 };
 
 } // namespace nano

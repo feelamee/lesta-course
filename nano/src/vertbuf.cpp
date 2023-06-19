@@ -25,6 +25,24 @@ vertbuf::primitive_type() const
     return type;
 }
 
+void
+vertbuf::bind_vbo() const
+{
+    GL_CHECK(glVertexAttribPointer(
+        0, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &data()->pos));
+    GL_CHECK(glEnableVertexAttribArray(0));
+
+    GL_CHECK(glVertexAttribPointer(
+        1, 3, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(vertex), &data()->rgb));
+    GL_CHECK(glEnableVertexAttribArray(1));
+
+    GL_CHECK(glVertexAttribPointer(
+        2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &data()->tpos));
+    GL_CHECK(glEnableVertexAttribArray(2));
+
+    GL_CHECK(glDrawArrays(static_cast<GLenum>(primitive_type()), 0, size()));
+}
+
 vertex*
 vertbuf::data()
 {
