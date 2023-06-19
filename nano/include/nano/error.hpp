@@ -15,23 +15,28 @@ extern FILE* err_os;
 #ifdef NANO_DEBUG
 #define GL_CHECK(expr)                                                         \
     {                                                                          \
-        expr;                                                                  \
+        (expr);                                                                \
         gl_check(__FILE__, __LINE__, #expr);                                   \
-    }
-
-#define GL_ASSERT(expr)                                                        \
-    {                                                                          \
-        expr;                                                                  \
-        if (EXIT_SUCCESS != gl_check(__FILE__, __LINE__, #expr))               \
-        {                                                                      \
-            return EXIT_FAILURE;                                               \
-        }                                                                      \
     }
 
 #define LOG_DEBUG(...)                                                         \
     {                                                                          \
         fprintf(nano::err_os, "[DEBUG: %s: %d]:\n    ", __FILE__, __LINE__);   \
         fprintf(nano::err_os, __VA_ARGS__);                                    \
+    }
+
+#else
+#define GL_CHECK(expr) (expr);
+#define LOG_DEBUG(...)
+#endif
+
+#define GL_ASSERT(expr)                                                        \
+    {                                                                          \
+        (expr);                                                                \
+        if (EXIT_SUCCESS != gl_check(__FILE__, __LINE__, #expr))               \
+        {                                                                      \
+            return EXIT_FAILURE;                                               \
+        }                                                                      \
     }
 
 #define ASSERT_ERROR(err, ...)                                                 \
@@ -43,12 +48,6 @@ extern FILE* err_os;
         }                                                                      \
         (err) = EXIT_FAILURE;                                                  \
     }
-
-#else
-#define GL_CHECK(expr) (expr)
-#define GL_ASSERT(expr) (expr)
-#define LOG_DEBUG(message)
-#endif
 
 #define ASSERT_SDL_ERROR(expr, ret)                                            \
     {                                                                          \

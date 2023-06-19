@@ -4,7 +4,7 @@
 #include <nano/resource_loader.hpp>
 #include <nano/shader.hpp>
 #include <nano/shape.hpp>
-#include <nano/texture.hpp>
+#include <nano/texture2D.hpp>
 #include <nano/utils.hpp>
 #include <nano/vec.hpp>
 #include <nano/vertbuf.hpp>
@@ -23,8 +23,8 @@ int
 main()
 {
     using namespace nano;
-    engine& eng = engine::instance();
-    int err_code = eng.initialize(engine::flag::events | engine::flag::video);
+    auto&& eng = engine::instance();
+    int err_code = eng->initialize(engine::flag::events | engine::flag::video);
     if (EXIT_SUCCESS != err_code)
     {
         LOG_DEBUG("Failed while initializing engine\n");
@@ -61,7 +61,7 @@ main()
             }
         }
 
-        eng.new_frame();
+        eng->new_frame();
 
         if (show_demo_window)
         {
@@ -85,10 +85,9 @@ main()
             ImGui::End();
         }
 
-        eng.renderUI();
-        eng.swap_buffers();
+        eng->renderUI();
+        eng->swap_buffers();
     }
 
-    eng.finalize();
     return exit_code;
 }

@@ -2,39 +2,28 @@
 #include <nano/error.hpp>
 #include <nano/shader.hpp>
 #include <nano/sprite.hpp>
-#include <nano/texture.hpp>
+#include <nano/texture2D.hpp>
 
 #include <fstream>
 #include <iostream>
 #include <numeric>
 #include <vector>
 
-#define TEST_ERROR(err, msg)                                                   \
-    {                                                                          \
-        if (EXIT_FAILURE == (err))                                             \
-        {                                                                      \
-            LOG_DEBUG((msg));                                                  \
-            return EXIT_FAILURE;                                               \
-        }                                                                      \
-        (err) = EXIT_FAILURE;                                                  \
-    }
-
 int
 main()
 {
     using namespace nano;
-    engine& eng = engine::instance();
-    eng.initialize(engine::flag::events | engine::flag::video);
+    auto&& eng = engine::instance();
+    eng->initialize(engine::flag::events | engine::flag::video);
 
     texture2D tex;
     int err_code = tex.load("../tests/nano/transform/leo.ppm");
-    // int err_code = tex.load("./test.ppm");
-    TEST_ERROR(err_code, "Fail while loading texture");
+    ASSERT_ERROR(err_code, "Fail while loading texture");
     sprite s(tex);
 
     shader program;
     err_code = shaders::transform_texture(program, s.texture());
-    TEST_ERROR(err_code, "Fail while setting up shader program");
+    ASSERT_ERROR(err_code, "Fail while setting up shader program");
     shader::use(program);
 
     bool is_rotate{ false };
@@ -112,9 +101,8 @@ main()
 
         program.uniform("u_matrix", s.transform());
         render(s);
-        eng.swap_buffers();
+        eng->swap_buffers();
     }
 
-    eng.finalize();
     return EXIT_SUCCESS;
 }

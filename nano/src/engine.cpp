@@ -1,9 +1,10 @@
+#include <immintrin.h>
 #include <nano/engine.hpp>
 
 #include <nano/error.hpp>
 #include <nano/event.hpp>
 #include <nano/shader.hpp>
-#include <nano/transform.hpp>
+#include <nano/transform2D.hpp>
 #include <nano/vertex.hpp>
 
 #define SDL_FUNCTION_POINTER_IS_VOID_POINTER
@@ -93,12 +94,7 @@ engine::initialize(int init_flags)
         return EXIT_FAILURE;
     }
 
-#ifdef __WINDOWS__
-    ImGui_ImplOpenGL3_Init("#version 300");
-#else
     ImGui_ImplOpenGL3_Init("#version 300 es");
-#endif
-
     return EXIT_SUCCESS;
 }
 
@@ -125,9 +121,11 @@ engine::renderUI()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void
-engine::finalize()
+engine::~engine()
 {
+    if (m_instance.expired())
+        return;
+
     if (not(flag::video & flags))
         return;
 
@@ -135,10 +133,6 @@ engine::finalize()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
-}
-
-engine::~engine()
-{
 }
 
 int
@@ -149,11 +143,18 @@ engine::swap_buffers()
     return EXIT_SUCCESS;
 }
 
-engine&
+std::weak_ptr<engine> engine::m_instance;
+
+std::shared_ptr<engine>
 engine::instance()
 {
-    static engine nano{};
-    return nano;
+    if (not m_instance.expired())
+    {
+        return m_instance.lock();
+    }
+    auto&& ret = std::shared_ptr<engine>(new engine);
+    m_instance = ret;
+    return ret;
 }
 
 } // namespace nano

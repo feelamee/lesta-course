@@ -1,8 +1,8 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
-#include <nano/texture.hpp>
-#include <nano/transform.hpp>
+#include <nano/texture2D.hpp>
+#include <nano/transform2D.hpp>
 
 #include <filesystem>
 #include <string>
@@ -62,7 +62,7 @@ private:
     constexpr static void clear_log_buf();
     static char log[1024];
 
-    constexpr static std::size_t shaders_max_count{ 2 };
+    constexpr static std::size_t max_count{ 2 };
 
     std::unordered_map<location_t, const texture2D&> textures;
     std::unordered_map<std::string, location_t> uniforms;

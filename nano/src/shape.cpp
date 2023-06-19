@@ -1,10 +1,8 @@
-#include "nano/texture.hpp"
-#include <iostream>
 #include <nano/shape.hpp>
 
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
-#include <nano/transform.hpp>
+#include <nano/transform2D.hpp>
 
 #include <glad/glad.h>
 
@@ -17,7 +15,7 @@ shape::shape(const vertbuf& p_vertbuf, const texture2D& p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
-    auto& win_size = engine::instance().window.size;
+    auto& win_size = engine::instance()->window.size;
     scale(1, win_size.x / win_size.y);
     origin({ 0, texture().size().normalized().y });
 }

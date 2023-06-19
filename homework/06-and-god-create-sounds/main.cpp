@@ -17,8 +17,8 @@
 int
 main()
 {
-    nano::engine& eng = nano::engine::instance();
-    int err_code = eng.initialize(nano::engine::flag::audio);
+    auto&& eng = nano::engine::instance();
+    int err_code = eng->initialize(nano::engine::flag::audio);
     ASSERT_ERROR(err_code, "Fail while initialising engine");
 
     std::filesystem::path fn(
@@ -68,6 +68,5 @@ main()
         }
     }
 
-    eng.finalize();
     return EXIT_SUCCESS;
 }

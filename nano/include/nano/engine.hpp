@@ -1,10 +1,11 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
+#include <memory>
 #include <nano/event.hpp>
 #include <nano/raii_wrapper.hpp>
-#include <nano/texture.hpp>
-#include <nano/transform.hpp>
+#include <nano/texture2D.hpp>
+#include <nano/transform2D.hpp>
 #include <nano/vec.hpp>
 #include <nano/vertbuf.hpp>
 
@@ -30,18 +31,25 @@ public:
     } window;
 
     int initialize(int init_flags);
-    void finalize();
 
     void new_frame();
     void renderUI();
     int swap_buffers();
 
-    static engine& instance();
+    static std::shared_ptr<engine> instance();
 
-    engine() = default;
     ~engine();
 
+    engine(const engine&) = delete;
+    engine(engine&&) = delete;
+    engine& operator=(const engine&) = delete;
+    engine& operator=(engine&&) = delete;
+
 private:
+    engine() = default;
+
+    static std::weak_ptr<engine> m_instance;
+
     struct impl_t;
     std::shared_ptr<impl_t> impl;
     int flags;

@@ -2,8 +2,8 @@
 #define SHAPE_HPP
 
 #include <nano/color.hpp>
-#include <nano/texture.hpp>
-#include <nano/transform.hpp>
+#include <nano/texture2D.hpp>
+#include <nano/transform2D.hpp>
 #include <nano/vertbuf.hpp>
 
 namespace nano

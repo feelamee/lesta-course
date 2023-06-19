@@ -1,4 +1,4 @@
-#include <nano/texture.hpp>
+#include <nano/texture2D.hpp>
 
 #include <nano/error.hpp>
 #include <nano/resource_loader.hpp>
@@ -106,20 +106,12 @@ texture2D::load(const std::filesystem::path& filename)
 {
     canvas img;
     int err_code = image::load(filename, img);
-    if (EXIT_SUCCESS != err_code)
-    {
-        LOG_DEBUG("Fail when loading canvas\n    %s\n",
-                  image::error2str(err_code).c_str());
-        return EXIT_FAILURE;
-    }
-    err_code = EXIT_FAILURE;
+    ASSERT_ERROR(err_code,
+                 "Fail when loading canvas\n    %s\n",
+                 image::error2str(err_code).c_str());
 
     err_code = load(img);
-    if (EXIT_SUCCESS != err_code)
-    {
-        LOG_DEBUG("Failed loading texture from canvas\n");
-        return EXIT_FAILURE;
-    }
+    ASSERT_ERROR(err_code, "Failed loading texture from canvas\n");
 
     return EXIT_SUCCESS;
 }
@@ -145,11 +137,12 @@ texture2D::bind(const texture2D& t)
 }
 
 void
-texture2D::remove(const texture2D& t)
+texture2D::remove(texture2D& t)
 {
     if (exist(t))
     {
         GL_CHECK(glDeleteTextures(1, &t.m_handle));
+        t.m_handle = 0;
     }
 }
 

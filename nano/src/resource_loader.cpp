@@ -265,6 +265,7 @@ load(std::istream& src, soundbuf& buf)
     {
         return err_t::incorrect_file_structure;
     }
+    raw_data.reset();
 
     audio_spec soundbuf_spec;
     if (static_cast<int>(spec.channels) > 2)

@@ -1,5 +1,5 @@
-#ifndef TRANSOFRMABLE_HPP
-#define TRANSOFRMABLE_HPP
+#ifndef TRANSFORM2D_HPP
+#define TRANSFORM2D_HPP
 
 #include <cstddef>
 #include <nano/vec.hpp>
@@ -56,4 +56,4 @@ private:
 
 } // namespace nano
 
-#endif // TRANSOFRMABLE_HPP
+#endif // TRANSFORM2D_HPP

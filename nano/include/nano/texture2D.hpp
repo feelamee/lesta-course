@@ -1,5 +1,5 @@
-#ifndef TEXTURE_HPP
-#define TEXTURE_HPP
+#ifndef TEXTURE2D_HPP
+#define TEXTURE2D_HPP
 
 #include <nano/canvas.hpp>
 #include <nano/vec.hpp>
@@ -36,7 +36,7 @@ public:
 
     std::uint32_t handle() const;
 
-    static void remove(const texture2D&);
+    static void remove(texture2D&);
     static bool exist(const texture2D&);
     static int bind(const texture2D&);
     static std::size_t max_active();
@@ -48,4 +48,4 @@ private:
 
 } // namespace nano
 
-#endif // TEXTURE_HPP
+#endif // TEXTURE2D_HPP

@@ -199,7 +199,7 @@ sound::audio_callback(void* userdata, std::uint8_t* stream, int len)
     {
         SDL_MixAudioFormat(stream,
                            &buf->data()[pos],
-                           static_cast<SDL_AudioFormat>(buf->buf.spec().fmt),
+                           static_cast<SDL_AudioFormat>(buf->spec().fmt),
                            len,
                            buf->volume());
         buf->position(pos + len);
@@ -208,7 +208,7 @@ sound::audio_callback(void* userdata, std::uint8_t* stream, int len)
     {
         SDL_MixAudioFormat(stream,
                            &buf->data()[pos],
-                           static_cast<SDL_AudioFormat>(buf->buf.spec().fmt),
+                           static_cast<SDL_AudioFormat>(buf->spec().fmt),
                            left,
                            buf->volume());
         if (buf->loop)

@@ -1,3 +1,4 @@
+#include <memory>
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/sound.hpp>
@@ -10,8 +11,8 @@ int
 main()
 {
     using namespace nano;
-    auto& e = engine::instance();
-    int err_code = e.initialize(engine::flag::all);
+    auto&& e = engine::instance();
+    int err_code = e->initialize(engine::flag::all);
     ASSERT_ERROR(err_code, "Fail while initialization of engine\n");
 
     const std::filesystem::path bg_fn{ "../tetris/bg.png" };
@@ -46,10 +47,10 @@ main()
             }
         }
 
-        e.new_frame();
+        e->new_frame();
 
         ImGui::SetNextWindowPos({ 0, 0 });
-        ImGui::SetNextWindowSize({ e.window.size.x, e.window.size.y });
+        ImGui::SetNextWindowSize({ e->window.size.x, e->window.size.y });
         ImGui::PushStyleColor(ImGuiCol_WindowBg, color::hex({ 50, 50, 125 }));
 
         ImGui::Begin("what?", nullptr, ImGuiWindowFlags_NoDecoration);
@@ -77,19 +78,25 @@ main()
 
         ImGui::PushStyleColor(ImGuiCol_Button, color::hex({ 50, 50, 150 }));
         ImGui::SetCursorPos({ 100, 350 });
-        ImGui::Button("Start");
+        if (ImGui::Button("Start"))
+        {
+            // gameplay
+        }
 
         ImGui::SetCursorPos({ 430, 350 });
-        ImGui::Button("Settings");
+        if (ImGui::Button("Settings"))
+        {
+            // settings
+        }
+
         ImGui::PopStyleColor();
 
         ImGui::End();
         ImGui::PopStyleColor();
 
-        e.renderUI();
-        e.swap_buffers();
+        e->renderUI();
+        e->swap_buffers();
     }
 
-    e.finalize();
     return EXIT_SUCCESS;
 }

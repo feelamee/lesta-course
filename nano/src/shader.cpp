@@ -375,12 +375,11 @@ shader::is_attached(type t, const shader& p)
     {
         return false;
     }
-    GLuint shaders[shaders_max_count];
+    GLuint shaders[max_count];
     GLint shader_t{ 0 };
     GLsizei count{ 0 };
 
-    GL_CHECK(
-        glGetAttachedShaders(p.handle, shaders_max_count, &count, shaders));
+    GL_CHECK(glGetAttachedShaders(p.handle, max_count, &count, shaders));
 
     for (GLsizei i{ 0 }; i < count; ++i)
     {

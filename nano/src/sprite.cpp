@@ -1,7 +1,7 @@
 #include <nano/sprite.hpp>
 
 #include <nano/engine.hpp>
-#include <nano/texture.hpp>
+#include <nano/texture2D.hpp>
 #include <nano/vertbuf.hpp>
 
 namespace nano

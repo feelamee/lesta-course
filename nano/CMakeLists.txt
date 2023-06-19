@@ -8,9 +8,9 @@ add_library(
     src/engine.cpp
     src/event.cpp
     src/shader.cpp
-    src/transform.cpp
+    src/transform2D.cpp
     src/vertbuf.cpp
-    src/texture.cpp
+    src/texture2D.cpp
     src/shader.cpp
     src/shape.cpp
     src/canvas.cpp
@@ -20,7 +20,9 @@ add_library(
     src/resource_loader.cpp
     src/sprite.cpp
     src/sound.cpp
+    src/scene.cpp
 
+    include/nano/drawable.hpp
     include/nano/sound.hpp
     include/nano/sprite.hpp
     include/nano/soundbuf.hpp
@@ -32,7 +34,7 @@ add_library(
     include/nano/shader.hpp
     include/nano/canvas.hpp
     include/nano/resource_loader.hpp
-    include/nano/texture.hpp
+    include/nano/texture2D.hpp
     include/nano/shape.hpp
     include/nano/vertbuf.hpp
     include/nano/rect.hpp
@@ -41,7 +43,8 @@ add_library(
     include/nano/color.hpp
     include/nano/engine.hpp
     include/nano/event.hpp
-    include/nano/transform.hpp
+    include/nano/transform2D.hpp
+    include/nano/scene.hpp
 
     # creating separate static lib from Dear ImGui occurs multiply definition on windows
     # in addition this method is recommended by Dear ImGui Developers
