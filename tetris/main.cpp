@@ -15,12 +15,14 @@ main()
     int err_code = e->initialize(engine::flag::all);
     ASSERT_ERROR(err_code, "Fail while initialization of engine\n");
 
-    const std::filesystem::path bg_fn{ "../tetris/bg.png" };
+    const std::filesystem::path bg_fn{ "../tetris/assets/bg.png" };
     texture2D bg;
     err_code = bg.load(bg_fn);
     ASSERT_ERROR(err_code, "Fail loading texture\n");
 
-    const std::filesystem::path bg_beat_fn{ "../tetris/piano-moment.wav" };
+    const std::filesystem::path bg_beat_fn{
+        "../tetris/assets/piano-moment.wav"
+    };
     sound bg_beat;
     err_code = bg_beat.load(bg_beat_fn);
     ASSERT_ERROR(err_code, "Fail loading sound\n");

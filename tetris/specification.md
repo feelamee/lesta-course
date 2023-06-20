@@ -29,7 +29,7 @@ If stopped __tetrominos__ create horizontal line full filled with squares,
 then it will disappear.
 If column of __tetrominos__ will reach upper bound of __game map__,
 then game will over.
-![__tetromino__ types](./tetromino-types.png)
+![__tetromino__ types](./assets/tetromino-types.png)
 
 
 __game map__
