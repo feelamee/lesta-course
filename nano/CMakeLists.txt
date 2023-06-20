@@ -75,11 +75,12 @@ target_compile_options(${TARGET} PUBLIC -DNANO_DEBUG)
 target_compile_options(${TARGET} PUBLIC -g)
 endif()
 
+if (ANDROID)
+target_link_libraries(${TARGET} PUBLIC GLESv2 EGL SDL3::SDL3-shared SDL3_image::SDL3_image android log)
+else()
 find_package(OpenGL REQUIRED)
-target_link_libraries(${TARGET} PUBLIC OpenGL::GL)
-target_link_libraries(${TARGET} PUBLIC glad)
-target_link_libraries(${TARGET} PUBLIC SDL3::SDL3-shared)
-target_link_libraries(${TARGET} PUBLIC SDL3_image::SDL3_image)
+target_link_libraries(${TARGET} PUBLIC OpenGL::GL glad SDL3::SDL3-shared SDL3_image::SDL3_image)
+endif()
 
 target_link_libraries(${TARGET} PUBLIC sanitizer)
 
