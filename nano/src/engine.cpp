@@ -1,4 +1,3 @@
-#include <immintrin.h>
 #include <nano/engine.hpp>
 
 #include <nano/error.hpp>
@@ -9,13 +8,14 @@
 
 #define SDL_FUNCTION_POINTER_IS_VOID_POINTER
 #include <SDL3/SDL.h>
-#include <glad/glad.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 
 #ifdef __ANDROID__
 #include <GLESv2/gl.h>
 #include <SDL3/SDL_main.h>
+#else
+#include <glad/glad.h>
 #endif
 
 #include <assert.h>
