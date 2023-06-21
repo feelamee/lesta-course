@@ -3,6 +3,7 @@
      com.gamemaker.game
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:versionCode="1"
     android:versionName="1.0"
     android:installLocation="auto">
@@ -13,7 +14,7 @@
     <!-- Touchscreen support -->
     <uses-feature
         android:name="android.hardware.touchscreen"
-        android:required="false" />
+        android:required="true" />
 
     <!-- Game controller support -->
     <uses-feature
@@ -70,13 +71,12 @@
          -->
      
         <activity android:name="SDLActivity"
-            android:label="@string/app_name"
             android:alwaysRetainTaskState="true"
             android:launchMode="singleInstance"
             android:configChanges="layoutDirection|locale|orientation|uiMode|screenLayout|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:preferMinimalPostProcessing="true"
             android:exported="true"
-            >
+            tools:targetApi="r">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -1,4 +1,3 @@
-#include <memory>
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/sound.hpp>
@@ -6,8 +5,15 @@
 #include <imgui.h>
 
 #include <cstdlib>
+#include <memory>
 
-int
+#include <SDL3/SDL_log.h>
+
+#ifdef __ANDROID__
+#define main SDL_main
+#endif
+
+extern "C" int
 main()
 {
     using namespace nano;
@@ -15,14 +21,13 @@ main()
     int err_code = e->initialize(engine::flag::all);
     ASSERT_ERROR(err_code, "Fail while initialization of engine\n");
 
-    const std::filesystem::path bg_fn{ "../tetris/assets/bg.png" };
+    SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "here");
+    const std::filesystem::path bg_fn{ "../assets/bg.png" };
     texture2D bg;
     err_code = bg.load(bg_fn);
     ASSERT_ERROR(err_code, "Fail loading texture\n");
 
-    const std::filesystem::path bg_beat_fn{
-        "../tetris/assets/piano-moment.wav"
-    };
+    const std::filesystem::path bg_beat_fn{ "../assets/piano-moment.wav" };
     sound bg_beat;
     err_code = bg_beat.load(bg_beat_fn);
     ASSERT_ERROR(err_code, "Fail loading sound\n");

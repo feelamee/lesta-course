@@ -8,25 +8,20 @@ else {
 }
 
 android {
-    compileSdkVersion 34
+    compileSdkVersion 33
+    ndkVersion '25.2.9519653'
     defaultConfig {
-        if (buildAsApplication) {
-            applicationId "org.libsdl.app"
-        }
-        minSdkVersion 16
-        targetSdkVersion 34
+        applicationId "org.home.tetris"
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
-            ndkBuild {
-                arguments "APP_PLATFORM=android-16"
-                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+            cmake {
+                arguments "-DANDROID_STL=c++_shared"
+                // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                // abiFilters 'arm64-v8a'
             }
-            // cmake {
-            //     arguments "-DANDROID_APP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
-            //     // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
-            //     abiFilters 'arm64-v8a'
-            // }
         }
     }
     buildTypes {

@@ -271,12 +271,14 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
      */
     protected String[] getLibraries() {
         return new String[] {
+                "c++_shared",
             "SDL3",
-            // "SDL3_image",
+            "SDL3_image",
             // "SDL3_mixer",
             // "SDL3_net",
             // "SDL3_ttf",
-            "main"
+            "nano",
+            "tetris",
         };
     }
 
