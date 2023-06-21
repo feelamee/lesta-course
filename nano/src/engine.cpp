@@ -46,7 +46,7 @@ struct engine::impl_t
 int
 engine::initialize(int init_flags)
 {
-    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_ERROR);
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
     flags = init_flags;
 
     impl = std::make_shared<impl_t>();
@@ -58,11 +58,27 @@ engine::initialize(int init_flags)
         return EXIT_SUCCESS;
     }
 
-    const SDL_DisplayMode* dm{};
-    dm = SDL_GetCurrentDisplayMode(1);
-    ASSERT_SDL_ERROR(nullptr != dm, EXIT_FAILURE);
-    window.size.x = dm->w;
-    window.size.y = dm->h;
+#ifdef __ANDROID__
+    {
+        const SDL_DisplayMode* display_mode{nullptr};
+        int display_count{0};
+        SDL_DisplayID* display_ids = SDL_GetDisplays(&display_count);
+        ASSERT_SDL_ERROR(nullptr != display_ids, EXIT_FAILURE);
+        int i{ 0 };
+        SDL_DisplayID* id{ display_ids };
+        while (nullptr == display_mode and i < display_count)
+        {
+            display_mode = SDL_GetCurrentDisplayMode(*id);
+            ++i;
+            ++id;
+        }
+        SDL_free(display_ids);
+
+        ASSERT_SDL_ERROR(nullptr != display_mode, EXIT_FAILURE);
+        window.size.x = display_mode->w;
+        window.size.y = display_mode->h;
+    }
+#endif
 
     impl->window = SDL_CreateWindow(
         "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);
