@@ -26,7 +26,6 @@ add_library(
     include/nano/sound.hpp
     include/nano/sprite.hpp
     include/nano/soundbuf.hpp
-    include/nano/raii_wrapper.hpp
     include/nano/utils.hpp
     include/nano/error.hpp
     include/nano/vertbuf.hpp
@@ -72,11 +71,12 @@ target_compile_features(${TARGET} PUBLIC cxx_std_20)
 option(NANO_DEBUG "Debug macro for libnano" ON)
 if (NANO_DEBUG)
 target_compile_options(${TARGET} PUBLIC -DNANO_DEBUG)
+target_compile_options(${TARGET} PUBLIC -DDEBUG)
 target_compile_options(${TARGET} PUBLIC -g)
 endif()
 
 if (ANDROID)
-target_link_libraries(${TARGET} PUBLIC GLESv2 EGL SDL3::SDL3-shared SDL3_image::SDL3_image android log)
+target_link_libraries(${TARGET} PUBLIC GLESv3 EGL SDL3::SDL3-shared SDL3_image::SDL3_image android log)
 else()
 find_package(OpenGL REQUIRED)
 target_link_libraries(${TARGET} PUBLIC OpenGL::GL glad SDL3::SDL3-shared SDL3_image::SDL3_image)
@@ -86,4 +86,8 @@ target_link_libraries(${TARGET} PUBLIC sanitizer)
 
 target_include_directories(${TARGET} PUBLIC ${imgui})
 target_include_directories(${TARGET} PUBLIC ${imgui}/backends)
+if (ANDROID)
+target_compile_definitions(${TARGET} PRIVATE -DIMGUI_IMPL_OPENGL_ES3)
+    else()
 target_compile_definitions(${TARGET} PRIVATE -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM)
+endif()

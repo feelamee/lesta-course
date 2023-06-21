@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <cmath>
 #include <concepts>
-#include <ranges>
+// #include <ranges>
 
 namespace nano
 {
@@ -68,29 +68,29 @@ struct vec3
 using vec3f = vec3<float>;
 
 // TODO: RENAME function
-template <std::ranges::input_range T, typename Proj>
-    requires std::is_copy_constructible_v<T>
-constexpr auto
-mult(const T& lhs, const T& rhs, Proj func) -> T
-{
-    namespace rng = std::ranges;
+// template <std::ranges::input_range T, typename Proj>
+//     requires std::is_copy_constructible_v<T>
+// constexpr auto
+// mult(const T& lhs, const T& rhs, Proj func) -> T
+// {
+//     namespace rng = std::ranges;
 
-    T ret{ lhs };
-    const auto lhs_size = rng::distance(begin(lhs), end(lhs));
-    const auto rhs_size = rng::distance(begin(rhs), end(rhs));
-    assert(lhs_size == rhs_size and "size of vectors should be equal");
+//     T ret{ lhs };
+//     const auto lhs_size = rng::distance(begin(lhs), end(lhs));
+//     const auto rhs_size = rng::distance(begin(rhs), end(rhs));
+//     assert(lhs_size == rhs_size and "size of vectors should be equal");
 
-    auto lhs_it = rng::begin(lhs);
-    auto rhs_it = rng::begin(rhs);
+//     auto lhs_it = rng::begin(lhs);
+//     auto rhs_it = rng::begin(rhs);
 
-    for (auto& i : ret)
-    {
-        i = func((*lhs_it), (*rhs_it));
-        ++lhs_it;
-        ++rhs_it;
-    }
-    return ret;
-}
+//     for (auto& i : ret)
+//     {
+//         i = func((*lhs_it), (*rhs_it));
+//         ++lhs_it;
+//         ++rhs_it;
+//     }
+//     return ret;
+// }
 
 } // namespace nano
 

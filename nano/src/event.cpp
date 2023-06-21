@@ -65,14 +65,18 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
         break;
 
     case ev_t::text_edit:
-        std::ranges::copy(sdl_ev->edit.text, ev->edit.text);
+        std::copy(sdl_ev->edit.text,
+                  sdl_ev->edit.text + SDL_TEXTEDITINGEVENT_TEXT_SIZE,
+                  ev->edit.text);
         ev->edit.length = sdl_ev->edit.length;
         ev->edit.start = sdl_ev->edit.start;
         ev->edit.windowID = sdl_ev->edit.windowID;
         break;
 
     case ev_t::text_input:
-        std::ranges::copy(sdl_ev->text.text, ev->input.text);
+        std::copy(sdl_ev->text.text,
+                  sdl_ev->text.text + SDL_TEXTEDITINGEVENT_TEXT_SIZE,
+                  ev->input.text);
         ev->input.windowID = sdl_ev->text.windowID;
         break;
 

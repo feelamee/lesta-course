@@ -1,8 +1,7 @@
-#include "nano/drawable.hpp"
+#include <nano/drawable.hpp>
 #include <nano/scene.hpp>
 
 #include <functional>
-#include <ranges>
 
 namespace nano
 {
@@ -25,39 +24,44 @@ node::process()
 void
 scene::start()
 {
-    std::ranges::for_each(nodes, &node::start);
+    using std::placeholders::_1;
+    std::for_each(nodes.begin(), nodes.end(), std::bind(&node::start, _1));
 }
 
 void
 scene::stop()
 {
-    std::ranges::for_each(nodes, &node::stop);
+    using std::placeholders::_1;
+    std::for_each(nodes.begin(), nodes.end(), std::bind(&node::stop, _1));
 }
 
 void
 scene::pause()
 {
-    std::ranges::for_each(nodes, &node::pause);
+    using std::placeholders::_1;
+    std::for_each(nodes.begin(), nodes.end(), std::bind(&node::pause, _1));
 }
 
 void
 scene::resume()
 {
-    std::ranges::for_each(nodes, &node::resume);
+    using std::placeholders::_1;
+    std::for_each(nodes.begin(), nodes.end(), std::bind(&node::resume, _1));
 }
 
 void
 scene::process()
 {
-    std::ranges::for_each(nodes, &node::process);
+    using std::placeholders::_1;
+    std::for_each(nodes.begin(), nodes.end(), std::bind(&node::process, _1));
 }
 
 void
 scene::draw(const drawable::state& attrs) const
 {
     using std::placeholders::_1;
-    auto&& binder = std::bind(&node::draw, _1, attrs);
-    std::ranges::for_each(nodes, binder);
+    std::for_each(
+        nodes.begin(), nodes.end(), std::bind(&node::draw, _1, attrs));
 }
 
 void

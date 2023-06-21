@@ -23,11 +23,11 @@ if (BUILD_TESTS OR BUILD_ALL)
 add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 endif()
 
-option (BUILD_TETRIS "enable building of tetris game" ON)
+# option (BUILD_TETRIS "enable building of tetris game" ON)
 
-if (BUILD_TETRIS OR BUILD_ALL)
-add_subdirectory(${CMAKE_SOURCE_DIR}/tetris)
-endif()
+# if (BUILD_TETRIS OR BUILD_ALL)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/tetris)
+# endif()
 
 option(ADDRESS_SANITIZER ON)
 

@@ -1,9 +1,10 @@
-#include <cstdint>
-#include <limits>
+#include <nano/error.hpp>
 #include <nano/soundbuf.hpp>
 
 #include <algorithm>
 #include <climits>
+#include <cstdint>
+#include <limits>
 
 namespace nano
 {

@@ -19,7 +19,7 @@ public:
         fragment = 0x8B30,
         vertex = 0x8B31,
     };
-    constexpr static std::string type2str(type);
+    static std::string type2str(type);
     shader();
     ~shader();
 

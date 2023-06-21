@@ -8,17 +8,18 @@
 
 #define SDL_FUNCTION_POINTER_IS_VOID_POINTER
 #include <SDL3/SDL.h>
+
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 
 #ifdef __ANDROID__
-#include <GLESv2/gl.h>
+#include <GLES3/gl3.h>
 #include <SDL3/SDL_main.h>
 #else
 #include <glad/glad.h>
 #endif
 
-#include <assert.h>
+#include <cassert>
 #include <chrono>
 #include <cstdlib>
 #include <memory>
@@ -45,6 +46,7 @@ struct engine::impl_t
 int
 engine::initialize(int init_flags)
 {
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_ERROR);
     flags = init_flags;
 
     impl = std::make_shared<impl_t>();
@@ -55,6 +57,12 @@ engine::initialize(int init_flags)
     {
         return EXIT_SUCCESS;
     }
+
+    const SDL_DisplayMode* dm{};
+    dm = SDL_GetCurrentDisplayMode(1);
+    ASSERT_SDL_ERROR(nullptr != dm, EXIT_FAILURE);
+    window.size.x = dm->w;
+    window.size.y = dm->h;
 
     impl->window = SDL_CreateWindow(
         "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);
@@ -81,7 +89,9 @@ engine::initialize(int init_flags)
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context, EXIT_FAILURE);
 
+#ifndef __ANDROID__
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
+#endif
 
     IMGUI_CHECKVERSION();
     ImGuiContext* imgui_ctx = ImGui::CreateContext();

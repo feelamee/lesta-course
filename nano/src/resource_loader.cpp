@@ -247,7 +247,14 @@ load(std::istream& src, soundbuf& buf)
         return err_t::calc_length;
     }
     src.seekg(0, std::ios::beg);
-    auto raw_data = std::make_shared<soundbuf::bufdata_t[]>(size);
+    std::shared_ptr<soundbuf::bufdata_t> raw_data(
+        reinterpret_cast<soundbuf::bufdata_t*>(::operator new[](size)),
+        [](auto&& p)
+        {
+            if (p)
+                delete[] p;
+        });
+
     src.read(reinterpret_cast<char*>(raw_data.get()), size);
 
     SDL_RWops* sdl_buf = SDL_RWFromMem(raw_data.get(), size);
@@ -257,7 +264,7 @@ load(std::istream& src, soundbuf& buf)
     }
 
     SDL_AudioSpec spec;
-    std::uint8_t* soundbuf_data{ nullptr };
+    uint8_t* soundbuf_data{ nullptr };
     std::uint32_t soundbuf_len{ 0 };
     SDL_AudioSpec* res =
         SDL_LoadWAV_RW(sdl_buf, 1, &spec, &soundbuf_data, &soundbuf_len);

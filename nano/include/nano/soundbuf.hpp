@@ -36,7 +36,7 @@ public:
     ~soundbuf() = default;
 
     using bufdata_t = std::uint8_t;
-    using buf_t = std::shared_ptr<bufdata_t[]>;
+    using buf_t = std::shared_ptr<bufdata_t>;
 
     soundbuf(buf_t, int, const audio_spec& = {});
 

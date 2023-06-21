@@ -1,11 +1,11 @@
 #ifndef IMAGE_LOADER_HPP
 #define IMAGE_LOADER_HPP
 
-#include <filesystem>
 #include <nano/canvas.hpp>
 #include <nano/soundbuf.hpp>
 
 #include <cstdint>
+#include <filesystem>
 #include <iosfwd>
 #include <string>
 

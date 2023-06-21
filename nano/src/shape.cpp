@@ -1,14 +1,17 @@
-#include "nano/texture2D.hpp"
-#include <cstdlib>
 #include <nano/shape.hpp>
 
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/transform2D.hpp>
 
+#ifdef __ANDROID__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
 
 #include <cmath>
+#include <cstdlib>
 
 namespace nano
 {

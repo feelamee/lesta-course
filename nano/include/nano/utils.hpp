@@ -13,14 +13,16 @@ std::string path2str(const std::filesystem::path&);
 
 int extract_file(std::string&, const std::filesystem::path&);
 
+#ifdef __cpp_lib_ranges
 void
 print(const std::ranges::range auto& r)
 {
-    fprintf(err_os, "(range: %UL )[ ", std::size(r));
+    printf("(range: %UL )[ ", std::size(r));
     for (const auto& i : r)
-        fprintf(err_os, "%d ", i);
-    fprintf(err_os, "]\n");
+        printf("%d ", i);
+    printf("]\n");
 }
+#endif
 
 } // namespace nano
 

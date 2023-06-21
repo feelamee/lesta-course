@@ -1,13 +1,13 @@
 #ifndef ENGINE_HPP
 #define ENGINE_HPP
 
-#include <memory>
 #include <nano/event.hpp>
-#include <nano/raii_wrapper.hpp>
 #include <nano/texture2D.hpp>
 #include <nano/transform2D.hpp>
 #include <nano/vec.hpp>
 #include <nano/vertbuf.hpp>
+
+#include <memory>
 
 namespace nano
 {

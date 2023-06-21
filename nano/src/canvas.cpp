@@ -30,13 +30,14 @@ canvas::operator()(size_t row, size_t col)
 void
 canvas::fill(const color& val)
 {
-    std::ranges::fill(buf, val);
+    std::fill(buf.begin(), buf.end(), val);
 }
 
 bool
 canvas::operator==(const canvas& other) const
 {
-    return std::ranges::equal(buf, other.buf);
+    return std::equal(
+        buf.begin(), buf.end(), other.buf.begin(), other.buf.end());
 }
 
 const color*
