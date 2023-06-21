@@ -5,7 +5,11 @@
 #include <iosfwd>
 #include <string_view>
 
+#ifdef __ANDROID__
+#include <GLES3/gl3.h>
+#else
 #include <glad/glad.h>
+#endif
 
 namespace nano
 {

@@ -48,14 +48,14 @@ android {
     lintOptions {
         abortOnError false
     }
-    namespace 'org.libsdl.app'
+    namespace 'org.home.tetris'
 
     if (buildAsLibrary) {
         libraryVariants.all { variant ->
             variant.outputs.each { output ->
                 def outputFile = output.outputFile
                 if (outputFile != null && outputFile.name.endsWith(".aar")) {
-                    def fileName = "org.libsdl.app.aar"
+                    def fileName = "org.home.tetris.aar"
                     output.outputFile = new File(outputFile.parent, fileName)
                 }
             }
