@@ -25,8 +25,9 @@ extern FILE* err_os;
 
 #define LOG_DEBUG(...)                                                         \
     {                                                                          \
-        fprintf(nano::err_os, "[DEBUG: %s: %d]:\n    ", __FILE__, __LINE__);   \
-        fprintf(nano::err_os, __VA_ARGS__);                                    \
+        /* fprintf(nano::err_os, "[DEBUG: %s: %d]:\n    ", __FILE__,           \
+        __LINE__); fprintf(nano::err_os, __VA_ARGS__); */                      \
+        nano::log_debug(__LINE__, __FILE__, __VA_ARGS__);                      \
     }
 
 #else
@@ -57,7 +58,16 @@ extern FILE* err_os;
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG("%s\n", SDL_GetError());                                 \
+            LOG_DEBUG("Internal SDL error: %s\n", SDL_GetError());             \
+            return (ret);                                                      \
+        }                                                                      \
+    }
+
+#define ASSERT_IMG_ERROR(expr, ret)                                            \
+    {                                                                          \
+        if (!(expr))                                                           \
+        {                                                                      \
+            LOG_DEBUG("Internal IMG error: %s\n", IMG_GetError());             \
             return (ret);                                                      \
         }                                                                      \
     }
@@ -66,13 +76,14 @@ extern FILE* err_os;
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG("%s\n", SDL_GetError());                                 \
+            LOG_DEBUG("Internal SDL error: %s\n", SDL_GetError());             \
         }                                                                      \
     }
 
 namespace nano
 {
 
+void log_debug(int line, const char* fn, const char* fmt, ...);
 int gl_check(const std::filesystem::path& filename,
              unsigned int line,
              std::string_view expr);

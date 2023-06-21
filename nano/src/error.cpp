@@ -1,5 +1,7 @@
 #include <nano/error.hpp>
 
+#include <SDL3/SDL_log.h>
+
 #include <cstdlib>
 #include <iostream>
 
@@ -7,6 +9,16 @@ namespace nano
 {
 
 FILE* err_os = stderr;
+
+void
+log_debug(int line, const char* fn, const char* fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    SDL_LogMessageV(
+        SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_ERROR, fmt, args);
+    va_end(args);
+}
 
 int
 gl_check(const std::filesystem::path& file,
