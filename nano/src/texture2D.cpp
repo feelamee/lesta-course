@@ -107,11 +107,11 @@ texture2D::load(const std::filesystem::path& filename)
     canvas img;
     int err_code = image::load(filename, img);
     ASSERT_ERROR(err_code,
-                 "Fail when loading canvas\n    %s\n",
+                 "Fail when loading canvas:    %s",
                  image::error2str(err_code).c_str());
 
     err_code = load(img);
-    ASSERT_ERROR(err_code, "Failed loading texture from canvas\n");
+    ASSERT_ERROR(err_code, "Failed loading texture from canvas");
 
     return EXIT_SUCCESS;
 }

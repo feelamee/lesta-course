@@ -32,9 +32,7 @@ sound::load(const std::filesystem::path& fn)
     std::ifstream file(fn, std::ios::binary);
     if (not file)
     {
-        LOG_DEBUG(
-                  "ERROR: failed while opening file:    %s\n",
-                  fn.string().c_str());
+        LOG_DEBUG("ERROR: failed while opening file: %s", fn.string().c_str());
         return EXIT_FAILURE;
     }
 
@@ -42,8 +40,7 @@ sound::load(const std::filesystem::path& fn)
     int err_code = nano::wav::load(file, buf);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG(
-                  "ERROR: failed while loading file    %s:\n    %s\n",
+        LOG_DEBUG("ERROR: failed while loading file %s\n%s",
                   fn.string().c_str(),
                   nano::wav::error2str(err_code).c_str());
         return EXIT_FAILURE;
@@ -52,8 +49,7 @@ sound::load(const std::filesystem::path& fn)
     err_code = load(buf);
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG(
-                  "ERROR: failed while loading sound from soundbuf\n");
+        LOG_DEBUG("ERROR: failed while loading sound from soundbuf");
         return EXIT_FAILURE;
     }
 
@@ -81,16 +77,13 @@ sound::load(const soundbuf& p_buf, std::size_t p_position)
     audio_deviceID = SDL_OpenAudioDevice(nullptr, 0, &spec, &obtained, 0);
     if (0 == audio_deviceID)
     {
-        LOG_DEBUG(
-                  "Failed to open audio device: %s\n",
-                  SDL_GetError());
+        LOG_DEBUG("Failed to open audio device: %s\n", SDL_GetError());
         return EXIT_FAILURE;
     }
 
     if (obtained != spec)
     {
-        LOG_DEBUG(
-                  "Obtained spec is not equal to desired\n");
+        LOG_DEBUG("Obtained spec is not equal to desired\n");
         return EXIT_FAILURE;
     }
 

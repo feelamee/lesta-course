@@ -1,3 +1,4 @@
+#include <memory>
 #include <nano/resource_loader.hpp>
 
 #include <nano/error.hpp>
@@ -172,17 +173,17 @@ int
 load(const std::filesystem::path& fn, canvas& buf)
 {
     SDL_Surface* img = IMG_Load(fn.string().c_str());
-    ASSERT_SDL_ERROR(nullptr != img, err_t::internal_load);
+    ASSERT_IMG_ERROR(nullptr != img, err_t::internal_load);
 
     SDL_Surface* new_img{ nullptr };
     if (SDL_PIXELFORMAT_RGBA8888 != img->format->format)
     {
-        LOG_DEBUG("Unsupported pixel format in image loaded from: %s\n",
+        LOG_DEBUG("Unsupported pixel format in image loaded from: %s",
                   path2str(fn).c_str());
-        LOG_DEBUG("Trying to convert...\n");
+        LOG_DEBUG("Trying to convert...");
         new_img = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_RGB24);
         ASSERT_SDL_ERROR(nullptr != new_img, err_t::convert_pixelformat);
-        LOG_DEBUG("Successful converting pixel format\n");
+        LOG_DEBUG("Successful converting pixel format");
         SDL_DestroySurface(img);
         img = new_img;
     }
@@ -240,6 +241,7 @@ load(std::istream& src, soundbuf& buf)
     {
         return err_t::bad_stream;
     }
+
     src.seekg(0, std::ios::end);
     int size = src.tellg();
     if (-1 == size)
@@ -247,13 +249,11 @@ load(std::istream& src, soundbuf& buf)
         return err_t::calc_length;
     }
     src.seekg(0, std::ios::beg);
-    std::shared_ptr<soundbuf::bufdata_t> raw_data(
-        reinterpret_cast<soundbuf::bufdata_t*>(::operator new[](size)),
-        [](auto&& p)
-        {
-            if (p)
-                delete[] p;
-        });
+
+    // because no viable overload for
+    // std::make_shared<soundbuf::bufdata_t[]>(size) on android
+    soundbuf::buf_t raw_data(
+        reinterpret_cast<soundbuf::buf_t::element_type*>(malloc(size)), free);
 
     src.read(reinterpret_cast<char*>(raw_data.get()), size);
 
@@ -268,10 +268,7 @@ load(std::istream& src, soundbuf& buf)
     std::uint32_t soundbuf_len{ 0 };
     SDL_AudioSpec* res =
         SDL_LoadWAV_RW(sdl_buf, 1, &spec, &soundbuf_data, &soundbuf_len);
-    if (nullptr == res)
-    {
-        return err_t::incorrect_file_structure;
-    }
+    ASSERT_SDL_ERROR(nullptr != res, err_t::incorrect_file_structure);
     raw_data.reset();
 
     audio_spec soundbuf_spec;
