@@ -8,8 +8,6 @@
 namespace nano
 {
 
-FILE* err_os = stderr;
-
 void
 log_debug(int line, const char* fn, const char* fmt, ...)
 {
@@ -95,15 +93,14 @@ gl_check(const std::filesystem::path& file,
         }
         }
 
-        fprintf(err_os,
-                "[DEBUG: %s : %d ]:"
-                "\n    An internal OpenGL call failed"
-                "\n    Expression:\n        %s"
-                "\n    Error description:\n        %s\n",
-                file.string().c_str(),
-                line,
-                expression.data(),
-                description.c_str());
+        LOG_DEBUG("[: %s : %d ]:"
+                  "\n    An internal OpenGL call failed"
+                  "\n    Expression:\n        %s"
+                  "\n    Error description:\n        %s\n",
+                  file.string().c_str(),
+                  line,
+                  expression.data(),
+                  description.c_str());
 
         error_code = glGetError();
     } while (GL_NO_ERROR != error_code);

@@ -32,6 +32,8 @@ public:
 
     int initialize(int init_flags);
 
+    std::filesystem::path assets_path();
+
     void new_frame();
     void renderUI();
     int swap_buffers();

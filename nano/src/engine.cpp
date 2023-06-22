@@ -12,12 +12,7 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_sdl3.h>
 
-#ifdef __ANDROID__
-#include <GLES3/gl3.h>
-#include <SDL3/SDL_main.h>
-#else
 #include <glad/glad.h>
-#endif
 
 #include <cassert>
 #include <chrono>
@@ -43,6 +38,16 @@ struct engine::impl_t
     }
 };
 
+std::filesystem::path
+engine::assets_path()
+{
+#ifdef __ANDROID__
+    return "";
+#else
+    return "../assets";
+#endif
+}
+
 int
 engine::initialize(int init_flags)
 {
@@ -60,8 +65,8 @@ engine::initialize(int init_flags)
 
 #ifdef __ANDROID__
     {
-        const SDL_DisplayMode* display_mode{nullptr};
-        int display_count{0};
+        const SDL_DisplayMode* display_mode{ nullptr };
+        int display_count{ 0 };
         SDL_DisplayID* display_ids = SDL_GetDisplays(&display_count);
         ASSERT_SDL_ERROR(nullptr != display_ids, EXIT_FAILURE);
         int i{ 0 };
@@ -105,9 +110,10 @@ engine::initialize(int init_flags)
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context, EXIT_FAILURE);
 
-#ifndef __ANDROID__
+    // #ifndef __ANDROID__
+    //     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
+    // #endif
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
-#endif
 
     IMGUI_CHECKVERSION();
     ImGuiContext* imgui_ctx = ImGui::CreateContext();

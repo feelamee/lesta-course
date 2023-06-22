@@ -1,22 +1,13 @@
 #ifndef ERROR_HPP
 #define ERROR_HPP
 
+#include <glad/glad.h>
+
 #include <filesystem>
 #include <iosfwd>
 #include <string_view>
 
-#ifdef __ANDROID__
-#include <GLES3/gl3.h>
-#else
-#include <glad/glad.h>
-#endif
-
-namespace nano
-{
-extern FILE* err_os;
-}
-
-#ifdef NANO_DEBUG
+#if defined(NANO_DEBUG) || defined(DEBUG)
 #define GL_CHECK(expr)                                                         \
     {                                                                          \
         (expr);                                                                \
@@ -51,7 +42,6 @@ extern FILE* err_os;
             LOG_DEBUG(__VA_ARGS__);                                            \
             return EXIT_FAILURE;                                               \
         }                                                                      \
-        (err) = EXIT_FAILURE;                                                  \
     }
 
 #define ASSERT_SDL_ERROR(expr, ret)                                            \

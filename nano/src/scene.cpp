@@ -21,6 +21,8 @@ node::process()
 {
 }
 
+//////////////////////////////////////////////////////
+
 void
 scene::start()
 {
@@ -74,6 +76,28 @@ void
 scene::erase_node(std::shared_ptr<node> p_node)
 {
     nodes.remove(p_node);
+}
+
+//////////////////////////////////////////////////////
+
+void
+scene_controller::push(scene_ptr scene)
+{
+    if (not stack.empty())
+        stack.back()->pause();
+
+    stack.push_back(scene);
+    stack.back()->start();
+}
+
+void
+scene_controller::pop()
+{
+    if (not stack.empty())
+        stack.back()->stop();
+
+    if (not stack.empty())
+        stack.back()->resume();
 }
 
 } // namespace nano
