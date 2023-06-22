@@ -1,4 +1,3 @@
-#include <memory>
 #include <nano/resource_loader.hpp>
 
 #include <nano/error.hpp>
@@ -7,10 +6,12 @@
 
 #include <SDL3/SDL_audio.h>
 #include <SDL3/SDL_image.h>
+#include <SDL3/SDL_rwops.h>
 
 #include <cstdlib>
 #include <iostream>
 #include <istream>
+#include <memory>
 
 namespace nano::ppm
 {
@@ -210,54 +211,33 @@ error2str(int e)
         return "INFO: no errors were occured";
 
     case err_t::bad_stream:
-        return "ERROR: bad stream was provided in arguments, or fail when "
+        return "Bad stream was provided in arguments, or fail when "
                "reading or writing";
 
     case err_t::calc_length:
-        return "ERROR: failed while calculating length of stream buffer";
+        return "Failed while calculating length of stream buffer";
 
     case err_t::internal_read:
-        return std::string("ERROR: failed while reading raw file data to "
+        return std::string("Failed while reading raw file data to "
                            "internal buffer:\n") +
                SDL_GetError();
 
     case err_t::incorrect_file_structure:
-        return std::string(
-                   "ERROR: failed while reading file wav structure:\n") +
+        return std::string("Failed while reading file wav structure:\n") +
                SDL_GetError();
 
     case err_t::unsupported:
-        return "ERROR: unsupported specification data (format or channels)";
+        return "Unsupported specification data (format or channels)";
 
     default:
-        return "unknown error type was provided";
+        return "Unknown error type was provided";
     }
 }
 
 int
-load(std::istream& src, soundbuf& buf)
+load(const std::filesystem::path& fn, soundbuf& buf)
 {
-    if (not src.good())
-    {
-        return err_t::bad_stream;
-    }
-
-    src.seekg(0, std::ios::end);
-    int size = src.tellg();
-    if (-1 == size)
-    {
-        return err_t::calc_length;
-    }
-    src.seekg(0, std::ios::beg);
-
-    // because no viable overload for
-    // std::make_shared<soundbuf::bufdata_t[]>(size) on android
-    soundbuf::buf_t raw_data(
-        reinterpret_cast<soundbuf::buf_t::element_type*>(malloc(size)), free);
-
-    src.read(reinterpret_cast<char*>(raw_data.get()), size);
-
-    SDL_RWops* sdl_buf = SDL_RWFromMem(raw_data.get(), size);
+    SDL_RWops* sdl_buf = SDL_RWFromFile(fn.string().c_str(), "rb");
     if (nullptr == sdl_buf)
     {
         return err_t::internal_read;
@@ -269,7 +249,6 @@ load(std::istream& src, soundbuf& buf)
     SDL_AudioSpec* res =
         SDL_LoadWAV_RW(sdl_buf, 1, &spec, &soundbuf_data, &soundbuf_len);
     ASSERT_SDL_ERROR(nullptr != res, err_t::incorrect_file_structure);
-    raw_data.reset();
 
     audio_spec soundbuf_spec;
     if (static_cast<int>(spec.channels) > 2)

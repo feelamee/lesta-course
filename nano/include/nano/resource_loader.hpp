@@ -73,7 +73,7 @@ enum err_t
 
 std::string error2str(int);
 
-int load(std::istream& src, soundbuf& buf);
+int load(const std::filesystem::path& fn, soundbuf& buf);
 
 } // namespace nano::wav
 

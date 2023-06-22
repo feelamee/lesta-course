@@ -29,15 +29,8 @@ operator==(const SDL_AudioSpec& lhs, const SDL_AudioSpec& rhs)
 int
 sound::load(const std::filesystem::path& fn)
 {
-    std::ifstream file(fn, std::ios::binary);
-    if (not file)
-    {
-        LOG_DEBUG("ERROR: failed while opening file: %s", fn.string().c_str());
-        return EXIT_FAILURE;
-    }
-
     soundbuf buf;
-    int err_code = nano::wav::load(file, buf);
+    int err_code = nano::wav::load(fn, buf);
     if (EXIT_SUCCESS != err_code)
     {
         LOG_DEBUG("ERROR: failed while loading file %s\n%s",
