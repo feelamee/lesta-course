@@ -1,6 +1,7 @@
 #ifndef SHADER_HPP
 #define SHADER_HPP
 
+#include <memory>
 #include <nano/texture2D.hpp>
 #include <nano/transform2D.hpp>
 
@@ -38,7 +39,7 @@ public:
 
     int load_from_src(const std::string& frag_src, const std::string& vert_src);
 
-    int uniform(const std::string&, const texture2D&);
+    int uniform(const std::string&, std::shared_ptr<texture2D>);
     int uniform(const std::string&, const transform2D&);
 
     using location_t = int;
@@ -64,7 +65,7 @@ private:
 
     constexpr static std::size_t max_count{ 2 };
 
-    std::unordered_map<location_t, const texture2D&> textures;
+    std::unordered_map<location_t, std::shared_ptr<texture2D>> textures;
     mutable std::unordered_map<std::string, location_t> uniforms;
     unsigned int handle{ 0 };
 };
@@ -81,8 +82,8 @@ namespace frag
 std::string texture_src(const std::string& texture_arg_name);
 } // namespace frag
 
-int transform_texture(shader& result,
-                      const texture2D& tex = {},
+int transform_texture(std::shared_ptr<shader>& result,
+                      std::shared_ptr<texture2D> = {},
                       const transform2D& tr = {});
 
 } // namespace shaders

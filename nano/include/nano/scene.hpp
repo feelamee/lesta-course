@@ -1,6 +1,7 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
+#include <chrono>
 #include <nano/drawable.hpp>
 
 #include <list>
@@ -14,38 +15,22 @@ struct node : public drawable
     virtual void start() = 0;
     virtual void stop() = 0;
 
-    virtual void pause();
-    virtual void resume();
-    virtual void process();
+    virtual void pause() = 0;
+    virtual void resume() = 0;
+
+    using delta_t = std::chrono::nanoseconds;
+    virtual void process(delta_t) = 0;
 
     virtual ~node() = default;
-};
-
-class scene : public node
-{
-public:
-    void add_node(std::shared_ptr<node>);
-    void erase_node(std::shared_ptr<node>);
-
-    virtual void start() override;
-    virtual void stop() override;
-    virtual void pause() override;
-    virtual void resume() override;
-
-    virtual void process() override;
-
-    virtual void draw(const drawable::state& attrs) const override;
-
-private:
-    std::list<std::shared_ptr<node>> nodes;
 };
 
 class scene_controller
 {
 public:
-    using scene_ptr = std::shared_ptr<scene>;
+    using scene_ptr = std::shared_ptr<node>;
     void push(scene_ptr);
     void pop();
+    scene_ptr top();
 
 private:
     std::list<scene_ptr> stack;

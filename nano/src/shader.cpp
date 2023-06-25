@@ -1,3 +1,4 @@
+#include <memory>
 #include <nano/shader.hpp>
 
 #include <nano/error.hpp>
@@ -99,9 +100,7 @@ shader::load(type t, const std::filesystem::path& filename)
     int err_code = extract_file(src, filename);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG(
-                  "Fail when loading file: %s\n",
-                  path2str(filename).c_str());
+        LOG_DEBUG("Fail when loading file: %s\n", path2str(filename).c_str());
         return EXIT_FAILURE;
     }
 
@@ -117,8 +116,7 @@ shader::load(const std::filesystem::path& frag_fn,
     int err_code = load(type::fragment, frag_fn);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG(
-                  "Fail when loading fragment shader from: %s\n",
+        LOG_DEBUG("Fail when loading fragment shader from: %s\n",
                   path2str(frag_fn).c_str());
         return EXIT_FAILURE;
     }
@@ -127,8 +125,7 @@ shader::load(const std::filesystem::path& frag_fn,
     err_code = load(type::vertex, vert_fn);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG(
-                  "Fail when loading vertex shader from: %s\n",
+        LOG_DEBUG("Fail when loading vertex shader from: %s\n",
                   path2str(vert_fn).c_str());
         return EXIT_FAILURE;
     }
@@ -141,8 +138,7 @@ shader::load_from_src(type t, const std::string& sources)
 {
     if (is_attached(t, *this))
     {
-        LOG_DEBUG(
-                  "Shader of such type is already attached: %s\n"
+        LOG_DEBUG("Shader of such type is already attached: %s\n"
                   ". Call shader::remove before",
                   type2str(t).c_str());
         return EXIT_FAILURE;
@@ -167,8 +163,7 @@ shader::load_from_src(const std::string& frag_src, const std::string& vert_src)
     int err_code = load_from_src(type::fragment, frag_src);
     if (EXIT_FAILURE == err_code)
     {
-        LOG_DEBUG(
-                  "Fail when loading fragment shader from\n");
+        LOG_DEBUG("Fail when loading fragment shader from\n");
         return EXIT_FAILURE;
     }
 
@@ -183,9 +178,9 @@ shader::load_from_src(const std::string& frag_src, const std::string& vert_src)
 }
 
 int
-shader::uniform(const std::string& name, const texture2D& tex)
+shader::uniform(const std::string& name, std::shared_ptr<texture2D> tex)
 {
-    if (not texture2D::exist(tex))
+    if (not tex or not texture2D::exist(*tex))
     {
         LOG_DEBUG("Texture does not exist.\n");
         return EXIT_FAILURE;
@@ -194,9 +189,7 @@ shader::uniform(const std::string& name, const texture2D& tex)
     int location = uniform_location(name);
     if (location < 0)
     {
-        LOG_DEBUG(
-                  "Failed getting location of uniform: %s\n",
-                  name.c_str());
+        LOG_DEBUG("Failed getting location of uniform: %s\n", name.c_str());
         return EXIT_FAILURE;
     }
 
@@ -205,8 +198,7 @@ shader::uniform(const std::string& name, const texture2D& tex)
     {
         if (textures.size() + 1 >= texture2D::max_active())
         {
-            LOG_DEBUG(
-                      "Failed because all textures units are already used\n");
+            LOG_DEBUG("Failed because all textures units are already used\n");
             return EXIT_FAILURE;
         }
     }
@@ -226,9 +218,7 @@ shader::uniform(const std::string& name, const transform2D& tr)
     int location = uniform_location(name);
     if (location < 0)
     {
-        LOG_DEBUG(
-                  "Failed getting location of uniform: %s\n",
-                  name.c_str());
+        LOG_DEBUG("Failed getting location of uniform: %s\n", name.c_str());
         return EXIT_FAILURE;
     }
 
@@ -265,7 +255,7 @@ shader::bind_textures() const
     {
         // TODO: create method texture2D::active()
         GL_CHECK(glActiveTexture(GL_TEXTURE0 + i));
-        texture2D::bind(it->second);
+        texture2D::bind(*it->second);
         GL_CHECK(glUniform1i(it->first, i));
     }
     GL_CHECK(glActiveTexture(GL_TEXTURE0));
@@ -474,27 +464,29 @@ texture_src(const std::string& texture_arg_name)
 } // namespace frag
 
 int
-transform_texture(shader& result, const texture2D& tex, const transform2D& tr)
+transform_texture(std::shared_ptr<shader>& result,
+                  std::shared_ptr<texture2D> tex,
+                  const transform2D& tr)
 {
     int err_code =
-        result.load_from_src(shaders::frag::texture_src("u_texture"),
-                             shaders::vert::transform_src("u_matrix"));
+        result->load_from_src(shaders::frag::texture_src("u_texture"),
+                              shaders::vert::transform_src("u_matrix"));
 
     ASSERT_ERROR(err_code, "Shader program loading failed");
 
-    err_code = shader::link(result);
+    err_code = shader::link(*result);
     ASSERT_ERROR(err_code, "Shader program linking failed");
 
-    err_code = shader::validate(result);
+    err_code = shader::validate(*result);
     ASSERT_ERROR(err_code, "Shader program validation failure");
 
-    if (texture2D::exist(tex))
+    if (tex and texture2D::exist(*tex))
     {
-        err_code = result.uniform("u_texture", tex);
+        err_code = result->uniform("u_texture", tex);
         ASSERT_ERROR(err_code, "Setting uniform u_texture failure");
     }
 
-    err_code = result.uniform("u_matrix", tr);
+    err_code = result->uniform("u_matrix", tr);
     ASSERT_ERROR(err_code, "Setting uniform u_matrix failure");
 
     return EXIT_SUCCESS;

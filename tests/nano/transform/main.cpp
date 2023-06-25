@@ -1,3 +1,5 @@
+#include "nano/drawable.hpp"
+#include <memory>
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/shader.hpp>
@@ -16,12 +18,12 @@ main()
     auto&& eng = engine::instance();
     eng->initialize(engine::flag::events | engine::flag::video);
 
-    texture2D tex;
-    int err_code = tex.load("../tests/nano/transform/leo.ppm");
+    auto tex = std::make_shared<texture2D>();
+    int err_code = tex->load("../tests/nano/transform/leo.ppm");
     ASSERT_ERROR(err_code, "Fail while loading texture");
     sprite s(tex);
 
-    shader program;
+    auto program = std::make_shared<shader>();
     err_code = shaders::transform_texture(program);
     ASSERT_ERROR(err_code, "Fail while setting up shader program");
 
@@ -98,7 +100,7 @@ main()
             s.rotate(time / 1e20);
         }
 
-        s.draw({ &program });
+        s.draw({ program });
         eng->swap_buffers();
     }
 

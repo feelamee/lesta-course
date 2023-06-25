@@ -93,7 +93,7 @@ gl_check(const std::filesystem::path& file,
         }
         }
 
-        LOG_DEBUG("[: %s : %d ]:"
+        LOG_DEBUG("[ %s : %d ]:"
                   "\n    An internal OpenGL call failed"
                   "\n    Expression:\n        %s"
                   "\n    Error description:\n        %s\n",

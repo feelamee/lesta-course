@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.22)
 project(tetris)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+
 option(ADDRESS_SANITIZER ON)
 
 add_library(sanitizer INTERFACE)
@@ -19,14 +21,19 @@ set(target ${PROJECT_NAME})
 if (ANDROID)
 add_library(
   ${target} SHARED
-  main.cpp
 )
 else()
 add_executable(
     ${target}
-    main.cpp
-)
+  )
 endif()
+
+target_sources(${target} PUBLIC
+  src/main.cpp
+  src/menu_scene.cpp
+  src/game_scene.cpp
+  src/tetramino.cpp
+)
 
 target_link_libraries(${target} PUBLIC nano)
 target_link_libraries(${target} PUBLIC sanitizer)

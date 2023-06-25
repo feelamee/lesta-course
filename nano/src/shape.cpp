@@ -1,14 +1,12 @@
+#include "nano/texture2D.hpp"
+#include <memory>
 #include <nano/shape.hpp>
 
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/transform2D.hpp>
 
-#ifdef __ANDROID__
-#include <GLES3/gl3.h>
-#else
 #include <glad/glad.h>
-#endif
 
 #include <cmath>
 #include <cstdlib>
@@ -16,13 +14,18 @@
 namespace nano
 {
 
-shape::shape(const vertbuf& p_vertbuf, const texture2D& p_texture)
+shape::shape()
+{
+    auto& win_size = engine::instance()->window.size;
+    scale(1, win_size.x / win_size.y);
+}
+
+shape::shape(const vertbuf& p_vertbuf, std::shared_ptr<texture2D> p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
     auto& win_size = engine::instance()->window.size;
     scale(1, win_size.x / win_size.y);
-    origin({ 0, texture().size().normalized().y });
 }
 
 const vertex*
@@ -67,10 +70,24 @@ shape::points_count() const
     return vertices.size();
 }
 
-const texture2D&
+const std::shared_ptr<texture2D>
 shape::texture() const
 {
     return m_texture;
+}
+
+void
+shape::texture(std::shared_ptr<texture2D> tex)
+{
+    m_texture = tex;
+    // clang-format off
+    vertices = {
+        primitive_t::triangle_strip,
+        { { .pos = { texture()->size().normalized().x, 0 }, .tpos = { 1, 1 } },
+          { .pos = { 0, 0 },                                .tpos = { 0, 1 } },
+          { .pos = texture()->size().normalized(),          .tpos = { 1, 0 } },
+          { .pos = { 0, texture()->size().normalized().y }, .tpos = { 0, 0 } } }};
+    // clang-format on
 }
 
 const transform2D&
@@ -85,6 +102,13 @@ shape::transform() const
         transform_need_update = false;
     }
     return m_transform;
+}
+
+void
+shape::transform(const transform2D& t)
+{
+    m_transform = t;
+    transform_need_update = false;
 }
 
 vec2f
@@ -152,7 +176,7 @@ shape::scale(vec2f::type scale_x, vec2f::type scale_y)
 }
 
 void
-shape::draw(const state& s) const
+shape::draw(const state s) const
 {
     transform2D tr = s.transform;
     tr.combine(transform());
@@ -168,7 +192,7 @@ shape::draw(const state& s) const
         LOG_DEBUG("Shader need for draw sprite");
         return;
     };
-    vertices.bind_vbo();
+    vertices.draw();
 }
 
 } // namespace nano

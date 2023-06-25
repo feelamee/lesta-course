@@ -112,14 +112,48 @@ poll_event(event* ev)
     if (nullptr == ev)
         return 0;
 
+    static auto is_mouse_ev = [](SDL_Event* ev)
+    {
+        return ev->type == SDL_EVENT_MOUSE_WHEEL or
+               ev->type == SDL_EVENT_MOUSE_MOTION or
+               ev->type == SDL_EVENT_MOUSE_BUTTON_DOWN or
+               ev->type == SDL_EVENT_MOUSE_BUTTON_UP;
+    };
+
+    static auto is_keyboard_ev = [](SDL_Event* ev)
+    {
+        // clang-format off
+        return ev->type == SDL_EVENT_KEY_DOWN or
+               ev->type == SDL_EVENT_KEY_UP or
+               ev->type == SDL_EVENT_TEXT_EDITING or
+               ev->type == SDL_EVENT_TEXT_INPUT or
+               ev->type == SDL_EVENT_KEYMAP_CHANGED or
+               ev->type == SDL_EVENT_TEXT_EDITING_EXT;
+        // clang-format on
+    };
+
     static SDL_Event sdl_ev;
-    int result = SDL_PollEvent(&sdl_ev);
-    if (SDL_FALSE == result)
-        return 0;
+
+    bool imgui_capture{ true };
+    while (imgui_capture)
+    {
+        int result = SDL_PollEvent(&sdl_ev);
+        if (SDL_FALSE == result)
+            return 0;
+
+        if (ImGui::GetIO().WantCaptureMouse and is_mouse_ev(&sdl_ev))
+            imgui_capture = true;
+
+        else if (ImGui::GetIO().WantCaptureKeyboard and is_keyboard_ev(&sdl_ev))
+            imgui_capture = true;
+
+        else
+            imgui_capture = false;
+
+        ImGui_ImplSDL3_ProcessEvent(&sdl_ev);
+    }
 
     convert_sdl_event(&sdl_ev, ev);
-    ImGui_ImplSDL3_ProcessEvent(&sdl_ev);
-
     return 1;
 }
 

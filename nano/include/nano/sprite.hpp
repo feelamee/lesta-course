@@ -9,7 +9,8 @@ namespace nano
 struct sprite : public shape
 {
 public:
-    sprite(const texture2D& tex);
+    sprite(std::shared_ptr<texture2D>);
+    sprite();
 };
 
 } // namespace nano

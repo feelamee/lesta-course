@@ -1,3 +1,4 @@
+#include "SDL_pixels.h"
 #include <nano/resource_loader.hpp>
 
 #include <nano/error.hpp>
@@ -237,17 +238,11 @@ error2str(int e)
 int
 load(const std::filesystem::path& fn, soundbuf& buf)
 {
-    SDL_RWops* sdl_buf = SDL_RWFromFile(fn.string().c_str(), "rb");
-    if (nullptr == sdl_buf)
-    {
-        return err_t::internal_read;
-    }
-
     SDL_AudioSpec spec;
     uint8_t* soundbuf_data{ nullptr };
     std::uint32_t soundbuf_len{ 0 };
     SDL_AudioSpec* res =
-        SDL_LoadWAV_RW(sdl_buf, 1, &spec, &soundbuf_data, &soundbuf_len);
+        SDL_LoadWAV(fn.string().c_str(), &spec, &soundbuf_data, &soundbuf_len);
     ASSERT_SDL_ERROR(nullptr != res, err_t::incorrect_file_structure);
 
     audio_spec soundbuf_spec;
@@ -274,7 +269,7 @@ load(const std::filesystem::path& fn, soundbuf& buf)
                                    [](auto&& p)
                                    {
                                        if (p)
-                                           free(p);
+                                           SDL_free(p);
                                    }),
                    soundbuf_len,
                    soundbuf_spec);

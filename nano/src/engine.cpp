@@ -110,9 +110,6 @@ engine::initialize(int init_flags)
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context, EXIT_FAILURE);
 
-    // #ifndef __ANDROID__
-    //     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
-    // #endif
     assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
 
     IMGUI_CHECKVERSION();
@@ -176,6 +173,7 @@ int
 engine::swap_buffers()
 {
     TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(impl->window));
+    glClearColor(240. / 255, 244. / 255, 215. / 255, 1);
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
     return EXIT_SUCCESS;
 }

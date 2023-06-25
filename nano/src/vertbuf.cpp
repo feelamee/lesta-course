@@ -43,7 +43,12 @@ vertbuf::bind_vbo() const
     GL_CHECK(glVertexAttribPointer(
         2, 2, GL_FLOAT, GL_FALSE, sizeof(vertex), &data()->tpos));
     GL_CHECK(glEnableVertexAttribArray(2));
+}
 
+void
+vertbuf::draw() const
+{
+    bind_vbo();
     GL_CHECK(glDrawArrays(static_cast<GLenum>(primitive_type()), 0, size()));
 }
 

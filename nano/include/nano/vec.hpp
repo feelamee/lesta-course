@@ -14,8 +14,8 @@ template <typename T>
 struct vec2
 {
     using type = T;
-    T x;
-    T y;
+    T x{};
+    T y{};
 
     friend vec2<T>
     operator+(const vec2<T>& lhs, const vec2<T>& rhs)
@@ -38,6 +38,14 @@ struct vec2
         return *this;
     }
 
+    operator vec2<float>();
+
+    vec2<T>
+    operator-()
+    {
+        return { -x, -y };
+    }
+
     vec2<float>
     normalized()
     {
@@ -45,18 +53,31 @@ struct vec2
         return { x / xy_sqrt, y / xy_sqrt };
     }
 };
+
 using vec2f = vec2<float>;
 using vec2i = vec2<int>;
 using vec2s = vec2<std::size_t>;
+
+template <>
+inline vec2<int>::operator vec2<float>()
+{
+    return { static_cast<float>(x), static_cast<float>(y) };
+}
+
+template <>
+inline vec2<std::size_t>::operator vec2<float>()
+{
+    return { static_cast<float>(x), static_cast<float>(y) };
+}
 
 template <typename T>
     requires std::is_arithmetic_v<T>
 struct vec3
 {
     using type = T;
-    T x;
-    T y;
-    T z;
+    T x{};
+    T y{};
+    T z{};
 
     vec3<T>
     normalized()

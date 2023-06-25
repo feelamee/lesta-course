@@ -2,6 +2,7 @@
 #define ENGINE_HPP
 
 #include <nano/event.hpp>
+#include <nano/scene.hpp>
 #include <nano/texture2D.hpp>
 #include <nano/transform2D.hpp>
 #include <nano/vec.hpp>
@@ -30,10 +31,10 @@ public:
         vec2f size{ 720, 960 };
     } window;
 
+    scene_controller scenarist;
+
     int initialize(int init_flags);
-
     std::filesystem::path assets_path();
-
     void new_frame();
     void renderUI();
     int swap_buffers();
