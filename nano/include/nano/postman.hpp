@@ -4,6 +4,7 @@
 #include <nano/event.hpp>
 
 #include <functional>
+#include <unordered_map>
 
 namespace nano
 {

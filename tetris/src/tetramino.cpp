@@ -57,8 +57,6 @@ tetramino::tetramino(type p_t, nano::vec2f p_block_size)
     block_tex->load(assets_dir / filename);
     block.texture(block_tex);
     block.size(p_block_size);
-
-    m_state = state::falling;
 }
 
 tetramino::type
@@ -69,6 +67,12 @@ tetramino::random_type()
 
 std::vector<nano::vec2i>
 tetramino::positions() const
+{
+    return blocks_positions;
+}
+
+std::vector<nano::vec2i>&
+tetramino::positions()
 {
     return blocks_positions;
 }
@@ -85,6 +89,7 @@ tetramino::start()
         blocks_positions[1] = { 4, 20 }; //      3  4  5  6
         blocks_positions[2] = { 5, 20 }; // 20  [ ][ ][ ][ ]
         blocks_positions[3] = { 6, 20 }; //
+        m_origin = { 4.5, 20.5 };
         break;
 
     case type::J:
@@ -92,6 +97,7 @@ tetramino::start()
         blocks_positions[1] = { 3, 20 }; // 21  [ ]
         blocks_positions[2] = { 4, 20 }; // 20  [ ][ ][ ]
         blocks_positions[3] = { 5, 20 }; //
+        m_origin = { 4, 20 };
         break;
 
     case type::L:
@@ -99,6 +105,7 @@ tetramino::start()
         blocks_positions[1] = { 4, 20 }; // 21        [ ]
         blocks_positions[2] = { 5, 20 }; // 20  [ ][ ][ ]
         blocks_positions[3] = { 5, 21 }; //
+        m_origin = { 4, 20 };
         break;
 
     case type::O:
@@ -106,6 +113,7 @@ tetramino::start()
         blocks_positions[1] = { 4, 21 }; // 21  [ ][ ]
         blocks_positions[2] = { 3, 20 }; // 20  [ ][ ]
         blocks_positions[3] = { 4, 20 }; //
+        m_origin = { 3.5, 20.5 };
         break;
 
     case type::S:
@@ -113,6 +121,7 @@ tetramino::start()
         blocks_positions[1] = { 4, 20 }; // 21    [ ][ ]
         blocks_positions[2] = { 4, 21 }; // 20 [ ][ ]
         blocks_positions[3] = { 5, 21 }; //
+        m_origin = { 4, 20 };
         break;
 
     case type::T:
@@ -120,6 +129,7 @@ tetramino::start()
         blocks_positions[1] = { 4, 20 }; // 21    [ ]
         blocks_positions[2] = { 4, 21 }; // 20 [ ][ ][ ]
         blocks_positions[3] = { 5, 20 }; //
+        m_origin = { 4, 21 };
         break;
 
     case type::Z:
@@ -127,8 +137,10 @@ tetramino::start()
         blocks_positions[1] = { 4, 21 }; // 21 [ ][ ]
         blocks_positions[2] = { 4, 20 }; // 20    [ ][ ]
         blocks_positions[3] = { 5, 20 }; //
+        m_origin = { 4, 20 };
         break;
     }
+    m_state = state::falling;
 }
 
 void
@@ -158,168 +170,74 @@ tetramino::process(delta_t delta)
     {
         --y;
     }
+    --m_origin.y;
 }
 
 bool
-is_collideY(const std::shared_ptr<tetramino> lhs,
-            const std::shared_ptr<tetramino> rhs)
+is_collide(const std::shared_ptr<tetramino> lhs,
+           const std::shared_ptr<tetramino> rhs)
 {
     auto lpositions = lhs->positions();
     auto rpositions = rhs->positions();
 
-    for (auto&& [lx, ly] : lpositions)
+    for (auto&& l : lpositions)
     {
-        for (auto&& [rx, ry] : rpositions)
+        for (auto&& r : rpositions)
         {
-            if (lx == rx and std::abs(ly - ry) == 1)
+            if (l == r)
             {
                 return true;
             }
         }
     }
+
     return false;
 }
 
 bool
-is_collideX(const std::shared_ptr<tetramino> lhs,
-            const std::shared_ptr<tetramino> rhs)
-{
-    auto lpositions = lhs->positions();
-    auto rpositions = rhs->positions();
+is_collide(const std::shared_ptr<tetramino> lhs)
 
-    for (auto&& [lx, ly] : lpositions)
-    {
-        for (auto&& [rx, ry] : rpositions)
-        {
-            if (ly == ry and std::abs(lx - rx) == 1)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool
-tetramino::is_on_floor() const
 {
-    for (auto [_, y] : positions())
+    for (auto&& [x, y] : lhs->positions())
     {
-        if (y == 0)
+        // clang-format off
+        if (x < 0 or
+            x >= game_scene::width or
+            y < 0 or
+            y >= game_scene::height)
         {
             return true;
         }
+        // clang-format on
     }
+
     return false;
-}
-
-bool
-tetramino::is_wall_left() const
-{
-    const auto [x, _] = min_positionX();
-
-    if (x == 0)
-    {
-        return true;
-    }
-    return false;
-}
-
-bool
-tetramino::is_wall_right() const
-{
-    const auto [x, _] = max_positionX();
-
-    if (game_scene::width - x == 1)
-    {
-        return true;
-    }
-    return false;
-}
-
-nano::vec2i
-tetramino::min_positionX() const
-{
-    const auto&& p_positions = positions();
-    static auto less_x = [](auto&& lhs, auto&& rhs) { return lhs.x < rhs.x; };
-    return *std::min_element(begin(p_positions), end(p_positions), less_x);
-}
-
-nano::vec2i
-tetramino::min_positionY() const
-{
-    const auto&& p_positions = positions();
-    static auto less_y = [](auto&& lhs, auto&& rhs) { return lhs.y < rhs.y; };
-    return *std::min_element(begin(p_positions), end(p_positions), less_y);
-}
-
-nano::vec2i
-tetramino::max_positionX() const
-{
-    const auto&& pos = positions();
-    static auto less_x = [](auto&& lhs, auto&& rhs) { return lhs.x < rhs.x; };
-    return *std::max_element(begin(pos), end(pos), less_x);
-}
-
-nano::vec2i
-tetramino::max_positionY() const
-{
-    const auto&& pos = positions();
-    static auto less_y = [](auto&& lhs, auto&& rhs) { return lhs.y < rhs.y; };
-    return *std::max_element(begin(pos), end(pos), less_y);
 }
 
 nano::vec2f
 tetramino::origin()
 {
-    float y{ 0 }, x{ 0 };
-    auto [_1, min_y] = min_positionY();
-    auto [_2, max_y] = max_positionY();
-    auto [min_x, _3] = min_positionX();
-    auto [max_x, _4] = max_positionX();
-
-    for (int i{ min_x }; i <= max_x; ++i)
-    {
-        x += i;
-    }
-    for (int i{ min_y }; i <= max_y; ++i)
-    {
-        y += i;
-    }
-
-    LOG_DEBUG("origin minmax_x %d %d", min_x, max_x);
-    LOG_DEBUG("origin minmax_y %d %d", min_y, max_y);
-    return { x / (max_x - min_x + 1), y / (max_y - min_y + 1) };
+    return m_origin;
 }
 
 void
 tetramino::rot90()
 {
     nano::transform2D rot90;
-    LOG_DEBUG("orig %f %f", origin().x, origin().y);
-    rot90.rotate(std::numbers::pi / 2, origin());
-    nano::print(rot90);
+    rot90.rotate(3.1415 / 2, origin());
 
-    LOG_DEBUG("ROT90");
     for (auto& pos : blocks_positions)
     {
-        LOG_DEBUG("old %d %d", pos.x, pos.y);
         nano::vec2f new_pos = rot90.combine(pos);
-        LOG_DEBUG("float %f %f", new_pos.x, new_pos.y);
         pos = new_pos;
-        LOG_DEBUG("new %d %d", pos.x, pos.y);
-        LOG_DEBUG("");
     }
-
-    LOG_DEBUG("");
-    rotation_num++;
 }
 
 void
 tetramino::rot270()
 {
     nano::transform2D rot270;
-    rot270.rotate(-std::numbers::pi / 2, origin());
+    rot270.rotate(-3.1415 / 2, origin());
 
     for (auto& pos : blocks_positions)
     {
@@ -328,20 +246,33 @@ tetramino::rot270()
 }
 
 void
-tetramino::rshift()
+tetramino::xshift(const int step)
 {
     for (auto& [x, _] : blocks_positions)
     {
-        ++x;
+        x += step;
     }
+    m_origin.x += step;
 }
 
 void
-tetramino::lshift()
+tetramino::yshift(const int step)
 {
-    for (auto& [x, _] : blocks_positions)
+    for (auto& [_, y] : blocks_positions)
     {
-        --x;
+        y += step;
+    }
+    m_origin.y += step;
+}
+
+void
+tetramino::remove(const nano::vec2i pos)
+{
+    auto pos_it =
+        std::find(begin(blocks_positions), end(blocks_positions), pos);
+    if (pos_it != blocks_positions.end())
+    {
+        blocks_positions.erase(pos_it);
     }
 }
 

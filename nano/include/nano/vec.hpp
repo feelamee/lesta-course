@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <cmath>
 #include <concepts>
+#include <functional>
 #include <variant>
 // #include <ranges>
 
@@ -76,6 +77,13 @@ struct vec2
     operator-() const
     {
         return { -x, -y };
+    }
+
+    friend bool
+    operator==(const vec2<T> lhs, const vec2<T> rhs)
+    {
+        return std::equal_to<T>()(lhs.x, rhs.x) and
+               std::equal_to<T>()(lhs.y, rhs.y);
     }
 
     vec2<float>

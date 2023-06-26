@@ -22,6 +22,7 @@ postman::equal_key_t::operator()(const key_t& fst, const key_t& snd) const
     case ev_t::key_down:
     case ev_t::key_up:
         return (fst.ev.kb.key.keycode == snd.ev.kb.key.keycode) and
+               (fst.ev.kb.repeat == snd.ev.kb.repeat) and
                (fst.ev.kb.key.mod == snd.ev.kb.key.mod) and
                (fst.scene_id == snd.scene_id);
 
@@ -43,6 +44,7 @@ postman::hash_key_t::operator()(const key_t& key) const
     case ev_t::key_up:
     case ev_t::key_down:
         return std::hash<int>()(static_cast<int>(key.ev.type)) ^
+               std::hash<bool>()(key.ev.kb.repeat) ^
                std::hash<int>()(key.ev.kb.key.keycode) ^
                std::hash<int>()(key.ev.kb.key.mod) ^
                std::hash<int>()(key.scene_id);

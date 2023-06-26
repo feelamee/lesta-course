@@ -11,42 +11,34 @@ menu_scene::menu_scene(bool& p_is_running)
     : is_running(p_is_running)
     , node()
 {
-}
-
-void
-menu_scene::start()
-{
     auto&& e = nano::engine::instance();
+    const std::filesystem::path assets_dir{ e->assets_path() };
+    const std::filesystem::path bg_music_fn{ assets_dir / "piano-moment.wav" };
 
-    namespace fs = std::filesystem;
-    const fs::path assets_dir{ e->assets_path() };
-    const fs::path bg_fn{ assets_dir / "bg.png" };
-
-    int err_code = bg.load(bg_fn);
-    if (EXIT_SUCCESS != err_code)
-    {
-        LOG_DEBUG("Fail loading texture");
-        return;
-    }
-
-    const fs::path bg_music_fn{ assets_dir / "piano-moment.wav" };
-    err_code = bg_music.load(bg_music_fn);
+    int err_code = bg_music.load(bg_music_fn);
     if (EXIT_SUCCESS != err_code)
     {
         LOG_DEBUG("Fail loading sound");
         return;
     }
 
-    bg_music.play();
-    bg_music.volume(48);
-    bg_music.loop = true;
-
-    const fs::path bold_fp = assets_dir / "JetBrainsMonoNerdFont-Bold.ttf";
+    const std::filesystem::path bold_fp =
+        assets_dir / "JetBrainsMonoNerdFont-Bold.ttf";
     font_bold = nano::load_font_from_file_ttf(bold_fp, 100);
 
-    const fs::path light_fp = assets_dir / "JetBrainsMonoNerdFont-Light.ttf";
+    const std::filesystem::path light_fp =
+        assets_dir / "JetBrainsMonoNerdFont-Light.ttf";
     font_light = nano::load_font_from_file_ttf(light_fp, 100);
+}
 
+void
+menu_scene::start()
+{
+    bg_music.volume(50);
+    bg_music.play();
+    bg_music.loop = true;
+
+    auto&& e = nano::engine::instance();
     nano::event ev;
     ev.type = nano::event::type_t::quit;
     e->supplier.subscribe({ ev, id }, [this]() { this->is_running = false; });
@@ -63,15 +55,11 @@ menu_scene::process(delta_t delta)
     ImGui::SetNextWindowPos({ 0, 0 });
     ImGui::SetNextWindowSize({ nano::engine::instance()->window.size.x,
                                nano::engine::instance()->window.size.y });
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, nano::color::hex({ 49, 50, 125 }));
     ImGui::PushFont(font_bold);
-
+    ImGui::SetNextWindowBgAlpha(0);
     ImGui::Begin("Main menu", nullptr, ImGuiWindowFlags_NoDecoration);
 
     ImGui::SetCursorPos({ 0, 0 });
-    ImGui::Image(reinterpret_cast<ImTextureID>(bg.handle()),
-                 ImGui::GetWindowSize());
-
     {
         ImGui::SetCursorPosX(0);
         float size = ImGui::CalcTextSize("TETRIS").x;
@@ -81,7 +69,9 @@ menu_scene::process(delta_t delta)
             ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
     }
     ImGui::SetCursorPosY(100);
+    ImGui::PushStyleColor(ImGuiCol_Text, nano::color::hex({ 50, 0, 70 }));
     ImGui::Text("TETRIS");
+    ImGui::PopStyleColor();
 
     ImGui::PushStyleColor(ImGuiCol_Button, nano::color::hex({ 49, 50, 150 }));
     const float start_button_size = ImGui::CalcTextSize("Start").x + 100;
@@ -112,11 +102,9 @@ menu_scene::process(delta_t delta)
         // settings
     }
 
-    ImGui::PopFont();
     ImGui::PopStyleColor();
-
     ImGui::End();
-    ImGui::PopStyleColor();
+    ImGui::PopFont();
 }
 
 void
