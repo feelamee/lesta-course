@@ -37,6 +37,7 @@ public:
     transform2D rotated(radian angle, const vec2f origin = { 0, 0 });
 
     transform2D& combine(const transform2D& other);
+    vec2f combine(const vec2f other);
     friend transform2D operator*(const transform2D& lhs,
                                  const transform2D& rhs);
 

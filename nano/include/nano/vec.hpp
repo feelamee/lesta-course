@@ -61,9 +61,8 @@ struct vec2
         return *this;
     }
 
-    template <typename K>
     vec2<T>&
-    operator=(const vec2<K>& other)
+    operator=(const vec2<T>& other)
     {
         x = other.x;
         y = other.y;
@@ -71,6 +70,7 @@ struct vec2
     }
 
     operator vec2<float>();
+    operator vec2<int>();
 
     vec2<T>
     operator-() const
@@ -100,6 +100,19 @@ template <>
 inline vec2<int>::operator vec2<float>()
 {
     return { static_cast<float>(x), static_cast<float>(y) };
+}
+
+inline float
+strange_round(float v, float precision = 0.001)
+{
+    return std::round(v + precision);
+}
+
+template <>
+inline vec2<float>::operator vec2<int>()
+{
+    return { static_cast<int>(strange_round(x)),
+             static_cast<int>(strange_round(y)) };
 }
 
 template <typename T>

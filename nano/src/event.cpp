@@ -1,12 +1,14 @@
 #include <nano/event.hpp>
 
+#include <nano/error.hpp>
+
 #include <SDL3/SDL_events.h>
+
+#include <imgui_impl_sdl3.h>
 
 #include <algorithm>
 #include <chrono>
 #include <ratio>
-
-#include <imgui_impl_sdl3.h>
 
 namespace nano
 {
@@ -145,7 +147,9 @@ poll_event(event* ev)
             imgui_capture = true;
 
         else if (ImGui::GetIO().WantCaptureKeyboard and is_keyboard_ev(&sdl_ev))
+        {
             imgui_capture = true;
+        }
 
         else
             imgui_capture = false;

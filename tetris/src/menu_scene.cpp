@@ -59,7 +59,6 @@ void
 menu_scene::process(delta_t delta)
 {
     auto&& e = nano::engine::instance();
-    e->new_frame();
 
     ImGui::SetNextWindowPos({ 0, 0 });
     ImGui::SetNextWindowSize({ nano::engine::instance()->window.size.x,
@@ -141,7 +140,6 @@ menu_scene::stop()
 void
 menu_scene::draw(nano::drawable::state) const
 {
-    nano::engine::instance()->renderUI();
 }
 
 } // namespace tetris

@@ -1,6 +1,10 @@
-#include "nano/engine.hpp"
-#include <cstdlib>
 #include <nano/postman.hpp>
+
+#include <nano/engine.hpp>
+#include <nano/error.hpp>
+#include <nano/event.hpp>
+
+#include <cstdlib>
 
 namespace nano
 {
@@ -59,7 +63,9 @@ postman::deliver(nano::event event)
 {
     auto&& scenarist = engine::instance()->scenarist;
     if (not scenarist.top())
+    {
         return EXIT_FAILURE;
+    }
 
     key_t key{ event, scenarist.top()->id };
     if (recipients.contains(key))

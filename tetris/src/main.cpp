@@ -23,10 +23,6 @@ main()
     int err_code = e->initialize(engine::flag::all);
     ASSERT_ERROR(err_code, "Fail while initialization of engine");
 
-    auto tex = std::make_shared<texture2D>();
-    tex->load("../assets/blue-J.png");
-    nano::sprite block(tex);
-
     bool is_running{ true };
     auto time_point = std::chrono::system_clock::now();
     auto menu = std::make_shared<tetris::menu_scene>(is_running);
@@ -43,6 +39,7 @@ main()
         {
             e->supplier.deliver(ev);
         }
+        e->new_frame();
 
         auto cur_time_point = std::chrono::system_clock::now();
         if (e->scenarist.top())
@@ -56,6 +53,7 @@ main()
             e->scenarist.top()->draw({ program });
         }
 
+        nano::engine::instance()->renderUI();
         engine::instance()->swap_buffers();
     }
     return EXIT_SUCCESS;

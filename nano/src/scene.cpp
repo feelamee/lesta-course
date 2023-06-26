@@ -21,7 +21,9 @@ void
 scene_controller::push(scene_ptr scene)
 {
     if (not stack.empty())
+    {
         stack.back()->pause();
+    }
 
     stack.push_back(scene);
     stack.back()->start();
@@ -31,12 +33,16 @@ void
 scene_controller::pop()
 {
     if (not stack.empty())
+    {
         stack.back()->stop();
+    }
 
     stack.pop_back();
 
     if (not stack.empty())
+    {
         stack.back()->resume();
+    }
 }
 
 scene_controller::scene_ptr

@@ -49,25 +49,33 @@ transform2D::combine(const transform2D& other)
 {
 
     auto lhs = *this;
-    auto& mat = *this;
+    auto& m = *this;
     // clang-format off
-    mat(0, 0) = lhs(0, 0) * other(0, 0) + lhs(1, 0) * other(0, 1) + lhs(2, 0) * other(0, 2);
-    mat(1, 0) = lhs(0, 0) * other(1, 0) + lhs(1, 0) * other(1, 1) + lhs(2, 0) * other(1, 2);
+    m(0, 0) = lhs(0, 0) * other(0, 0) + lhs(1, 0) * other(0, 1) + lhs(2, 0) * other(0, 2);
+    m(1, 0) = lhs(0, 0) * other(1, 0) + lhs(1, 0) * other(1, 1) + lhs(2, 0) * other(1, 2);
     // mat(2, 0) = lhs(0, 0) * other(2, 0) + lhs(1, 0) * other(2, 1) + lhs(2, 0) * other(2, 2);
-    mat(2, 0) = 0;
+    m(2, 0) = 0;
 
-    mat(0, 1) = lhs(0, 1) * other(0, 0) + lhs(1, 1) * other(0, 1) + lhs(2, 1) * other(0, 2);
-    mat(1, 1) = lhs(0, 1) * other(1, 0) + lhs(1, 1) * other(1, 1) + lhs(2, 1) * other(1, 2);
+    m(0, 1) = lhs(0, 1) * other(0, 0) + lhs(1, 1) * other(0, 1) + lhs(2, 1) * other(0, 2);
+    m(1, 1) = lhs(0, 1) * other(1, 0) + lhs(1, 1) * other(1, 1) + lhs(2, 1) * other(1, 2);
     // mat(2, 1) = lhs(0, 1) * other(2, 0) + lhs(1, 1) * other(2, 1) + lhs(2, 1) * other(2, 2);
-    mat(2, 1) = 0;
+    m(2, 1) = 0;
 
-    mat(0, 2) = lhs(0, 2) * other(0, 0) + lhs(1, 2) * other(0, 1) + lhs(2, 2) * other(0, 2);
-    mat(1, 2) = lhs(0, 2) * other(1, 0) + lhs(1, 2) * other(1, 1) + lhs(2, 2) * other(1, 2);
+    m(0, 2) = lhs(0, 2) * other(0, 0) + lhs(1, 2) * other(0, 1) + lhs(2, 2) * other(0, 2);
+    m(1, 2) = lhs(0, 2) * other(1, 0) + lhs(1, 2) * other(1, 1) + lhs(2, 2) * other(1, 2);
     // mat(2, 2) = lhs(0, 2) * other(2, 0) + lhs(1, 2) * other(2, 1) + lhs(2, 2) * other(2, 2);
-    mat(2, 2) = 1;
+    m(2, 2) = 1;
     // clang-format on
 
     return *this;
+}
+
+vec2f
+transform2D::combine(const vec2f other)
+{
+    auto&& m = *this;
+    return { m(0, 0) * other.x + m(0, 1) * other.y + m(0, 2),
+             m(1, 0) * other.x + m(1, 1) * other.y + m(1, 2) };
 }
 
 transform2D

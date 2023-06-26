@@ -92,10 +92,11 @@ shape::texture(std::shared_ptr<texture2D> tex)
 
     auto&& win = nano::engine::instance()->window;
     vec2f tex2win_ratio = texture()->size() / win.size / vec2f{ 1, win.ratio };
+    // clang-format off
     vertices = { primitive_t::triangle_strip,
                  { { .pos = { tex2win_ratio.x, 0 }, .tpos = { 1, 1 } },
-                   { .pos = { 0, 0 }, .tpos = { 0, 1 } },
-                   { .pos = tex2win_ratio, .tpos = { 1, 0 } },
+                   { .pos = { 0, 0 },               .tpos = { 0, 1 } },
+                   { .pos = tex2win_ratio,          .tpos = { 1, 0 } },
                    { .pos = { 0, tex2win_ratio.y }, .tpos = { 0, 0 } } } };
     // clang-format on
     m_size = texture()->size();
