@@ -2,6 +2,7 @@
 #define ENGINE_HPP
 
 #include <nano/event.hpp>
+#include <nano/postman.hpp>
 #include <nano/scene.hpp>
 #include <nano/texture2D.hpp>
 #include <nano/transform2D.hpp>
@@ -28,10 +29,12 @@ public:
 
     struct window_t
     {
-        vec2f size{ 720, 960 };
+        vec2f size{ 500, 1000 };
+        float ratio{ size.x / size.y };
     } window;
 
     scene_controller scenarist;
+    postman supplier;
 
     int initialize(int init_flags);
     std::filesystem::path assets_path();

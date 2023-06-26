@@ -17,10 +17,10 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
     if (not sdl_ev or not ev)
         return;
 
-    using ev_t = event::type;
-    ev->t = static_cast<ev_t>(sdl_ev->type);
+    using ev_t = event::type_t;
+    ev->type = static_cast<ev_t>(sdl_ev->type);
     ev->kb.timestamp = event::timestamp_t(sdl_ev->key.timestamp);
-    switch (ev->t)
+    switch (ev->type)
     {
     case ev_t::key_down:
     case ev_t::key_up:
@@ -101,7 +101,7 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
         break;
 
     default:
-        ev->t = ev_t::unknown;
+        ev->type = ev_t::unknown;
         break;
     }
 }

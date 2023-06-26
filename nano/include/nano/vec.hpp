@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <cmath>
 #include <concepts>
+#include <variant>
 // #include <ranges>
 
 namespace nano
@@ -17,21 +18,52 @@ struct vec2
     T x{};
     T y{};
 
-    friend vec2<T>
-    operator+(const vec2<T>& lhs, const vec2<T>& rhs)
+    template <typename K>
+    auto
+    operator+(const vec2<K>& rhs) const
     {
-        return { lhs.x + rhs.x, lhs.y + rhs.y };
+        return vec2{ x + rhs.x, y + rhs.y };
     }
 
+    vec2<float>
+    operator*(const vec2<float>& rhs) const
+    {
+        return { x * rhs.x, y * rhs.y };
+    }
+
+    template <typename K>
+    vec2<float>
+    operator/(const vec2<K> other) const
+    {
+        return { static_cast<float>(x) / other.x,
+                 static_cast<float>(y) / other.y };
+    }
+
+    template <typename K>
+    vec2<float>
+    operator/(const K other) const
+    {
+        return { static_cast<float>(x) / other, static_cast<float>(y) / other };
+    }
+
+    template <typename K>
+    vec2<float>
+    operator*(const K other) const
+    {
+        return { static_cast<float>(x) * other, static_cast<float>(y) * other };
+    }
+
+    template <typename K>
     vec2<T>&
-    operator+=(const vec2<T>& other)
+    operator+=(const vec2<K>& other)
     {
         *this = *this + other;
         return *this;
     }
 
+    template <typename K>
     vec2<T>&
-    operator=(const vec2<T>& other)
+    operator=(const vec2<K>& other)
     {
         x = other.x;
         y = other.y;
@@ -41,13 +73,13 @@ struct vec2
     operator vec2<float>();
 
     vec2<T>
-    operator-()
+    operator-() const
     {
         return { -x, -y };
     }
 
     vec2<float>
-    normalized()
+    normalized() const
     {
         float xy_sqrt = std::sqrt(x * x + y * y);
         return { x / xy_sqrt, y / xy_sqrt };
@@ -59,13 +91,13 @@ using vec2i = vec2<int>;
 using vec2s = vec2<std::size_t>;
 
 template <>
-inline vec2<int>::operator vec2<float>()
+inline vec2<std::size_t>::operator vec2<float>()
 {
     return { static_cast<float>(x), static_cast<float>(y) };
 }
 
 template <>
-inline vec2<std::size_t>::operator vec2<float>()
+inline vec2<int>::operator vec2<float>()
 {
     return { static_cast<float>(x), static_cast<float>(y) };
 }

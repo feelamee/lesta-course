@@ -12,6 +12,10 @@ namespace nano
 
 struct node : public drawable
 {
+    node();
+    int id{ 0 };
+    static int last_id;
+
     virtual void start() = 0;
     virtual void stop() = 0;
 

@@ -1,4 +1,5 @@
 #include "menu_scene.hpp"
+#include "game_scene.hpp"
 
 #include <nano/error.hpp>
 #include <nano/utils.hpp>
@@ -6,11 +7,19 @@
 namespace tetris
 {
 
+menu_scene::menu_scene(bool& p_is_running)
+    : is_running(p_is_running)
+    , node()
+{
+}
+
 void
 menu_scene::start()
 {
+    auto&& e = nano::engine::instance();
+
     namespace fs = std::filesystem;
-    const fs::path assets_dir{ nano::engine::instance()->assets_path() };
+    const fs::path assets_dir{ e->assets_path() };
     const fs::path bg_fn{ assets_dir / "bg.png" };
 
     int err_code = bg.load(bg_fn);
@@ -37,12 +46,20 @@ menu_scene::start()
 
     const fs::path light_fp = assets_dir / "JetBrainsMonoNerdFont-Light.ttf";
     font_light = nano::load_font_from_file_ttf(light_fp, 100);
+
+    nano::event ev;
+    ev.type = nano::event::type_t::quit;
+    e->supplier.subscribe({ ev, id }, [this]() { this->is_running = false; });
+
+    ev.type = nano::event::type_t::window_close_request;
+    e->supplier.subscribe({ ev, id }, [this]() { this->is_running = false; });
 }
 
 void
 menu_scene::process(delta_t delta)
 {
-    nano::engine::instance()->new_frame();
+    auto&& e = nano::engine::instance();
+    e->new_frame();
 
     ImGui::SetNextWindowPos({ 0, 0 });
     ImGui::SetNextWindowSize({ nano::engine::instance()->window.size.x,
@@ -78,7 +95,8 @@ menu_scene::process(delta_t delta)
     }
     if (ImGui::Button("Start", { start_button_size, 100 }))
     {
-        // gameplay
+        auto game = std::make_shared<game_scene>(e->window.size.x, is_running);
+        e->scenarist.push(game);
     }
 
     const float settings_button_size = ImGui::CalcTextSize("Settings").x + 100;

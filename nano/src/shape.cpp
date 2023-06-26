@@ -16,16 +16,17 @@ namespace nano
 
 shape::shape()
 {
-    auto& win_size = engine::instance()->window.size;
-    scale(1, win_size.x / win_size.y);
+    auto& win = engine::instance()->window;
+    scale(1, win.ratio);
 }
 
 shape::shape(const vertbuf& p_vertbuf, std::shared_ptr<texture2D> p_texture)
     : vertices(p_vertbuf)
     , m_texture(p_texture)
 {
-    auto& win_size = engine::instance()->window.size;
-    scale(1, win_size.x / win_size.y);
+    auto& win = engine::instance()->window;
+    scale(1, win.ratio);
+    m_size = texture()->size();
 }
 
 const vertex*
@@ -38,6 +39,14 @@ vertex*
 shape::data()
 {
     return vertices.data();
+}
+
+vec2f
+shape::screen2ndc(const vec2f coords)
+{
+    auto&& win = engine::instance()->window;
+    return vec2f{ 2 * coords.x / win.size.x,
+                  2 * coords.y / win.size.y / win.ratio };
 }
 
 void
@@ -80,14 +89,16 @@ void
 shape::texture(std::shared_ptr<texture2D> tex)
 {
     m_texture = tex;
-    // clang-format off
-    vertices = {
-        primitive_t::triangle_strip,
-        { { .pos = { texture()->size().normalized().x, 0 }, .tpos = { 1, 1 } },
-          { .pos = { 0, 0 },                                .tpos = { 0, 1 } },
-          { .pos = texture()->size().normalized(),          .tpos = { 1, 0 } },
-          { .pos = { 0, texture()->size().normalized().y }, .tpos = { 0, 0 } } }};
+
+    auto&& win = nano::engine::instance()->window;
+    vec2f tex2win_ratio = texture()->size() / win.size / vec2f{ 1, win.ratio };
+    vertices = { primitive_t::triangle_strip,
+                 { { .pos = { tex2win_ratio.x, 0 }, .tpos = { 1, 1 } },
+                   { .pos = { 0, 0 }, .tpos = { 0, 1 } },
+                   { .pos = tex2win_ratio, .tpos = { 1, 0 } },
+                   { .pos = { 0, tex2win_ratio.y }, .tpos = { 0, 0 } } } };
     // clang-format on
+    m_size = texture()->size();
 }
 
 const transform2D&
@@ -96,7 +107,9 @@ shape::transform() const
     if (transform_need_update)
     {
         transform2D new_tr;
-        new_tr.rotate(rotation(), origin()).move(position()).scale(factor());
+        new_tr.rotate(rotation(), origin())
+            .move(screen2ndc(position()))
+            .scale(factor());
         m_transform = new_tr;
 
         transform_need_update = false;
@@ -109,6 +122,28 @@ shape::transform(const transform2D& t)
 {
     m_transform = t;
     transform_need_update = false;
+}
+
+void
+shape::size(const vec2f new_size)
+{
+    auto&& win = engine::instance()->window;
+    m_size = new_size;
+    vec2f tex2win_ratio =
+        size() * vec2f{ 2, 2 } / win.size / vec2f{ 1, win.ratio };
+    // clang-format off
+    vertices = { primitive_t::triangle_strip,
+                 { { .pos = { tex2win_ratio.x, 0 }, .tpos = { 1, 1 } },
+                   { .pos = { 0, 0 },               .tpos = { 0, 1 } },
+                   { .pos = tex2win_ratio,          .tpos = { 1, 0 } },
+                   { .pos = { 0, tex2win_ratio.y }, .tpos = { 0, 0 } } } };
+    // clang-format on
+}
+
+vec2f
+shape::size()
+{
+    return m_size;
 }
 
 vec2f
@@ -176,15 +211,14 @@ shape::scale(vec2f::type scale_x, vec2f::type scale_y)
 }
 
 void
-shape::draw(const state s) const
+shape::draw(state s) const
 {
-    transform2D tr = s.transform;
-    tr.combine(transform());
+    s.transform.combine(transform());
 
     if (s.program)
     {
         s.program->uniform("u_texture", texture());
-        s.program->uniform("u_matrix", tr);
+        s.program->uniform("u_matrix", s.transform);
         shader::use(*s.program);
     }
     else

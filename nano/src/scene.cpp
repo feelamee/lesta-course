@@ -1,3 +1,4 @@
+#include <chrono>
 #include <nano/drawable.hpp>
 #include <nano/scene.hpp>
 
@@ -5,6 +6,14 @@
 
 namespace nano
 {
+
+int node::last_id{ 0 };
+
+node::node()
+    : id(last_id)
+{
+    last_id++;
+}
 
 //////////////////////////////////////////////////////
 
@@ -23,6 +32,8 @@ scene_controller::pop()
 {
     if (not stack.empty())
         stack.back()->stop();
+
+    stack.pop_back();
 
     if (not stack.empty())
         stack.back()->resume();

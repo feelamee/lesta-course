@@ -21,6 +21,7 @@ add_library(
     src/sprite.cpp
     src/sound.cpp
     src/scene.cpp
+    src/postman.cpp
 
     include/nano/drawable.hpp
     include/nano/sound.hpp
@@ -44,6 +45,7 @@ add_library(
     include/nano/event.hpp
     include/nano/transform2D.hpp
     include/nano/scene.hpp
+    include/nano/postman.hpp
 
     # creating separate static lib from Dear ImGui occurs multiply definition on windows
     # in addition this method is recommended by Dear ImGui Developers

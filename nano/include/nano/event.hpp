@@ -98,7 +98,7 @@ enum scancode_t
 struct event
 {
     using timestamp_t = std::chrono::duration<std::uint64_t, std::nano>;
-    enum class type;
+    enum class type_t;
 
     struct keyboard
     {
@@ -109,7 +109,7 @@ struct event
             std::uint16_t mod;
         };
 
-        type t;                /**< event_t::key_down or event_t::key_up */
+        type_t type;           /**< event_t::key_down or event_t::key_up */
         timestamp_t timestamp; /**< in nanoseconds */
         bool repeat;
         key_t key;
@@ -130,7 +130,8 @@ struct event
             right,
         };
 
-        type t; /**< event_t::mouse_button_down or event_t::mouse_button_up */
+        type_t
+            type; /**< event_t::mouse_button_down or event_t::mouse_button_up */
         timestamp_t timestamp; /**< in nanoseconds */
 
         // int windowID;          /**< The window with mouse focus, if any */
@@ -145,7 +146,7 @@ struct event
 
     struct mouse_motion
     {
-        type t;                /**< event_t::mouse_motion */
+        type_t type;           /**< event_t::mouse_motion */
         timestamp_t timestamp; /**< In nanoseconds */
         int windowID;          /**< The window with mouse focus, if any */
         int mouseID;           /**< The mouse instance id */
@@ -166,7 +167,7 @@ struct event
             right,
         };
 
-        type t;                /**< event_t::mouse_wheel */
+        type_t type;           /**< event_t::mouse_wheel */
         timestamp_t timestamp; /**< in nanoseconds */
 
         // int windowID;          /**< The window with mouse focus, if any */
@@ -181,7 +182,7 @@ struct event
 
     struct text_edit
     {
-        type t;                /**< event::type::text_edit */
+        type_t type;           /**< event::type::text_edit */
         timestamp_t timestamp; /**< in nanoseconds */
         int windowID;          /**< The window with keyboard focus, if any */
         char text[32];         /**< The editing text */
@@ -191,7 +192,7 @@ struct event
 
     struct text_input
     {
-        type t;                /**< event::type::text_input */
+        type_t type;           /**< event::type::text_input */
         timestamp_t timestamp; /**< in nanoseconds */
         int windowID;          /**< The window with keyboard focus, if any */
         char text[32];         /**< The input text */
@@ -199,20 +200,20 @@ struct event
 
     struct window
     {
-        type t;                /**< event::type::window* */
+        type_t type;           /**< event::type::window* */
         timestamp_t timestamp; /**< in nanoseconds */
         int windowID;
     };
 
     struct quit
     {
-        type t; /**< event_t::quit */
+        type_t type; /**< event_t::quit */
         timestamp_t timestamp;
     };
 
     union
     {
-        type t;
+        type_t type;
         keyboard kb;
         mouse_button mouse;
         mouse_motion motion;
@@ -227,7 +228,7 @@ struct event
 /**
  * @brief this events should match with SDL_EventType
  */
-enum class event::type
+enum class event::type_t
 {
     unknown = 0x000,
 

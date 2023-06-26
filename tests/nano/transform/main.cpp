@@ -35,38 +35,38 @@ main()
         event ev;
         while (poll_event(&ev))
         {
-            switch (ev.t)
+            switch (ev.type)
             {
-            case event::type::window_focus_lost:
+            case event::type_t::window_focus_lost:
                 is_rotated = is_rotate;
                 is_rotate = false;
                 break;
 
-            case event::type::window_focus_gain:
+            case event::type_t::window_focus_gain:
                 is_rotate = is_rotated;
                 break;
 
-            case event::type::window_close_request:
+            case event::type_t::window_close_request:
                 is_running = false;
                 break;
 
-            case event::type::key_down:
+            case event::type_t::key_down:
                 switch (ev.kb.key.keycode)
                 {
                 case keycode_t::kb_w:
-                    s.move(0, 0.01);
+                    s.move(0, 5);
                     break;
 
                 case keycode_t::kb_a:
-                    s.move(-0.01, 0);
+                    s.move(-5, 0);
                     break;
 
                 case keycode_t::kb_s:
-                    s.move(0, -0.01);
+                    s.move(0, -5);
                     break;
 
                 case keycode_t::kb_d:
-                    s.move(0.01, 0);
+                    s.move(5, 0);
                     break;
                 case keycode_t::kb_r:
                     is_rotate = not is_rotate;

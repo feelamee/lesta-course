@@ -45,14 +45,14 @@ main()
         event ev;
         while (poll_event(&ev))
         {
-            switch (ev.t)
+            switch (ev.type)
             {
-            case event::type::key_up:
+            case event::type_t::key_up:
                 if (ev.kb.key.keycode == keycode_t::kb_q)
                     is_running = false;
                 break;
 
-            case event::type::window_close_request:
+            case event::type_t::window_close_request:
                 is_running = false;
                 break;
 

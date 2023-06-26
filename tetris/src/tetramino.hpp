@@ -22,6 +22,8 @@ public:
         S,
         Z
     };
+    static type random_type();
+
     enum color
     {
         blue,
@@ -30,7 +32,13 @@ public:
         green
     };
 
-    tetramino(type, color);
+    enum class state
+    {
+        falling,
+        locked,
+    };
+
+    tetramino(type, color, nano::vec2f);
 
     void start() override;
     void stop() override;
@@ -38,6 +46,13 @@ public:
     void pause() override;
     void resume() override;
     void process(delta_t) override;
+    void lock();
+
+    void rotate90();
+    void rotate270();
+
+    void rshift();
+    void lshift();
 
     void draw(nano::drawable::state) const override;
 
@@ -47,6 +62,7 @@ public:
 private:
     mutable nano::sprite block;
     type t;
+    state m_state;
     std::vector<nano::vec2i> blocks_positions{};
 };
 

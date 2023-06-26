@@ -19,6 +19,7 @@ namespace tetris
 class menu_scene : public nano::node
 {
 public:
+    menu_scene(bool&);
     void start() override;
     void process(delta_t) override;
     void resume() override;
@@ -32,6 +33,7 @@ private:
     ImFont* font_light{};
     nano::sound bg_music;
     nano::texture2D bg;
+    bool& is_running;
 };
 
 } // namespace tetris
