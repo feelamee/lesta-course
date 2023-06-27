@@ -26,12 +26,35 @@ game_scene::game_scene(float p_width, bool& p_is_running)
                                 "8bit-music.wav");
     if (EXIT_SUCCESS != err_code)
     {
-        LOG_DEBUG("Fail while loading background sound for game scene");
+        LOG_DEBUG("Fail while loading background beat sound for game scene");
     }
     else
     {
         bg_beat.volume(50);
         bg_beat.loop = true;
+    }
+
+    err_code =
+        death.load(nano::engine::instance()->assets_path() / "death.wav");
+    if (EXIT_SUCCESS != err_code)
+    {
+        LOG_DEBUG("Fail while loading death sound for game scene");
+    }
+    else
+    {
+        death.volume(70);
+    }
+
+    err_code = collision.load(nano::engine::instance()->assets_path() /
+                              "tetramino-collision.wav");
+    if (EXIT_SUCCESS != err_code)
+    {
+        LOG_DEBUG(
+            "Fail while loading tetramino collision sound for game scene");
+    }
+    else
+    {
+        collision.volume(50);
     }
 
     pixels_size = { p_width, p_width * height / width };
@@ -389,6 +412,7 @@ game_scene::process(delta_t delta)
         is_collision = true;
         falling->yshift(1);
         lock_falling();
+        collision.play();
     }
     else
     {
@@ -399,6 +423,7 @@ game_scene::process(delta_t delta)
                 is_collision = true;
                 falling->yshift(1);
                 lock_falling();
+                collision.play();
                 break;
             }
         }
@@ -408,6 +433,8 @@ game_scene::process(delta_t delta)
     {
         if (is_game_over())
         {
+            bg_beat.stop();
+            death.play_sync();
             nano::engine::instance()->scenarist.pop();
             return;
         }

@@ -61,6 +61,8 @@ private:
     delta_t max_delay{ delta_t::period::den }; // depends on score
     mutable delta_t delay{ 0 };
     nano::sound bg_beat;
+    nano::sound death;
+    nano::sound collision;
 
     bool& is_running;
 };

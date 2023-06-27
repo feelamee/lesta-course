@@ -33,7 +33,8 @@ public:
     status_t status() const;
     void stop();
     void extracted();
-    void play();
+    int play();
+    void play_sync();
     void pause();
     void toggle();
 

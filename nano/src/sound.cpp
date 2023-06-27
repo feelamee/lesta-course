@@ -31,20 +31,13 @@ sound::load(const std::filesystem::path& fn)
 {
     soundbuf buf;
     int err_code = nano::wav::load(fn, buf);
-    if (EXIT_SUCCESS != err_code)
-    {
-        LOG_DEBUG("ERROR: failed while loading file %s\n%s",
-                  fn.string().c_str(),
-                  nano::wav::error2str(err_code).c_str());
-        return EXIT_FAILURE;
-    }
+    ASSERT_ERROR(err_code,
+                 "ERROR: failed while loading file %s\n%s",
+                 fn.string().c_str(),
+                 nano::wav::error2str(err_code).c_str());
 
     err_code = load(buf);
-    if (EXIT_SUCCESS != err_code)
-    {
-        LOG_DEBUG("ERROR: failed while loading sound from soundbuf");
-        return EXIT_FAILURE;
-    }
+    ASSERT_ERROR(err_code, "ERROR: failed while loading sound from soundbuf");
 
     return EXIT_SUCCESS;
 }
@@ -119,10 +112,27 @@ sound::advance(msduration dur)
     return {};
 }
 
-void
+int
 sound::play()
 {
-    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PlayAudioDevice(audio_deviceID));
+    if (0 == audio_deviceID)
+    {
+        int err_code = load(buf, 0);
+        ASSERT_ERROR(err_code,
+                     "ERROR: failed while loading sound from soundbuf");
+    }
+    ASSERT_SDL_ERROR(EXIT_SUCCESS == SDL_PlayAudioDevice(audio_deviceID),
+                     EXIT_FAILURE);
+    return EXIT_SUCCESS;
+}
+
+void
+sound::play_sync()
+{
+    play();
+    while (status() != status_t::stopped)
+    {
+    }
 }
 
 void
@@ -134,7 +144,8 @@ sound::pause()
 void
 sound::stop()
 {
-    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PauseAudioDevice(audio_deviceID));
+    SDL_CloseAudioDevice(audio_deviceID);
+    audio_deviceID = 0;
     position(0);
 }
 
@@ -200,9 +211,11 @@ sound::audio_callback(void* userdata, std::uint8_t* stream, int len)
                            static_cast<SDL_AudioFormat>(buf->spec().fmt),
                            left,
                            buf->volume());
-        if (buf->loop)
+
+        buf->position(0);
+        if (not buf->loop)
         {
-            buf->position(0);
+            buf->stop();
         }
     }
 }
