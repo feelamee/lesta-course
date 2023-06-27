@@ -103,7 +103,7 @@ gl_check(const std::filesystem::path& file,
                   description.c_str());
 
         error_code = glGetError();
-    } while (GL_NO_ERROR != error_code);
+    } while (false); // GL_NO_ERROR != error_code);
 
     return EXIT_FAILURE;
 }

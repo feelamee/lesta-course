@@ -144,15 +144,17 @@ poll_event(event* ev)
             return 0;
 
         if (ImGui::GetIO().WantCaptureMouse and is_mouse_ev(&sdl_ev))
+        {
             imgui_capture = true;
-
+        }
         else if (ImGui::GetIO().WantCaptureKeyboard and is_keyboard_ev(&sdl_ev))
         {
             imgui_capture = true;
         }
-
         else
+        {
             imgui_capture = false;
+        }
 
         ImGui_ImplSDL3_ProcessEvent(&sdl_ev);
     }

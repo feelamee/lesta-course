@@ -53,8 +53,8 @@ main()
             e->scenarist.top()->draw({ program });
         }
 
-        nano::engine::instance()->renderUI();
-        engine::instance()->swap_buffers();
+        e->renderUI();
+        e->swap_buffers();
     }
     return EXIT_SUCCESS;
 }

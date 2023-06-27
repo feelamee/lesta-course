@@ -37,6 +37,7 @@ private:
     static int ariphmetic_progression_sum(const int begin,
                                           const int end,
                                           const int step);
+    void draw_score() const;
     void subscribe_on_events() const;
     void rshift_falling() const;
     void lshift_falling() const;

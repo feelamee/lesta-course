@@ -5,6 +5,8 @@
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 
+#include <imgui.h>
+
 #include <algorithm>
 #include <chrono>
 #include <climits>
@@ -47,42 +49,42 @@ game_scene::subscribe_on_events() const
     using ev_t = nano::event::type_t;
     nano::event ev;
     ev.type = ev_t::quit;
-    e->supplier.subscribe({ ev, id }, [this]() { this->is_running = false; });
+    e->supplier.subscribe({ ev, id },
+                          [this](auto ev) { this->is_running = false; });
 
     ev.type = ev_t::window_close_request;
-    e->supplier.subscribe({ ev, id }, [this]() { this->is_running = false; });
+    e->supplier.subscribe({ ev, id },
+                          [this](auto ev) { this->is_running = false; });
 
     ev.type = ev_t::key_down;
-    ev.kb.repeat = false;
+    ev.kb.key.mod = 0;
     ev.kb.key.keycode = nano::keycode_t::kb_d;
-    e->supplier.subscribe({ ev, id }, [this]() { rshift_falling(); });
+    e->supplier.subscribe({ ev, id }, [this](auto ev) { rshift_falling(); });
 
-    ev.kb.repeat = true;
-    ev.kb.key.keycode = nano::keycode_t::kb_d;
-    e->supplier.subscribe({ ev, id }, [this]() { rshift_falling(); });
-
-    ev.kb.repeat = false;
     ev.kb.key.keycode = nano::keycode_t::kb_a;
-    e->supplier.subscribe({ ev, id }, [this]() { lshift_falling(); });
-
-    ev.kb.repeat = true;
-    ev.kb.key.keycode = nano::keycode_t::kb_a;
-    e->supplier.subscribe({ ev, id }, [this]() { lshift_falling(); });
+    e->supplier.subscribe({ ev, id }, [this](auto ev) { lshift_falling(); });
 
     ev.kb.repeat = false;
     ev.kb.key.keycode = nano::keycode_t::kb_h;
-    e->supplier.subscribe({ ev, id }, [this]() { rot270_falling(); });
+    e->supplier.subscribe({ ev, id },
+                          [this](auto ev)
+                          {
+                              if (not ev.kb.repeat)
+                                  rot270_falling();
+                          });
 
     ev.kb.key.keycode = nano::keycode_t::kb_l;
-    e->supplier.subscribe({ ev, id }, [this]() { rot90_falling(); });
+    e->supplier.subscribe({ ev, id },
+                          [this](auto ev)
+                          {
+                              if (not ev.kb.repeat)
+                                  rot90_falling();
+                          });
 
     ev.kb.key.keycode = nano::keycode_t::kb_j;
-    ev.kb.repeat = false;
-    e->supplier.subscribe({ ev, id }, [this]() { shift_down(); });
+    e->supplier.subscribe({ ev, id }, [this](auto ev) { shift_down(); });
 
-    ev.kb.key.keycode = nano::keycode_t::kb_j;
-    ev.kb.repeat = true;
-    e->supplier.subscribe({ ev, id }, [this]() { shift_down(); });
+    ev.type = ev_t::mouse_motion;
 }
 
 void
@@ -269,7 +271,7 @@ game_scene::delete_row(const int row)
             }
         }
     }
-    score += 10;
+    score += ariphmetic_progression_sum(1, 9, 1);
     using namespace std::chrono_literals;
     max_delay -= max_delay > 100ms ? 100ms : 0ms;
     shift_down_all_higher(row);
@@ -344,9 +346,33 @@ game_scene::lock_falling()
 }
 
 void
+game_scene::draw_score() const
+{
+    auto&& e = nano::engine::instance();
+    ImGui::SetNextWindowPos(
+        { (e->window.size.x -
+           ImGui::CalcTextSize(std::to_string(score).c_str()).x) /
+              2,
+          100 });
+    ImGui::SetNextWindowSizeConstraints({ 250, 250 }, { 250, 250 });
+    ImGui::Begin("Score",
+                 nullptr,
+                 ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDecoration |
+                     ImGuiWindowFlags_NoBackground);
+    ImGui::PushStyleColor(ImGuiCol_Text,
+                          nano::color::hex(nano::color{ 200, 100, 200 }));
+    // ImGui::PushStyleVar(ImGuiStyleVar_a)
+    ImGui::Text("%d", score);
+    ImGui::PopStyleColor();
+    ImGui::End();
+}
+
+void
 game_scene::process(delta_t delta)
 {
     delay += delta;
+
+    draw_score();
 
     if (delay < max_delay)
     {

@@ -29,22 +29,24 @@ menu_scene::menu_scene(bool& p_is_running)
     const std::filesystem::path light_fp =
         assets_dir / "JetBrainsMonoNerdFont-Light.ttf";
     font_light = nano::load_font_from_file_ttf(light_fp, 100);
+
+    nano::event ev;
+    ev.type = nano::event::type_t::quit;
+    e->supplier.subscribe({ ev, id },
+                          [this](auto ev) { this->is_running = false; });
+
+    ev.type = nano::event::type_t::window_close_request;
+    e->supplier.subscribe({ ev, id },
+                          [this](auto ev) { this->is_running = false; });
+
+    bg_music.volume(50);
+    bg_music.loop = true;
 }
 
 void
 menu_scene::start()
 {
-    bg_music.volume(50);
     bg_music.play();
-    bg_music.loop = true;
-
-    auto&& e = nano::engine::instance();
-    nano::event ev;
-    ev.type = nano::event::type_t::quit;
-    e->supplier.subscribe({ ev, id }, [this]() { this->is_running = false; });
-
-    ev.type = nano::event::type_t::window_close_request;
-    e->supplier.subscribe({ ev, id }, [this]() { this->is_running = false; });
 }
 
 void

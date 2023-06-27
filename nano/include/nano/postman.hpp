@@ -29,7 +29,7 @@ public:
         int operator()(const postman::key_t& key) const;
     };
 
-    using eventHandler = std::function<void()>;
+    using eventHandler = std::function<void(event)>;
     int subscribe(key_t key, eventHandler handler);
     int unsubscribe(key_t key);
     int deliver(nano::event ev);
