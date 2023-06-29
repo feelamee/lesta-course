@@ -48,6 +48,24 @@ engine::assets_path()
 #endif
 }
 
+void
+engine::start()
+{
+    m_is_running = true;
+}
+
+void
+engine::stop()
+{
+    m_is_running = false;
+}
+
+bool
+engine::is_running()
+{
+    return m_is_running;
+}
+
 int
 engine::initialize(int init_flags)
 {

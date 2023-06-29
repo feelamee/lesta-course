@@ -2,6 +2,7 @@
 
 #include "tetramino.hpp"
 
+#include <compare>
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 
@@ -13,14 +14,14 @@
 #include <cstdlib>
 #include <functional>
 #include <memory>
+#include <sys/stat.h>
 #include <vector>
 
 namespace tetris
 {
 
-game_scene::game_scene(float p_width, bool& p_is_running)
-    : is_running(p_is_running)
-    , node()
+game_scene::game_scene(float p_width)
+    : node()
 {
     int err_code = bg_beat.load(nano::engine::instance()->assets_path() /
                                 "8bit-music.wav");
@@ -42,7 +43,7 @@ game_scene::game_scene(float p_width, bool& p_is_running)
     }
     else
     {
-        death.volume(70);
+        death.volume(100);
     }
 
     err_code = collision.load(nano::engine::instance()->assets_path() /
@@ -71,43 +72,90 @@ game_scene::subscribe_on_events() const
     auto&& e = nano::engine::instance();
     using ev_t = nano::event::type_t;
     nano::event ev;
-    ev.type = ev_t::quit;
+
+    // DONT TOUCH, this is super painstaking fitted code to
+    // process touch events fine
+    auto mouse_motion_callback = [this](auto ev)
+    {
+        if (is_motion)
+        {
+            xoffset += ev.motion.xrel;
+        }
+        // just need -1, 0, or 1 to move tetramino
+        int div = (xoffset / block_size.x);
+        div %= 2;
+        xshift_falling(div);
+        xoffset -= div * block_size.x;
+        is_motion = true;
+    };
+
+    auto mouse_pressed_motion_callback = [this, mouse_motion_callback](auto ev)
+    {
+        if (ev.motion.yrel > std::abs(ev.motion.xrel))
+        {
+            yoffset += ev.motion.yrel > 0 ? ev.motion.yrel : 0;
+            if (yoffset > block_size.y)
+            {
+                shift_down();
+                yoffset -= block_size.y;
+                return;
+            }
+        }
+
+        mouse_motion_callback(ev);
+    };
+
+    ev.type = ev_t::mouse_motion;
+    ev.motion.state = nano::event::button_state::pressed;
+    e->supplier.subscribe({ ev, id }, mouse_pressed_motion_callback);
+    ev.motion.state = nano::event::button_state::released;
+    e->supplier.subscribe({ ev, id }, mouse_motion_callback);
+
+    ev.type = ev_t::mouse_key_up;
+    ev.mouse.button = nano::event::mouse_button::left;
+    ev.mouse.state = nano::event::button_state::released;
     e->supplier.subscribe({ ev, id },
-                          [this](auto ev) { this->is_running = false; });
+                          [this](auto ev)
+                          {
+                              if (not is_motion)
+                              {
+                                  rot90_falling();
+                              }
+                              else
+                              {
+                                  is_motion = false;
+                              }
+                          });
+    // std::bind(&game_scene::rot90_falling, this));
+
+    ev.type = ev_t::quit;
+    e->supplier.subscribe({ ev, id }, std::bind(&nano::engine::stop, e));
 
     ev.type = ev_t::window_close_request;
-    e->supplier.subscribe({ ev, id },
-                          [this](auto ev) { this->is_running = false; });
+    e->supplier.subscribe({ ev, id }, std::bind(&nano::engine::stop, e));
 
     ev.type = ev_t::key_down;
     ev.kb.key.mod = 0;
     ev.kb.key.keycode = nano::keycode_t::kb_d;
-    e->supplier.subscribe({ ev, id }, [this](auto ev) { rshift_falling(); });
+    e->supplier.subscribe({ ev, id },
+                          std::bind(&game_scene::xshift_falling, this, 1));
 
     ev.kb.key.keycode = nano::keycode_t::kb_a;
-    e->supplier.subscribe({ ev, id }, [this](auto ev) { lshift_falling(); });
+    e->supplier.subscribe({ ev, id },
+                          std::bind(&game_scene::xshift_falling, this, -1));
 
     ev.kb.repeat = false;
     ev.kb.key.keycode = nano::keycode_t::kb_h;
     e->supplier.subscribe({ ev, id },
-                          [this](auto ev)
-                          {
-                              if (not ev.kb.repeat)
-                                  rot270_falling();
-                          });
+                          std::bind(&game_scene::rot270_falling, this));
 
     ev.kb.key.keycode = nano::keycode_t::kb_l;
     e->supplier.subscribe({ ev, id },
-                          [this](auto ev)
-                          {
-                              if (not ev.kb.repeat)
-                                  rot90_falling();
-                          });
+                          std::bind(&game_scene::rot90_falling, this));
 
     ev.kb.key.keycode = nano::keycode_t::kb_j;
-    e->supplier.subscribe({ ev, id }, [this](auto ev) { shift_down(); });
-
-    ev.type = ev_t::mouse_motion;
+    e->supplier.subscribe({ ev, id }, std::bind(&game_scene::shift_down, this));
+    // #endif
 }
 
 void
@@ -143,15 +191,15 @@ game_scene::resume()
 }
 
 void
-game_scene::rshift_falling() const
+game_scene::xshift_falling(const int step) const
 {
     if (not falling)
         return;
 
-    falling->xshift(1);
+    falling->xshift(step);
     if (is_collide(falling))
     {
-        falling->xshift(-1);
+        falling->xshift(-step);
         return;
     }
 
@@ -159,32 +207,7 @@ game_scene::rshift_falling() const
     {
         if (is_collide(falling, block))
         {
-            falling->xshift(-1);
-            return;
-        }
-    }
-}
-
-void
-game_scene::lshift_falling() const
-{
-    if (not falling)
-    {
-        return;
-    }
-
-    falling->xshift(-1);
-    if (is_collide(falling))
-    {
-        falling->xshift(1);
-        return;
-    }
-
-    for (auto&& block : blocks)
-    {
-        if (is_collide(falling, block))
-        {
-            falling->xshift(1);
+            falling->xshift(-step);
             return;
         }
     }
@@ -405,6 +428,7 @@ game_scene::process(delta_t delta)
     delay -= max_delay;
 
     falling->process(delta);
+    ++score;
 
     bool is_collision{ false };
     if (is_collide(falling))

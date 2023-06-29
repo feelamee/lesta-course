@@ -56,6 +56,18 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
         ev->motion.yrel = sdl_ev->motion.yrel;
         break;
 
+    case ev_t::finger_motion:
+        ev->touch.dx = sdl_ev->tfinger.dx;
+        ev->touch.dy = sdl_ev->tfinger.dy;
+    case ev_t::finger_down:
+    case ev_t::finger_up:
+        ev->touch.fingerID = sdl_ev->tfinger.fingerId;
+        ev->touch.touchID = sdl_ev->tfinger.touchId;
+        ev->touch.windowID = sdl_ev->tfinger.windowID;
+        ev->touch.x = sdl_ev->tfinger.x;
+        ev->touch.y = sdl_ev->tfinger.y;
+        ev->touch.pressure = sdl_ev->tfinger.pressure;
+
     case ev_t::mouse_wheel:
         ev->wheel.mouseID = sdl_ev->wheel.which;
         ev->wheel.direction = static_cast<event::mouse_wheel::direction_t>(
@@ -114,12 +126,15 @@ poll_event(event* ev)
     if (nullptr == ev)
         return 0;
 
-    static auto is_mouse_ev = [](SDL_Event* ev)
+    static auto is_mouse_or_touch_ev = [](SDL_Event* ev)
     {
         return ev->type == SDL_EVENT_MOUSE_WHEEL or
                ev->type == SDL_EVENT_MOUSE_MOTION or
                ev->type == SDL_EVENT_MOUSE_BUTTON_DOWN or
-               ev->type == SDL_EVENT_MOUSE_BUTTON_UP;
+               ev->type == SDL_EVENT_MOUSE_BUTTON_UP or
+               ev->type == SDL_EVENT_FINGER_DOWN or
+               ev->type == SDL_EVENT_FINGER_UP or
+               ev->type == SDL_EVENT_FINGER_MOTION;
     };
 
     static auto is_keyboard_ev = [](SDL_Event* ev)
@@ -143,7 +158,7 @@ poll_event(event* ev)
         if (SDL_FALSE == result)
             return 0;
 
-        if (ImGui::GetIO().WantCaptureMouse and is_mouse_ev(&sdl_ev))
+        if (ImGui::GetIO().WantCaptureMouse and is_mouse_or_touch_ev(&sdl_ev))
         {
             imgui_capture = true;
         }

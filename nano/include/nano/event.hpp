@@ -117,7 +117,7 @@ struct event
 
     enum button_state : std::uint8_t
     {
-        released,
+        released = 0,
         pressed,
     };
 
@@ -211,6 +211,20 @@ struct event
         timestamp_t timestamp;
     };
 
+    struct finger
+    {
+        type_t type;
+        timestamp_t timestamp;
+        int touchID; /**< The touch device id */
+        int fingerID;
+        float x;        /**< Normalized in the range 0...1 */
+        float y;        /**< Normalized in the range 0...1 */
+        float dx;       /**< Normalized in the range -1...1 */
+        float dy;       /**< Normalized in the range -1...1 */
+        float pressure; /**< Normalized in the range 0...1 */
+        int windowID;   /**< The window underneath the finger, if any */
+    };
+
     union
     {
         type_t type;
@@ -218,6 +232,7 @@ struct event
         mouse_button mouse;
         mouse_motion motion;
         mouse_wheel wheel;
+        finger touch;
         text_edit edit;
         text_input input;
         window win;
@@ -239,6 +254,10 @@ enum class event::type_t
     text_edit,
     text_input,
     keymap_change,
+
+    finger_down = 0x700,
+    finger_up,
+    finger_motion,
 
     mouse_motion = 0x400,
     mouse_key_down,

@@ -112,18 +112,11 @@ sound::advance(msduration dur)
     return {};
 }
 
-int
+void
 sound::play()
 {
-    if (0 == audio_deviceID)
-    {
-        int err_code = load(buf, 0);
-        ASSERT_ERROR(err_code,
-                     "ERROR: failed while loading sound from soundbuf");
-    }
-    ASSERT_SDL_ERROR(EXIT_SUCCESS == SDL_PlayAudioDevice(audio_deviceID),
-                     EXIT_FAILURE);
-    return EXIT_SUCCESS;
+    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PlayAudioDevice(audio_deviceID));
+    m_status = status_t::playing;
 }
 
 void
@@ -131,42 +124,47 @@ sound::play_sync()
 {
     play();
     while (status() != status_t::stopped)
-    {
-    }
+        ;
 }
 
 void
 sound::pause()
 {
     TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PauseAudioDevice(audio_deviceID));
+    m_status = status_t::paused;
 }
 
 void
 sound::stop()
 {
-    SDL_CloseAudioDevice(audio_deviceID);
-    audio_deviceID = 0;
+    TEST_SDL_ERROR(EXIT_SUCCESS == SDL_PauseAudioDevice(audio_deviceID));
+    m_status = status_t::stopped;
     position(0);
 }
 
 void
 sound::toggle()
 {
-    SDL_AudioStatus status = SDL_GetAudioDeviceStatus(audio_deviceID);
-    if (SDL_AUDIO_STOPPED == status or SDL_AUDIO_PAUSED == status)
+    switch (status())
     {
+    case status_t::stopped:
         play();
-    }
-    else
-    {
+        break;
+
+    case status_t::paused:
+        play();
+        break;
+
+    case status_t::playing:
         pause();
+        break;
     }
 }
 
 sound::status_t
 sound::status() const
 {
-    return static_cast<status_t>(SDL_GetAudioDeviceStatus(audio_deviceID));
+    return m_status;
 }
 
 const audio_spec&
@@ -191,6 +189,7 @@ void
 sound::audio_callback(void* userdata, std::uint8_t* stream, int len)
 {
     auto buf = static_cast<sound*>(userdata);
+
     std::fill_n(stream, len, buf->spec().silence);
     int pos = buf->position();
     int left = buf->size() - pos;
@@ -212,8 +211,11 @@ sound::audio_callback(void* userdata, std::uint8_t* stream, int len)
                            left,
                            buf->volume());
 
-        buf->position(0);
-        if (not buf->loop)
+        if (buf->loop)
+        {
+            buf->position(0);
+        }
+        else
         {
             buf->stop();
         }

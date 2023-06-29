@@ -7,9 +7,8 @@
 namespace tetris
 {
 
-menu_scene::menu_scene(bool& p_is_running)
-    : is_running(p_is_running)
-    , node()
+menu_scene::menu_scene()
+    : node()
 {
     auto&& e = nano::engine::instance();
     const std::filesystem::path assets_dir{ e->assets_path() };
@@ -30,14 +29,13 @@ menu_scene::menu_scene(bool& p_is_running)
         assets_dir / "JetBrainsMonoNerdFont-Light.ttf";
     font_light = nano::load_font_from_file_ttf(light_fp, 100);
 
+    using namespace std::placeholders;
     nano::event ev;
     ev.type = nano::event::type_t::quit;
-    e->supplier.subscribe({ ev, id },
-                          [this](auto ev) { this->is_running = false; });
+    e->supplier.subscribe({ ev, id }, std::bind(&nano::engine::stop, e));
 
     ev.type = nano::event::type_t::window_close_request;
-    e->supplier.subscribe({ ev, id },
-                          [this](auto ev) { this->is_running = false; });
+    e->supplier.subscribe({ ev, id }, std::bind(&nano::engine::stop, e));
 
     bg_music.volume(50);
     bg_music.loop = true;
@@ -86,7 +84,7 @@ menu_scene::process(delta_t delta)
     }
     if (ImGui::Button("Start", { start_button_size, 100 }))
     {
-        auto game = std::make_shared<game_scene>(e->window.size.x, is_running);
+        auto game = std::make_shared<game_scene>(e->window.size.x);
         e->scenarist.push(game);
     }
 

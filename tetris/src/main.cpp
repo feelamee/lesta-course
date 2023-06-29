@@ -23,16 +23,16 @@ main()
     int err_code = e->initialize(engine::flag::all);
     ASSERT_ERROR(err_code, "Fail while initialization of engine");
 
-    bool is_running{ true };
     auto time_point = std::chrono::system_clock::now();
-    auto menu = std::make_shared<tetris::menu_scene>(is_running);
+    auto menu = std::make_shared<tetris::menu_scene>();
     e->scenarist.push(menu);
 
     auto program = std::make_shared<shader>();
     err_code = shaders::transform_texture(program);
     ASSERT_ERROR(err_code, "Fail while creating default shader");
 
-    while (is_running)
+    e->start();
+    while (e->is_running())
     {
         event ev;
         while (poll_event(&ev))

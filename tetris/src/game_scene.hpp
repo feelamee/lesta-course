@@ -15,7 +15,7 @@ namespace tetris
 
 struct game_scene : public nano::node
 {
-    game_scene(float width, bool&);
+    game_scene(float width);
 
     void add(std::shared_ptr<tetramino>);
 
@@ -39,8 +39,7 @@ private:
                                           const int step);
     void draw_score() const;
     void subscribe_on_events() const;
-    void rshift_falling() const;
-    void lshift_falling() const;
+    void xshift_falling(const int step) const;
     void shift_down() const;
     void rot90_falling() const;
     void rot270_falling() const;
@@ -60,11 +59,12 @@ private:
     int score{ 0 };
     delta_t max_delay{ delta_t::period::den }; // depends on score
     mutable delta_t delay{ 0 };
+    mutable float xoffset{ 0 };
+    mutable float yoffset{ 0 };
     nano::sound bg_beat;
     nano::sound death;
     nano::sound collision;
-
-    bool& is_running;
+    mutable bool is_motion{ false };
 };
 
 } // namespace tetris

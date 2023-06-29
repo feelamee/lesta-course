@@ -41,6 +41,9 @@ public:
     void new_frame();
     void renderUI();
     int swap_buffers();
+    void start();
+    void stop();
+    bool is_running();
 
     static std::shared_ptr<engine> instance();
 
@@ -59,6 +62,7 @@ private:
     struct impl_t;
     std::shared_ptr<impl_t> impl;
     int flags;
+    bool m_is_running{ false };
 };
 
 } // namespace nano

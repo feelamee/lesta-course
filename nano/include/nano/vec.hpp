@@ -11,8 +11,11 @@
 namespace nano
 {
 
+template <typename _Tp>
+concept floating_point = std::is_floating_point_v<_Tp>;
+
 template <typename T>
-    requires std::is_arithmetic_v<T>
+requires std::is_arithmetic_v<T>
 struct vec2
 {
     using type = T;
@@ -26,8 +29,9 @@ struct vec2
         return vec2{ x + rhs.x, y + rhs.y };
     }
 
-    vec2<float>
-    operator*(const vec2<float>& rhs) const
+    template <floating_point K>
+    vec2<K>
+    operator*(const vec2<K>& rhs) const
     {
         return { x * rhs.x, y * rhs.y };
     }
@@ -79,11 +83,10 @@ struct vec2
         return { -x, -y };
     }
 
-    friend bool
-    operator==(const vec2<T> lhs, const vec2<T> rhs)
+    bool
+    operator==(const vec2<T> rhs)
     {
-        return std::equal_to<T>()(lhs.x, rhs.x) and
-               std::equal_to<T>()(lhs.y, rhs.y);
+        return std::equal_to<T>()(x, rhs.x) and std::equal_to<T>()(y, rhs.y);
     }
 
     vec2<float>
@@ -124,7 +127,7 @@ inline vec2<float>::operator vec2<int>()
 }
 
 template <typename T>
-    requires std::is_arithmetic_v<T>
+requires std::is_arithmetic_v<T>
 struct vec3
 {
     using type = T;
