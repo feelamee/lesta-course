@@ -235,6 +235,7 @@ game_scene::rot90_falling() const
     falling->rot90();
     if (is_collide(falling))
     {
+        falling->rot270();
         return;
     }
 
