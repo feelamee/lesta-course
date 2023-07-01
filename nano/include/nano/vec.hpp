@@ -18,6 +18,13 @@ template <typename T>
 requires std::is_arithmetic_v<T>
 struct vec2
 {
+    vec2(T _x, T _y)
+        : x(_x)
+        , y(_y)
+    {
+    }
+    vec2() = default;
+
     using type = T;
     T x{};
     T y{};
@@ -125,6 +132,9 @@ inline vec2<float>::operator vec2<int>()
     return { static_cast<int>(strange_round(x)),
              static_cast<int>(strange_round(y)) };
 }
+
+template <typename T>
+vec2(T _x, T _y) -> vec2<T>;
 
 template <typename T>
 requires std::is_arithmetic_v<T>

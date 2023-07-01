@@ -39,6 +39,7 @@ main()
         {
             e->supplier.deliver(ev);
         }
+
         e->new_frame();
 
         auto cur_time_point = std::chrono::system_clock::now();
@@ -53,8 +54,7 @@ main()
             e->scenarist.top()->draw({ program });
         }
 
-        e->renderUI();
-        e->swap_buffers();
+        e->render();
     }
     return EXIT_SUCCESS;
 }

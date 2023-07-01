@@ -1,15 +1,16 @@
-#include "nano/texture2D.hpp"
-#include <memory>
 #include <nano/shape.hpp>
 
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
+#include <nano/texture2D.hpp>
 #include <nano/transform2D.hpp>
+#include <nano/utils.hpp>
 
 #include <glad/glad.h>
 
 #include <cmath>
 #include <cstdlib>
+#include <memory>
 
 namespace nano
 {
@@ -215,7 +216,6 @@ void
 shape::draw(state s) const
 {
     s.transform.combine(transform());
-
     if (s.program)
     {
         s.program->uniform("u_texture", texture());

@@ -31,7 +31,7 @@ game_scene::game_scene(float p_width)
     }
     else
     {
-        bg_beat.volume(50);
+        bg_beat.volume(30);
         bg_beat.loop = true;
     }
 
@@ -55,13 +55,13 @@ game_scene::game_scene(float p_width)
     }
     else
     {
-        collision.volume(50);
+        collision.volume(30);
     }
 
+    auto win_size = nano::engine::instance()->window.size;
     pixels_size = { p_width, p_width * height / width };
-    block_size = pixels_size / nano::vec2f{ width, height };
-    pixels_size_visible = pixels_size;
-    pixels_size_visible.y -= 4 * block_size.y;
+    block_size = pixels_size / nano::vec2f(width, height);
+    pixels_size_visible = win_size;
 
     subscribe_on_events();
 }
@@ -155,7 +155,6 @@ game_scene::subscribe_on_events() const
 
     ev.kb.key.keycode = nano::keycode_t::kb_j;
     e->supplier.subscribe({ ev, id }, std::bind(&game_scene::shift_down, this));
-    // #endif
 }
 
 void

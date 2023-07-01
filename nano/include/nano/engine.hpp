@@ -37,10 +37,9 @@ public:
     postman supplier;
 
     int initialize(int init_flags);
-    std::filesystem::path assets_path();
+    static std::filesystem::path assets_path();
     void new_frame();
-    void renderUI();
-    int swap_buffers();
+    int render();
     void start();
     void stop();
     bool is_running();
@@ -61,8 +60,8 @@ private:
 
     struct impl_t;
     std::shared_ptr<impl_t> impl;
-    int flags;
     bool m_is_running{ false };
+    int flags;
 };
 
 } // namespace nano

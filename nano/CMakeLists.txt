@@ -49,9 +49,9 @@ add_library(
 
     # creating separate static lib from Dear ImGui occurs multiply definition on windows
     # in addition this method is recommended by Dear ImGui Developers
-    ${imgui}/imconfig.h
+    src/imconfig.h
+
     ${imgui}/imgui.cpp
-    ${imgui}/imgui.h
     ${imgui}/imgui_demo.cpp
     ${imgui}/imgui_draw.cpp
     ${imgui}/imgui_tables.cpp
@@ -88,4 +88,4 @@ target_link_libraries(${TARGET} PUBLIC sanitizer)
 
 target_include_directories(${TARGET} PUBLIC ${imgui})
 target_include_directories(${TARGET} PUBLIC ${imgui}/backends)
-target_compile_definitions(${TARGET} PRIVATE -DIMGUI_IMPL_OPENGL_LOADER_CUSTOM)
+target_compile_definitions(${TARGET} PRIVATE -DIMGUI_USER_CONFIG="../../nano/src/imconfig.h")

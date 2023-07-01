@@ -138,7 +138,6 @@ engine::initialize(int init_flags)
         return EXIT_FAILURE;
     }
 
-    // TODO: implement this methods by yourself
     bool err = not ImGui_ImplSDL3_InitForOpenGL(impl->window, impl->context);
     if (err)
     {
@@ -156,21 +155,9 @@ engine::new_frame()
     if (not(flag::video & flags))
         return;
 
-    // TODO: implement this methods by yourself
     ImGui_ImplSDL3_NewFrame();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui::NewFrame();
-}
-
-void
-engine::renderUI()
-{
-    if (not(flag::video & flags))
-        return;
-
-    ImGui::Render();
-    // TODO: implement this methods by yourself
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 engine::~engine()
@@ -181,15 +168,22 @@ engine::~engine()
     if (not(flag::video & flags))
         return;
 
-    // TODO: implement this methods by yourself
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL3_Shutdown();
     ImGui::DestroyContext();
 }
 
 int
-engine::swap_buffers()
+engine::render()
 {
+    if (not(flag::video & flags))
+    {
+        return EXIT_SUCCESS;
+    }
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(impl->window));
     glClearColor(240. / 255, 244. / 255, 215. / 255, 1);
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
