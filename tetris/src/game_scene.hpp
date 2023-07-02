@@ -41,6 +41,7 @@ private:
     void subscribe_on_events() const;
     void xshift_falling(const int step) const;
     void shift_down() const;
+    void rot_falling(int times) const;
     void rot90_falling() const;
     void rot270_falling() const;
     bool is_game_over() const;

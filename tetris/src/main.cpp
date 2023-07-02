@@ -28,7 +28,7 @@ main()
     ASSERT_ERROR(err_code, "Fail while creating default shader");
 
     auto time_point = std::chrono::system_clock::now();
-    auto menu = std::make_shared<tetris::menu_scene>();
+    auto menu = std::make_shared<tetris::menu_scene>(e->window.size.x);
     e->scenarist.push(menu);
 
     e->start();

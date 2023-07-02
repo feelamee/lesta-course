@@ -39,6 +39,21 @@ struct color
         return ret;
     }
 
+    static std::uint32_t
+    hex(const std::uint8_t r,
+        const std::uint8_t g,
+        const std::uint8_t b,
+        const std::uint8_t a)
+    {
+        std::uint32_t ret{ 0 };
+        ret = (int)r << 0;
+        ret |= (int)g << 8;
+        ret |= (int)b << 16;
+        ret |= (int)a << 24;
+
+        return ret;
+    }
+
     static color
     hex(std::uint32_t p_hex)
     {

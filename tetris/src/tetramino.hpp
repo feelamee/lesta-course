@@ -43,6 +43,7 @@ public:
     bool is_locked() const;
     bool is_falling() const;
 
+    void rot(int times);
     void rot90();
     void rot270();
     nano::vec2f origin();

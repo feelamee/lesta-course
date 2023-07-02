@@ -58,10 +58,10 @@ game_scene::game_scene(float p_width)
         collision.volume(30);
     }
 
-    auto win_size = nano::engine::instance()->window.size;
+    auto win = nano::engine::instance()->window;
     pixels_size = { p_width, p_width * height / width };
     block_size = pixels_size / nano::vec2f(width, height);
-    pixels_size_visible = win_size;
+    pixels_size_visible = win.size;
 
     subscribe_on_events();
 }
@@ -109,17 +109,10 @@ game_scene::subscribe_on_events() const
         mouse_motion_callback(ev);
     };
 
-    // ev.type = ev_t::mouse_motion;
     ev.type = ev_t::finger_motion;
-    // ev.motion.state = nano::event::button_state::pressed;
     e->supplier.subscribe({ ev, id }, mouse_pressed_motion_callback);
-    // ev.motion.state = nano::event::button_state::released;
-    // e->supplier.subscribe({ ev, id }, mouse_motion_callback);
 
-    // ev.type = ev_t::mouse_key_up;
     ev.type = ev_t::finger_up;
-    // ev.mouse.button = nano::event::mouse_button::left;
-    // ev.mouse.state = nano::event::button_state::released;
     e->supplier.subscribe({ ev, id },
                           [this](auto ev)
                           {
@@ -132,7 +125,6 @@ game_scene::subscribe_on_events() const
                                   is_motion = false;
                               }
                           });
-    // std::bind(&game_scene::rot90_falling, this));
 
     ev.type = ev_t::quit;
     e->supplier.subscribe({ ev, id }, std::bind(&nano::engine::stop, e));
@@ -230,17 +222,17 @@ game_scene::shift_down() const
 }
 
 void
-game_scene::rot90_falling() const
+game_scene::rot_falling(int times) const
 {
     if (not falling)
     {
         return;
     }
 
-    falling->rot90();
+    falling->rot(times);
     if (is_collide(falling))
     {
-        falling->rot270();
+        falling->rot(-times);
         return;
     }
 
@@ -248,35 +240,22 @@ game_scene::rot90_falling() const
     {
         if (is_collide(falling, block))
         {
-            falling->rot270();
+            falling->rot(-times);
             return;
         }
     }
 }
 
 void
+game_scene::rot90_falling() const
+{
+    rot_falling(1);
+}
+
+void
 game_scene::rot270_falling() const
 {
-    if (not falling)
-    {
-        return;
-    }
-
-    falling->rot270();
-    if (is_collide(falling))
-    {
-        falling->rot90();
-        return;
-    }
-
-    for (auto&& block : blocks)
-    {
-        if (is_collide(falling, block))
-        {
-            falling->rot90();
-            return;
-        }
-    }
+    rot_falling(-1);
 }
 
 bool
@@ -483,7 +462,10 @@ game_scene::draw(nano::drawable::state s) const
     tr.move(-pixels_size_visible / win.size / nano::vec2f{ 1, win.ratio });
     s.transform.combine(tr);
 
-    falling->draw(s);
+    if (nullptr != falling)
+    {
+        falling->draw(s);
+    }
     using namespace std::placeholders;
     std::for_each(
         begin(blocks), end(blocks), std::bind(&tetramino::draw, _1, s));
