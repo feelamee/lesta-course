@@ -131,6 +131,7 @@ menu_scene::resume()
 void
 menu_scene::pause()
 {
+    reset_animation();
     bg_music.pause();
 }
 
@@ -159,6 +160,13 @@ menu_scene::draw(nano::drawable::state s) const
 
 //  methods for animation
 
+void
+menu_scene::reset_animation()
+{
+    state = 0;
+    blocks.clear();
+    falling = nullptr;
+}
 void
 menu_scene::fill_states()
 {
@@ -277,7 +285,15 @@ menu_scene::fill_states()
         std::bind(transform,
                   movs{ mov(2, 1), mov(3, 1), mov(5, 1), mov(12, -1) },
                   rots{}));
-    states.push_back([]() {});
+    states.push_back(
+        [this, i = 0]() mutable
+        {
+            if (i > 100)
+            {
+                ++state;
+            }
+            ++i;
+        });
 }
 
 void

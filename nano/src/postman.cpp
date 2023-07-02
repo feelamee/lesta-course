@@ -103,6 +103,7 @@ postman::deliver(nano::event event)
     key_t key{ event, scenarist.top()->id };
     if (recipients.contains(key))
     {
+        LOG_DEBUG("Event founded");
         recipients[key](event);
         return EXIT_SUCCESS;
     }

@@ -39,6 +39,7 @@ private:
     int state{ 0 };
 
     void fill_states();
+    void reset_animation();
 
     void add(std::shared_ptr<tetramino>);
     void xshift_falling(const int step) const;
