@@ -75,11 +75,12 @@ game_scene::subscribe_on_events() const
 
     // DONT TOUCH, this is super painstaking fitted code to
     // process touch events fine
-    auto mouse_motion_callback = [this](auto ev)
+    auto mouse_motion_callback = [this, e](auto ev)
     {
         if (is_motion)
         {
-            xoffset += ev.motion.xrel;
+            // xoffset += ev.motion.xrel;
+            xoffset += ev.touch.dx * e->window.size.x;
         }
         // just need -1, 0, or 1 to move tetramino
         int div = (xoffset / block_size.x);
@@ -89,11 +90,14 @@ game_scene::subscribe_on_events() const
         is_motion = true;
     };
 
-    auto mouse_pressed_motion_callback = [this, mouse_motion_callback](auto ev)
+    auto mouse_pressed_motion_callback =
+        [this, mouse_motion_callback, e](auto ev)
     {
-        if (ev.motion.yrel > std::abs(ev.motion.xrel))
+        // if (ev.motion.yrel > std::abs(ev.motion.xrel))
+        if (ev.touch.dy > std::abs(ev.touch.dx))
         {
-            yoffset += ev.motion.yrel > 0 ? ev.motion.yrel : 0;
+            // yoffset += ev.motion.yrel > 0 ? ev.motion.yrel : 0;
+            yoffset += e->window.size.y * (ev.touch.dy > 0 ? ev.touch.dy : 0);
             if (yoffset > block_size.y)
             {
                 shift_down();
@@ -105,15 +109,17 @@ game_scene::subscribe_on_events() const
         mouse_motion_callback(ev);
     };
 
-    ev.type = ev_t::mouse_motion;
-    ev.motion.state = nano::event::button_state::pressed;
+    // ev.type = ev_t::mouse_motion;
+    ev.type = ev_t::finger_motion;
+    // ev.motion.state = nano::event::button_state::pressed;
     e->supplier.subscribe({ ev, id }, mouse_pressed_motion_callback);
-    ev.motion.state = nano::event::button_state::released;
-    e->supplier.subscribe({ ev, id }, mouse_motion_callback);
+    // ev.motion.state = nano::event::button_state::released;
+    // e->supplier.subscribe({ ev, id }, mouse_motion_callback);
 
-    ev.type = ev_t::mouse_key_up;
-    ev.mouse.button = nano::event::mouse_button::left;
-    ev.mouse.state = nano::event::button_state::released;
+    // ev.type = ev_t::mouse_key_up;
+    ev.type = ev_t::finger_up;
+    // ev.mouse.button = nano::event::mouse_button::left;
+    // ev.mouse.state = nano::event::button_state::released;
     e->supplier.subscribe({ ev, id },
                           [this](auto ev)
                           {
@@ -280,7 +286,7 @@ game_scene::is_game_over() const
     {
         for (auto&& [_, y] : block->positions())
         {
-            if (y >= height_visible)
+            if (y > height_visible)
             {
                 return true;
             }
@@ -319,7 +325,7 @@ game_scene::delete_row(const int row)
     }
     score += ariphmetic_progression_sum(1, 9, 1);
     using namespace std::chrono_literals;
-    max_delay -= max_delay > 100ms ? 100ms : 0ms;
+    max_delay -= max_delay > 100ms ? 10ms : 0ms;
     shift_down_all_higher(row);
 }
 

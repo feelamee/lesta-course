@@ -1,17 +1,18 @@
 #ifndef SCENE_HPP
 #define SCENE_HPP
 
-#include <chrono>
 #include <nano/drawable.hpp>
 
+#include <chrono>
 #include <list>
 #include <memory>
 
 namespace nano
 {
 
-struct node : public drawable
+class node : public drawable
 {
+public:
     node();
     int id{ 0 };
     static int last_id;

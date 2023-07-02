@@ -129,9 +129,10 @@ struct event
             middle,
             right,
         };
+        static constexpr int touch_mouseID = -1;
 
-        type_t
-            type; /**< event_t::mouse_button_down or event_t::mouse_button_up */
+        /**< event_t::mouse_button_down or event_t::mouse_button_up */
+        type_t type;
         timestamp_t timestamp; /**< in nanoseconds */
 
         // int windowID;          /**< The window with mouse focus, if any */
@@ -260,8 +261,8 @@ enum class event::type_t
     finger_motion,
 
     mouse_motion = 0x400,
-    mouse_key_down,
-    mouse_key_up,
+    mouse_button_down,
+    mouse_button_up,
     mouse_wheel,
 
     window_show = 0x202,      /**< Window has been shown */
@@ -281,6 +282,28 @@ enum class event::type_t
     window_focus_gain,        /**< Window has gained keyboard focus */
     window_focus_lost,        /**< Window has lost keyboard focus */
     window_close_request,     /**< The window manager requests that the */
+};
+
+enum keymod
+{
+    km_none = 0x0000,
+    km_lshift = 0x0001,
+    km_rshift = 0x0002,
+    km_lctrl = 0x0040,
+    km_rctrl = 0x0080,
+    km_lalt = 0x0100,
+    km_ralt = 0x0200,
+    km_lgui = 0x0400,
+    km_rgui = 0x0800,
+    km_num = 0x1000,
+    km_caps = 0x2000,
+    km_mode = 0x4000,
+    km_scroll = 0x8000,
+
+    km_ctrl = km_lctrl | km_rctrl,
+    km_shift = km_lshift | km_rshift,
+    km_alt = km_lalt | km_ralt,
+    km_gui = km_lgui | km_rgui
 };
 
 } // namespace nano

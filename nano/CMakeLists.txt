@@ -22,7 +22,9 @@ add_library(
     src/sound.cpp
     src/scene.cpp
     src/postman.cpp
+    src/imgui_backend.cpp
 
+    include/nano/imgui_backend.hpp
     include/nano/drawable.hpp
     include/nano/sound.hpp
     include/nano/sprite.hpp

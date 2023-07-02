@@ -185,8 +185,10 @@ engine::render()
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     TEST_SDL_ERROR(EXIT_SUCCESS == SDL_GL_SwapWindow(impl->window));
+
     glClearColor(240. / 255, 244. / 255, 215. / 255, 1);
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
+
     return EXIT_SUCCESS;
 }
 

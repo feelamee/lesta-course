@@ -1,6 +1,7 @@
 #include <nano/event.hpp>
 
 #include <nano/error.hpp>
+#include <nano/imgui_backend.hpp>
 
 #include <SDL3/SDL_events.h>
 
@@ -33,8 +34,8 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
         ev->kb.repeat = sdl_ev->key.repeat;
         break;
 
-    case ev_t::mouse_key_down:
-    case ev_t::mouse_key_up:
+    case ev_t::mouse_button_down:
+    case ev_t::mouse_button_up:
         ev->mouse.mouseID = sdl_ev->button.which;
         ev->mouse.button =
             static_cast<event::mouse_button::button_t>(sdl_ev->button.button);
@@ -57,8 +58,6 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
         break;
 
     case ev_t::finger_motion:
-        ev->touch.dx = sdl_ev->tfinger.dx;
-        ev->touch.dy = sdl_ev->tfinger.dy;
     case ev_t::finger_down:
     case ev_t::finger_up:
         ev->touch.fingerID = sdl_ev->tfinger.fingerId;
@@ -66,7 +65,10 @@ convert_sdl_event(SDL_Event* sdl_ev, event* ev)
         ev->touch.windowID = sdl_ev->tfinger.windowID;
         ev->touch.x = sdl_ev->tfinger.x;
         ev->touch.y = sdl_ev->tfinger.y;
+        ev->touch.dx = sdl_ev->tfinger.dx;
+        ev->touch.dy = sdl_ev->tfinger.dy;
         ev->touch.pressure = sdl_ev->tfinger.pressure;
+        break;
 
     case ev_t::mouse_wheel:
         ev->wheel.mouseID = sdl_ev->wheel.which;
@@ -157,6 +159,7 @@ poll_event(event* ev)
         int result = SDL_PollEvent(&sdl_ev);
         if (SDL_FALSE == result)
             return 0;
+        convert_sdl_event(&sdl_ev, ev);
 
         if (ImGui::GetIO().WantCaptureMouse and is_mouse_or_touch_ev(&sdl_ev))
         {
@@ -171,10 +174,9 @@ poll_event(event* ev)
             imgui_capture = false;
         }
 
-        ImGui_ImplSDL3_ProcessEvent(&sdl_ev);
+        imgui::process_event(ev);
     }
 
-    convert_sdl_event(&sdl_ev, ev);
     return 1;
 }
 
