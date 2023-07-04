@@ -1,6 +1,16 @@
 #### lesta-course
 
-###### build homework, nano, tests
+##### build dependencies
+- git
+- cmake
+
+##### installing build dependencies
+###### Archlinux
+    sudo pacman -S git cmake
+###### Ubuntu
+    apt install git cmake
+
+##### build homework, nano, tests
     git clone --recurse-submodules https://github.com/hiebyshek/lesta-course
     cd lesta-course/
     mkdir build/
@@ -8,7 +18,7 @@
     cmake .. -DBUILD_ALL=ON [-DBUILD_NANO=ON -DBUILD_HW=ON -DBUILD_TESTS=ON -DADDRESS_SANITIZER=ON]*
     cmake --build .
 
-###### build Tetris
+##### build Tetris
     git clone --recurse-submodules https://github.com/hiebyshek/lesta-course
     cd lesta-course/tetris
     mkdir build/
