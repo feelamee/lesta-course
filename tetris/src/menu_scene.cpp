@@ -25,11 +25,11 @@ menu_scene::menu_scene(float p_width)
 
     const std::filesystem::path bold_fp =
         assets_dir / "JetBrainsMonoNerdFont-Bold.ttf";
-    font_bold = nano::load_font_from_file_ttf(bold_fp, 100);
+    font_bold = nano::load_font_from_file_ttf(bold_fp, e->window.size.x / 5);
 
     const std::filesystem::path light_fp =
         assets_dir / "JetBrainsMonoNerdFont-Light.ttf";
-    font_light = nano::load_font_from_file_ttf(light_fp, 100);
+    font_light = nano::load_font_from_file_ttf(light_fp, e->window.size.x / 5);
 
     using namespace std::placeholders;
     nano::event ev;
@@ -112,10 +112,10 @@ menu_scene::process(delta_t delta)
             ImGui::SetCursorPos({ off, ImGui::GetWindowHeight() / 8 * 3 });
     }
 
-    if (ImGui::Button("Settings"))
-    {
-        // settings
-    }
+    // if (ImGui::Button("Settings"))
+    // {
+    //     // settings
+    // }
     ImGui::PopStyleColor();
     ImGui::PopStyleColor();
     ImGui::End();
