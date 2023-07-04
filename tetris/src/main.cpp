@@ -36,10 +36,6 @@ main()
         event ev;
         while (poll_event(&ev))
         {
-            if (ev.type == nano::event::type_t::key_down)
-            {
-                LOG_DEBUG("KEY_DOWN %c", ev.kb.key.keycode);
-            }
             e->supplier.deliver(ev);
         }
 
