@@ -103,7 +103,6 @@ menu_scene::process(delta_t delta)
     }
 
     const float settings_button_size = e->window.size.x / 4 * 3;
-    // ImGui::CalcTextSize("Settings").x + 100;
     {
         ImGui::SetCursorPosX(0);
 

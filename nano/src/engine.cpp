@@ -81,7 +81,6 @@ engine::initialize(int init_flags)
         return EXIT_SUCCESS;
     }
 
-#ifdef __ANDROID__
     {
         const SDL_DisplayMode* display_mode{ nullptr };
         int display_count{ 0 };
@@ -98,10 +97,14 @@ engine::initialize(int init_flags)
         SDL_free(display_ids);
 
         ASSERT_SDL_ERROR(nullptr != display_mode, EXIT_FAILURE);
+#ifdef __ANDROID__
         window.size.x = display_mode->w;
         window.size.y = display_mode->h;
-    }
+#else
+        window.size.x = display_mode->h / 2. * 0.9;
+        window.size.y = display_mode->h * 0.9;
 #endif
+    }
 
     impl->window = SDL_CreateWindow(
         "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);
