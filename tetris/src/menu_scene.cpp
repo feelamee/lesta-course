@@ -138,6 +138,7 @@ menu_scene::pause()
 void
 menu_scene::stop()
 {
+    reset_animation();
     bg_music.stop();
 }
 
@@ -211,6 +212,7 @@ menu_scene::fill_states()
     };
 
     states.push_back(std::bind(spawn_block, tetramino::type::O));
+    states.push_back(std::bind(transform, movs{ mov(8, 1) }));
 
     states.push_back(std::bind(spawn_block, tetramino::type::J));
     states.push_back(
@@ -220,8 +222,8 @@ menu_scene::fill_states()
     states.push_back(std::bind(transform, movs{}, rots{ rot(2, -1) }));
 
     states.push_back(std::bind(spawn_block, tetramino::type::L));
-    states.push_back(
-        std::bind(transform, movs{}, rots{ rot(2, -1), rot(8, -1) }));
+    states.push_back(std::bind(
+        transform, movs{ mov(5, -1) }, rots{ rot(2, -1), rot(8, -1) }));
     states.push_back(std::bind(spawn_block, tetramino::type::J));
     states.push_back(std::bind(transform,
                                movs{ mov(2, 1), mov(10, 1) },
@@ -269,7 +271,7 @@ menu_scene::fill_states()
 
     states.push_back(std::bind(spawn_block, tetramino::type::L));
     states.push_back(std::bind(
-        transform, movs{ mov(3, 1), mov(17, -1) }, rots{ rot(2, -1) }));
+        transform, movs{ mov(3, 1), mov(16, -1) }, rots{ rot(2, -1) }));
 
     states.push_back(std::bind(spawn_block, tetramino::type::T));
     states.push_back(std::bind(transform,
@@ -283,7 +285,7 @@ menu_scene::fill_states()
     states.push_back(std::bind(spawn_block, tetramino::type::Z));
     states.push_back(
         std::bind(transform,
-                  movs{ mov(2, 1), mov(3, 1), mov(5, 1), mov(12, -1) },
+                  movs{ mov(2, 1), mov(3, 2), mov(5, 1), mov(12, -1) },
                   rots{}));
     states.push_back(
         [this, i = 0]() mutable
@@ -291,6 +293,20 @@ menu_scene::fill_states()
             if (i > 100)
             {
                 ++state;
+            }
+            ++i;
+        });
+    states.push_back(
+        [this, i = 0]() mutable
+        {
+            if (i == 12)
+            {
+                state = 0;
+                return;
+            }
+            if (i % 2 == 0)
+            {
+                delete_row(0);
             }
             ++i;
         });

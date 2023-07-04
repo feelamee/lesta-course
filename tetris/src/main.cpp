@@ -27,7 +27,6 @@ main()
     err_code = shaders::transform_texture(program);
     ASSERT_ERROR(err_code, "Fail while creating default shader");
 
-    auto time_point = std::chrono::system_clock::now();
     auto menu = std::make_shared<tetris::menu_scene>(e->window.size.x);
     e->scenarist.push(menu);
 
@@ -37,17 +36,20 @@ main()
         event ev;
         while (poll_event(&ev))
         {
+            if (ev.type == nano::event::type_t::key_down)
+            {
+                LOG_DEBUG("KEY_DOWN %c", ev.kb.key.keycode);
+            }
             e->supplier.deliver(ev);
         }
 
         e->new_frame();
 
-        auto cur_time_point = std::chrono::system_clock::now();
         if (e->scenarist.top())
         {
-            e->scenarist.top()->process(cur_time_point - time_point);
+            using namespace std::chrono_literals;
+            e->scenarist.top()->process(16ms);
         }
-        time_point = cur_time_point;
 
         if (e->scenarist.top())
         {

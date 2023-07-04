@@ -180,12 +180,12 @@ load(const std::filesystem::path& fn, canvas& buf)
     SDL_Surface* new_img{ nullptr };
     if (SDL_PIXELFORMAT_RGBA8888 != img->format->format)
     {
-        LOG_DEBUG("Unsupported pixel format in image loaded from: %s",
-                  path2str(fn).c_str());
-        LOG_DEBUG("Trying to convert...");
+        // LOG_DEBUG("Unsupported pixel format in image loaded from: %s",
+        // path2str(fn).c_str());
+        // LOG_DEBUG("Trying to convert...");
         new_img = SDL_ConvertSurfaceFormat(img, SDL_PIXELFORMAT_RGB24);
         ASSERT_SDL_ERROR(nullptr != new_img, err_t::convert_pixelformat);
-        LOG_DEBUG("Successful converting pixel format");
+        // LOG_DEBUG("Successful converting pixel format");
         SDL_DestroySurface(img);
         img = new_img;
     }

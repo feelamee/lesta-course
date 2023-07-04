@@ -101,18 +101,18 @@ tetramino::start()
         break;
 
     case type::L:
-        blocks_positions[0] = { 4, 20 }; //      3  4  5
-        blocks_positions[1] = { 5, 20 }; // 21        [ ]
-        blocks_positions[2] = { 6, 20 }; // 20  [ ][ ][ ]
-        blocks_positions[3] = { 6, 21 }; //
+        blocks_positions[0] = { 3, 20 }; //      3  4  5
+        blocks_positions[1] = { 4, 20 }; // 21        [ ]
+        blocks_positions[2] = { 5, 20 }; // 20  [ ][ ][ ]
+        blocks_positions[3] = { 5, 21 }; //
         m_origin = { 4, 20 };
         break;
 
     case type::O:
-        blocks_positions[0] = { 4, 21 }; //      3  4
-        blocks_positions[1] = { 5, 21 }; // 21  [ ][ ]
-        blocks_positions[2] = { 4, 20 }; // 20  [ ][ ]
-        blocks_positions[3] = { 5, 20 }; //
+        blocks_positions[0] = { 3, 21 }; //      3  4
+        blocks_positions[1] = { 4, 21 }; // 21  [ ][ ]
+        blocks_positions[2] = { 3, 20 }; // 20  [ ][ ]
+        blocks_positions[3] = { 4, 20 }; //
         m_origin = { 3.5, 20.5 };
         break;
 
@@ -133,10 +133,10 @@ tetramino::start()
         break;
 
     case type::Z:
-        blocks_positions[0] = { 4, 21 }; //     3  4  5
-        blocks_positions[1] = { 5, 21 }; // 21 [ ][ ]
-        blocks_positions[2] = { 5, 20 }; // 20    [ ][ ]
-        blocks_positions[3] = { 6, 20 }; //
+        blocks_positions[0] = { 3, 21 }; //     3  4  5
+        blocks_positions[1] = { 4, 21 }; // 21 [ ][ ]
+        blocks_positions[2] = { 4, 20 }; // 20    [ ][ ]
+        blocks_positions[3] = { 5, 20 }; //
         m_origin = { 4, 20 };
         break;
     }

@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <nano/postman.hpp>
 
 #include <nano/engine.hpp>
@@ -59,7 +60,7 @@ postman::hash_key_t::operator()(const key_t& key) const
     case ev_t::key_down:
         return std::hash<int>()(static_cast<int>(key.ev.type)) ^
                std::hash<int>()(key.ev.kb.key.keycode) ^
-               std::hash<int>()(key.ev.kb.key.mod) ^
+               std::hash<std::uint16_t>()(key.ev.kb.key.mod) ^
                std::hash<int>()(key.scene_id);
 
     case ev_t::mouse_motion:
@@ -103,7 +104,6 @@ postman::deliver(nano::event event)
     key_t key{ event, scenarist.top()->id };
     if (recipients.contains(key))
     {
-        LOG_DEBUG("Event founded");
         recipients[key](event);
         return EXIT_SUCCESS;
     }
