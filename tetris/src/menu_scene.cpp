@@ -86,17 +86,17 @@ menu_scene::process(delta_t delta)
     ImGui::PopStyleColor();
 
     ImGui::PushStyleColor(ImGuiCol_Button, nano::color::hex({ 49, 50, 150 }));
-    const float start_button_size = e->window.size.x / 3 * 2;
-    // ImGui::CalcTextSize("Start").x + 100;
     {
         ImGui::SetCursorPosX(0);
 
-        const float off = (ImGui::GetWindowWidth() - start_button_size) / 2;
+        const float off =
+            (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Start").x) / 2;
+
         if (off > 0)
             ImGui::SetCursorPos({ off, ImGui::GetWindowHeight() * 1 / 4 });
     }
     ImGui::PushStyleColor(ImGuiCol_Button, nano::color::hex(50, 0, 200, 50));
-    if (ImGui::Button("Start", { start_button_size, 120 }))
+    if (ImGui::Button("Start"))
     {
         auto game = std::make_shared<game_scene>(pixels_size.x);
         e->scenarist.push(game);
@@ -107,12 +107,13 @@ menu_scene::process(delta_t delta)
     {
         ImGui::SetCursorPosX(0);
 
-        const float off = (ImGui::GetWindowWidth() - settings_button_size) / 2;
+        const float off =
+            (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Settings").x) / 2;
         if (off > 0)
             ImGui::SetCursorPos({ off, ImGui::GetWindowHeight() / 8 * 3 });
     }
 
-    if (ImGui::Button("Settings", { settings_button_size, 120 }))
+    if (ImGui::Button("Settings"))
     {
         // settings
     }

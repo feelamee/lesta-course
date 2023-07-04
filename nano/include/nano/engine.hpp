@@ -29,7 +29,7 @@ public:
 
     struct window_t
     {
-        vec2f size{ 500, 1000 };
+        vec2f size{ 450, 900 };
         float ratio{ size.x / size.y };
     } window;
 
