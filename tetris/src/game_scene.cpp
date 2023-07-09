@@ -2,6 +2,7 @@
 
 #include "tetramino.hpp"
 
+#include <bits/chrono.h>
 #include <compare>
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
@@ -213,7 +214,7 @@ game_scene::xshift_falling(const int step) const
 void
 game_scene::shift_down() const
 {
-    if (not falling)
+    if (not falling or falling->is_locked())
     {
         return;
     }
@@ -302,9 +303,9 @@ game_scene::delete_row(const int row)
             }
         }
     }
-    score += ariphmetic_progression_sum(1, 9, 1);
     using namespace std::chrono_literals;
-    max_delay -= max_delay > 100ms ? 10ms : 0ms;
+    score += ariphmetic_progression_sum(1, 9, 1);
+    max_delay -= max_delay > 100ms ? 25ms : 0ms;
     shift_down_all_higher(row);
 }
 
@@ -379,20 +380,17 @@ game_scene::lock_falling()
 void
 game_scene::draw_score() const
 {
-    auto&& e = nano::engine::instance();
-    ImGui::SetNextWindowPos(
-        { (e->window.size.x -
-           ImGui::CalcTextSize(std::to_string(score).c_str()).x) /
-              2,
-          100 });
-    ImGui::SetNextWindowSizeConstraints({ 250, 250 }, { 250, 250 });
+    auto&& win_size = nano::engine::instance()->window.size;
+    float x_pos =
+        (win_size.x - ImGui::CalcTextSize(std::to_string(score).c_str()).x) / 2;
+    ImGui::SetNextWindowPos({ x_pos, 100 });
+    ImGui::SetNextWindowSize({ win_size.x, 250 });
     ImGui::Begin("Score",
                  nullptr,
                  ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoDecoration |
                      ImGuiWindowFlags_NoBackground);
     ImGui::PushStyleColor(ImGuiCol_Text,
                           nano::color::hex(nano::color{ 200, 100, 200 }));
-    // ImGui::PushStyleVar(ImGuiStyleVar_a)
     ImGui::Text("%d", score);
     ImGui::PopStyleColor();
     ImGui::End();

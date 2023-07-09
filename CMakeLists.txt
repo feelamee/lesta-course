@@ -3,9 +3,11 @@ project(lesta-course)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/external)
+set(BUILD_SDL3 ON)
+set(BUILD_GLAD ON)
 
 option(BUILD_NANO "enable building of nano engine" ON)
+
 
 if (BUILD_NANO OR BUILD_ALL)
 add_subdirectory(${CMAKE_SOURCE_DIR}/nano)
@@ -20,8 +22,11 @@ endif()
 option (BUILD_TESTS "enable building of tests" ON)
 
 if (BUILD_TESTS OR BUILD_ALL)
+set(BUILD_CATCH2 ON)
 add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 endif()
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/external)
 
 option(ADDRESS_SANITIZER ON)
 

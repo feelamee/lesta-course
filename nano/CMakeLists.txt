@@ -2,6 +2,7 @@ project(nano)
 
 set(TARGET ${PROJECT_NAME})
 set(imgui ${CMAKE_SOURCE_DIR}/external/imgui)
+
 add_library(
     ${TARGET} SHARED
 

@@ -93,7 +93,8 @@ menu_scene::process(delta_t delta)
             (ImGui::GetWindowWidth() - ImGui::CalcTextSize("Start").x) / 2;
 
         if (off > 0)
-            ImGui::SetCursorPos({ off, ImGui::GetWindowHeight() * 1 / 4 });
+            ImGui::SetCursorPos(
+                { off, ImGui::GetWindowHeight() * 1 / 2 - off / 2 });
     }
     ImGui::PushStyleColor(ImGuiCol_Button, nano::color::hex(50, 0, 200, 50));
     if (ImGui::Button("Start"))
