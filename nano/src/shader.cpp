@@ -4,11 +4,7 @@
 #include <nano/error.hpp>
 #include <nano/utils.hpp>
 
-#ifdef __ANDROID__
-#include <GLES3/gl3.h>
-#else
 #include <glad/glad.h>
-#endif
 
 #include <cstdlib>
 #include <cstring>
