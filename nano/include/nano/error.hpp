@@ -48,7 +48,7 @@
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG("Internal SDL error: %s\n", SDL_GetError());             \
+            LOG_DEBUG("ASSERT: Internal SDL error: %s\n", SDL_GetError());     \
             return (ret);                                                      \
         }                                                                      \
     }
@@ -66,7 +66,7 @@
     {                                                                          \
         if (!(expr))                                                           \
         {                                                                      \
-            LOG_DEBUG("Internal SDL error: %s\n", SDL_GetError());             \
+            LOG_DEBUG("TEST: Internal SDL error: %s\n", SDL_GetError());       \
         }                                                                      \
     }
 

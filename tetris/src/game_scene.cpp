@@ -2,8 +2,6 @@
 
 #include "tetramino.hpp"
 
-#include <bits/chrono.h>
-#include <compare>
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 

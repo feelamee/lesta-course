@@ -57,7 +57,8 @@ private:
     soundbuf buf;
     std::size_t m_position{ 0 };
     std::uint8_t m_volume{ 0 };
-    status_t m_status{ status_t::stopped };
+    // can be modified from another thread
+    volatile status_t m_status{ status_t::stopped };
 };
 
 } // namespace nano

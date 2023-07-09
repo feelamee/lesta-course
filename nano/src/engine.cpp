@@ -131,7 +131,10 @@ engine::initialize(int init_flags)
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context, EXIT_FAILURE);
 
-    assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress));
+    // assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress);
+
+    err_code = gladLoadGLES2Loader(SDL_GL_GetProcAddress);
+    assert(0 != err_code);
 
     IMGUI_CHECKVERSION();
     ImGuiContext* imgui_ctx = ImGui::CreateContext();

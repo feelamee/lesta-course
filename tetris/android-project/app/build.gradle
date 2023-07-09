@@ -12,14 +12,14 @@ android {
     ndkVersion '25.2.9519653'
     defaultConfig {
         applicationId "org.home.tetris"
-        minSdkVersion 21
+        minSdkVersion 16
         targetSdkVersion 33
         versionCode 1
         versionName "1.0"
         externalNativeBuild {
             cmake {
                 arguments "-DANDROID_STL=c++_shared"
-                // abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 // abiFilters 'arm64-v8a'
             }
         }
@@ -28,6 +28,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
     }
     applicationVariants.all { variant ->
@@ -45,10 +46,10 @@ android {
         }
        
     }
-    lintOptions {
+    namespace 'org.home.tetris'
+    lint {
         abortOnError false
     }
-    namespace 'org.home.tetris'
 
     if (buildAsLibrary) {
         libraryVariants.all { variant ->
