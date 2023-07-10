@@ -18,6 +18,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <memory>
+#include <string>
 
 namespace nano
 {
@@ -66,9 +67,47 @@ engine::is_running()
     return m_is_running;
 }
 
+static int
+android_toast(std::string msg, int dur, int gravity, int offx, int offy)
+{
+#ifdef __ANDROID__
+    int err_code = not SDL_WasInit(SDL_INIT_VIDEO);
+    ASSERT_ERROR(err_code, "Video subsystem not initialized");
+
+    SDL_AndroidShowToast(msg.c_str(), dur, gravity, offx, offy);
+    return EXIT_SUCCESS;
+#endif
+
+    return EXIT_FAILURE;
+}
+
+static int
+display_mode(const SDL_DisplayMode*& dm)
+{
+    int err_code = not SDL_WasInit(SDL_INIT_VIDEO);
+    ASSERT_ERROR(err_code, "Video subsystem not initialized");
+
+    int display_count{ 0 };
+    SDL_DisplayID* display_ids = SDL_GetDisplays(&display_count);
+    ASSERT_SDL_ERROR(nullptr != display_ids, EXIT_FAILURE);
+    int i{ 0 };
+    SDL_DisplayID* id{ display_ids };
+    while (nullptr == dm and i < display_count)
+    {
+        dm = SDL_GetCurrentDisplayMode(*id);
+        ++i;
+        ++id;
+    }
+    SDL_free(display_ids);
+
+    ASSERT_SDL_ERROR(nullptr != dm, EXIT_FAILURE);
+    return EXIT_SUCCESS;
+}
+
 int
 engine::initialize(int init_flags)
 {
+    android_toast("This is TETRIS", 1, 100, 0, 0);
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
     flags = init_flags;
 
@@ -81,61 +120,72 @@ engine::initialize(int init_flags)
         return EXIT_SUCCESS;
     }
 
-    {
-        const SDL_DisplayMode* display_mode{ nullptr };
-        int display_count{ 0 };
-        SDL_DisplayID* display_ids = SDL_GetDisplays(&display_count);
-        ASSERT_SDL_ERROR(nullptr != display_ids, EXIT_FAILURE);
-        int i{ 0 };
-        SDL_DisplayID* id{ display_ids };
-        while (nullptr == display_mode and i < display_count)
-        {
-            display_mode = SDL_GetCurrentDisplayMode(*id);
-            ++i;
-            ++id;
-        }
-        SDL_free(display_ids);
-
-        ASSERT_SDL_ERROR(nullptr != display_mode, EXIT_FAILURE);
+    const SDL_DisplayMode* dm{ nullptr };
+    err_code = display_mode(dm);
+    ASSERT_ERROR(err_code, "Failed to get display mode");
 #ifdef __ANDROID__
-        window.size.x = display_mode->w;
-        window.size.y = display_mode->h;
+    window.size.x = dm->w;
+    window.size.y = dm->h;
 #else
-        window.size.x = display_mode->h / 2. * 0.9;
-        window.size.y = display_mode->h * 0.9;
+    // because taskbar occupy 10%???
+    window.size.x = dm->h / 2. * 0.9;
+    window.size.y = dm->h * 0.9;
 #endif
-    }
 
+    android_toast("window", 1, 100, 0, 0);
     impl->window = SDL_CreateWindow(
         "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);
     ASSERT_SDL_ERROR(nullptr != impl->window, EXIT_FAILURE);
 
-    // TODO: extract such values to config
+    //----------------------------------------
+    // OpenGL    GLSL      GLSL
+    // version   version   string
+    //----------------------------------------
+    //  2.0       110       "#version 110"
+    //  2.1       120       "#version 120"
+    //  3.0       130       "#version 130"
+    //  3.1       140       "#version 140"
+    //  3.2       150       "#version 150"
+    //  3.3       330       "#version 330 core"
+    //  4.0       400       "#version 400 core"
+    //  4.1       410       "#version 410 core"
+    //  4.2       420       "#version 410 core"
+    //  4.3       430       "#version 430 core"
+    //  ES 2.0    100       "#version 100"      = WebGL 1.0
+    //  ES 3.0    300       "#version 300 es"   = WebGL 2.0
+    //----------------------------------------
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-#ifdef __WINDOWS__
+    // #ifdef __WINDOWS__
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
                         SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-#else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-#endif
+    // #else
+    //     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+    //     SDL_GL_CONTEXT_PROFILE_ES);
+    // #endif
 
     GLint real_major_version{}, real_minor_version{};
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &real_major_version);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &real_minor_version);
 
-    // TODO: extract such values to config
-    assert(real_major_version == 3 && real_minor_version == 2);
+    android_toast("version " + std::to_string(real_major_version) + "." +
+                      std::to_string(real_minor_version),
+                  1,
+                  100,
+                  0,
+                  0);
+    assert(real_major_version >= 2 and real_minor_version >= 0);
 
+    android_toast("context", 1, 100, 0, 0);
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context, EXIT_FAILURE);
 
-    // assert(0 != gladLoadGLES2Loader(SDL_GL_GetProcAddress);
-
+    android_toast("gladLoadGLES2Loader", 1, 100, 0, 0);
     err_code = gladLoadGLES2Loader(SDL_GL_GetProcAddress);
     assert(0 != err_code);
 
+    android_toast("imcontext", 1, 100, 0, 0);
     IMGUI_CHECKVERSION();
     ImGuiContext* imgui_ctx = ImGui::CreateContext();
     if (nullptr == imgui_ctx)
@@ -144,6 +194,7 @@ engine::initialize(int init_flags)
         return EXIT_FAILURE;
     }
 
+    android_toast("im init sdl3", 1, 100, 0, 0);
     bool err = not ImGui_ImplSDL3_InitForOpenGL(impl->window, impl->context);
     if (err)
     {
@@ -151,6 +202,7 @@ engine::initialize(int init_flags)
         return EXIT_FAILURE;
     }
 
+    android_toast("im init gl", 1, 100, 0, 0);
     ImGui_ImplOpenGL3_Init("#version 300 es");
     return EXIT_SUCCESS;
 }

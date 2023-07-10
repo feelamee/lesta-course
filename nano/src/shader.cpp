@@ -411,7 +411,7 @@ transform_src(const std::string& transform_arg_name)
 {
     // so, std::format does not supports by mingw, thats why...
     return R"(
-            #version 320 es
+            #version 300 es
 
             layout (location = 0) in vec2 p_pos;
             layout (location = 1) in vec3 p_color;
@@ -440,7 +440,7 @@ std::string
 texture_src(const std::string& texture_arg_name)
 {
     return R"(
-            #version 320 es
+            #version 300 es
             precision mediump float;
 
             in vec2 tpos;

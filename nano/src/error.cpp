@@ -60,22 +60,6 @@ gl_check(const std::filesystem::path& file,
             break;
         }
 
-#ifndef __ANDROID__
-        case GL_STACK_OVERFLOW:
-        {
-            error = "GL_STACK_OVERFLOW";
-            description = "This command would cause a stack overflow.";
-            break;
-        }
-
-        case GL_STACK_UNDERFLOW:
-        {
-            error = "GL_STACK_UNDERFLOW";
-            description = "This command would cause a stack underflow.";
-            break;
-        }
-#endif
-
         case GL_OUT_OF_MEMORY:
         {
             error = "GL_OUT_OF_MEMORY";
