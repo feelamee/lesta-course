@@ -45,7 +45,7 @@ engine::assets_path()
 #ifdef __ANDROID__
     return "";
 #else
-    return "../assets";
+    return "./assets";
 #endif
 }
 

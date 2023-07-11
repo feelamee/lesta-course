@@ -63,3 +63,6 @@ target_sources(${target} PUBLIC
 
 target_link_libraries(${target} PUBLIC nano)
 target_link_libraries(${target} PUBLIC sanitizer)
+
+file(COPY ${CMAKE_SOURCE_DIR}/assets
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
