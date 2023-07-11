@@ -37,7 +37,7 @@
     cd lesta-course/tetris
     mkdir build/
     cd build/
-    x86_64-w64-mingw-cmake .. [-DADDRESS_SANITIZER=ON]*
+    x86_64-w64-mingw32-cmake .. [-DADDRESS_SANITIZER=ON]*
     cmake --build .
 
 ##### build Tetris for Android
