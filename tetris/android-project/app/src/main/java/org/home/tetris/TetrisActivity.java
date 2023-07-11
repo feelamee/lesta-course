@@ -22,32 +22,3 @@ public class TetrisActivity extends SDLActivity {
         };
     }
 }
-
-//class TetrisMain implements Runnable {
-//    @Override
-//    public void run() {
-//        String library = TetrisActivity.mSingleton.getMainSharedObject();
-//        String function = TetrisActivity.mSingleton.getMainFunction();
-//        String[] arguments = TetrisActivity.mSingleton.getArguments();
-//
-//        try {
-//            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY);
-//        } catch (Exception e) {
-//            Log.v("TETRIS", "modify thread properties failed " + e.toString());
-//        }
-//
-//        Log.v("TETRIS", "Running main function " + function + " from library " + library);
-//
-//        TetrisActivity.nativeRunMain(library, function, arguments);
-//
-//        Log.v("TETRIS", "Finished main function");
-//
-//        if (TetrisActivity.mSingleton != null && !TetrisActivity.mSingleton.isFinishing()) {
-//            // Let's finish the Activity
-//            TetrisActivity.mSDLThread = null;
-//            TetrisActivity.mSDLMainFinished = true;
-//            TetrisActivity.mSingleton.finish();
-//        }  // else: Activity is already being destroyed
-//
-//    }
-//}

@@ -71,10 +71,8 @@ static int
 android_toast(std::string msg, int dur, int gravity, int offx, int offy)
 {
 #ifdef __ANDROID__
-    int err_code = not SDL_WasInit(SDL_INIT_VIDEO);
-    ASSERT_ERROR(err_code, "Video subsystem not initialized");
-
-    SDL_AndroidShowToast(msg.c_str(), dur, gravity, offx, offy);
+    int err_code = SDL_AndroidShowToast(msg.c_str(), dur, gravity, offx, offy);
+    ASSERT_SDL_ERROR(EXIT_SUCCESS == err_code, EXIT_FAILURE);
     return EXIT_SUCCESS;
 #endif
 
@@ -84,9 +82,6 @@ android_toast(std::string msg, int dur, int gravity, int offx, int offy)
 static int
 display_mode(const SDL_DisplayMode*& dm)
 {
-    int err_code = not SDL_WasInit(SDL_INIT_VIDEO);
-    ASSERT_ERROR(err_code, "Video subsystem not initialized");
-
     int display_count{ 0 };
     SDL_DisplayID* display_ids = SDL_GetDisplays(&display_count);
     ASSERT_SDL_ERROR(nullptr != display_ids, EXIT_FAILURE);
@@ -107,7 +102,7 @@ display_mode(const SDL_DisplayMode*& dm)
 int
 engine::initialize(int init_flags)
 {
-    android_toast("This is TETRIS", 1, 100, 0, 0);
+    android_toast("Initialization begin", 1, 0, 0, 0);
     SDL_LogSetAllPriority(SDL_LOG_PRIORITY_INFO);
     flags = init_flags;
 
@@ -132,7 +127,7 @@ engine::initialize(int init_flags)
     window.size.y = dm->h * 0.9;
 #endif
 
-    android_toast("window", 1, 100, 0, 0);
+    android_toast("Window creating", 1, 0, 0, 0);
     impl->window = SDL_CreateWindow(
         "test", window.size.x, window.size.y, SDL_WINDOW_OPENGL);
     ASSERT_SDL_ERROR(nullptr != impl->window, EXIT_FAILURE);
@@ -157,35 +152,34 @@ engine::initialize(int init_flags)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 
-    // #ifdef __WINDOWS__
+#ifdef __WINDOWS__
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
                         SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-    // #else
-    //     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-    //     SDL_GL_CONTEXT_PROFILE_ES);
-    // #endif
+#else
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#endif
 
     GLint real_major_version{}, real_minor_version{};
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &real_major_version);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &real_minor_version);
 
-    android_toast("version " + std::to_string(real_major_version) + "." +
-                      std::to_string(real_minor_version),
+    android_toast("OpenGLES Version " + std::to_string(real_major_version) +
+                      "." + std::to_string(real_minor_version),
                   1,
-                  100,
+                  0,
                   0,
                   0);
     assert(real_major_version >= 2 and real_minor_version >= 0);
 
-    android_toast("context", 1, 100, 0, 0);
+    android_toast("OpenGLES context creating", 1, 0, 0, 0);
     impl->context = SDL_GL_CreateContext(impl->window);
     ASSERT_SDL_ERROR(nullptr != impl->context, EXIT_FAILURE);
 
-    android_toast("gladLoadGLES2Loader", 1, 100, 0, 0);
+    android_toast("gladLoadGLES2Loader calling", 1, 0, 0, 0);
     err_code = gladLoadGLES2Loader(SDL_GL_GetProcAddress);
     assert(0 != err_code);
 
-    android_toast("imcontext", 1, 100, 0, 0);
+    android_toast("Dear ImGui context creating", 1, 0, 0, 0);
     IMGUI_CHECKVERSION();
     ImGuiContext* imgui_ctx = ImGui::CreateContext();
     if (nullptr == imgui_ctx)
@@ -194,7 +188,7 @@ engine::initialize(int init_flags)
         return EXIT_FAILURE;
     }
 
-    android_toast("im init sdl3", 1, 100, 0, 0);
+    android_toast("Dear ImGui initialization SDL3", 1, 0, 0, 0);
     bool err = not ImGui_ImplSDL3_InitForOpenGL(impl->window, impl->context);
     if (err)
     {
@@ -202,7 +196,7 @@ engine::initialize(int init_flags)
         return EXIT_FAILURE;
     }
 
-    android_toast("im init gl", 1, 100, 0, 0);
+    android_toast("Dear ImGui initialization OpenGLES", 1, 0, 0, 0);
     ImGui_ImplOpenGL3_Init("#version 300 es");
     return EXIT_SUCCESS;
 }
