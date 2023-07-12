@@ -29,11 +29,11 @@ else()
 endif()
 
 execute_process (
-    COMMAND bash -c "pushd "${EXTERNAL_DIR}" &&
-                     git submodule update --init SDL_image imgui  SDL
-                     cd ../external/SDL_image/external/ &&
-                     git submodule update --init libpng &&
-                     popd"
+    COMMAND bash -c pushd ${EXTERNAL_DIR} &&
+                    git submodule update --init SDL_image imgui  SDL
+                    cd ../external/SDL_image/external/ &&
+                    git submodule update --init libpng &&
+                    popd
     OUTPUT_VARIABLE INIT_SUBMODULES_SDL3IMAGE_IMGUI_RESULT
 )
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/SDL ${CMAKE_CURRENT_BINARY_DIR}/lib/SDL)
