@@ -23,10 +23,11 @@ set(SDL3IMAGE_XV OFF)
 set(SDL3IMAGE_PNG ON)
 
 execute_process (
-    COMMAND bash -c "git submodule update --init ../external/SDL_image ../external/imgui  ../external/SDL
+    COMMAND bash -c "pushd ../external &&
+                     git submodule update --init SDL_image imgui  SDL
                      cd ../external/SDL_image/external/ &&
                      git submodule update --init libpng &&
-                     cd -"
+                     popd"
     OUTPUT_VARIABLE INIT_SUBMODULES_SDL3IMAGE_IMGUI_RESULT
 )
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/SDL ${CMAKE_CURRENT_BINARY_DIR}/lib/SDL)
