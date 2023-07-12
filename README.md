@@ -49,3 +49,5 @@ Build project (Ctrl + F9)\
 Replace $HOME/Android/Sdk with your android sdk dir if need
 
 ##### Linux, Windows, Android builds [here](https://drive.google.com/drive/folders/1xkTbF4SSuveb6KFR9aPRghVcRd26LTmm?usp=sharing)
+
+##### Play and Chill on Android [here](https://photos.app.goo.gl/MwRPbQy7wKqXYqkq5)
