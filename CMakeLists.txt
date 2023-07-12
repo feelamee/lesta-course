@@ -4,33 +4,28 @@ project(lesta-course)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(SDL_TESTS OFF)
-set(BUILD_SDL3 ON)
-set(BUILD_GLAD ON)
 
-option(BUILD_NANO "enable building of nano engine" ON)
-
-
-if (BUILD_NANO OR BUILD_ALL)
-    set(BUILD_SDL3IMAGE ON)
-add_subdirectory(${CMAKE_SOURCE_DIR}/nano)
-endif()
-
-option(BUILD_HW "enable building of homework" ON)
+option(BUILD_HW "enable building of homework" OFF)
 
 if (BUILD_HW OR BUILD_ALL)
+set(BUILD_NANO ON)
 add_subdirectory(${CMAKE_SOURCE_DIR}/homework)
 endif()
 
-option (BUILD_TESTS "enable building of tests" ON)
+option (BUILD_TESTS "enable building of tests" OFF)
 
 if (BUILD_TESTS OR BUILD_ALL)
-set(BUILD_CATCH2 ON)
+set(BUILD_NANO ON)
 add_subdirectory(${CMAKE_SOURCE_DIR}/tests)
 endif()
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/external)
+option(BUILD_NANO "enable building of nano engine" OFF)
 
-option(ADDRESS_SANITIZER ON)
+if (BUILD_NANO OR BUILD_ALL)
+add_subdirectory(${CMAKE_SOURCE_DIR}/nano)
+endif()
+
+option(ADDRESS_SANITIZER OFF)
 
 add_library(sanitizer INTERFACE)
 

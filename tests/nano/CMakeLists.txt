@@ -8,5 +8,5 @@ add_executable(
   read-file.cpp
 )
 
-target_link_libraries(read-file-test PUBLIC Catch2::Catch2WithMain)
 target_link_libraries(read-file-test PUBLIC nano)
+target_link_libraries(read-file-test PUBLIC Catch2::Catch2WithMain)

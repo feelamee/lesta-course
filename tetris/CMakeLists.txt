@@ -13,9 +13,7 @@ if(ADDRESS_SANITIZER)
     target_link_options(sanitizer INTERFACE -fsanitize=address)
 endif()
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/external)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/nano)
-
 
 set(target ${PROJECT_NAME})
 

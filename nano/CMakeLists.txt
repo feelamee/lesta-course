@@ -22,10 +22,16 @@ set(SDL3IMAGE_XPM OFF)
 set(SDL3IMAGE_XV OFF)
 set(SDL3IMAGE_PNG ON)
 
-set(BUILD_SDL3IMAGE ON)
-set(BUILD_SDL3 ON)
-
-set(BUILD_GLAD ON)
+execute_process (
+    COMMAND bash -c "git submodule update --init ../external/SDL_image ../external/imgui  ../external/SDL
+                     cd ../external/SDL_image/external/ &&
+                     git submodule update --init libpng &&
+                     cd -"
+    OUTPUT_VARIABLE INIT_SUBMODULES_SDL3IMAGE_IMGUI_RESULT
+)
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/SDL ${CMAKE_CURRENT_BINARY_DIR}/lib/SDL)
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/SDL_image ${CMAKE_CURRENT_BINARY_DIR}/lib/SDL_image)
+add_subdirectory(${CMAKE_SOURCE_DIR}/external/glad ${CMAKE_CURRENT_BINARY_DIR}/lib/glad)
 
 add_library(
     ${TARGET} SHARED

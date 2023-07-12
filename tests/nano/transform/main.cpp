@@ -1,5 +1,3 @@
-#include "nano/drawable.hpp"
-#include <memory>
 #include <nano/engine.hpp>
 #include <nano/error.hpp>
 #include <nano/shader.hpp>
@@ -8,6 +6,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <numeric>
 #include <vector>
 
