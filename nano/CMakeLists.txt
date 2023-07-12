@@ -22,8 +22,14 @@ set(SDL3IMAGE_XPM OFF)
 set(SDL3IMAGE_XV OFF)
 set(SDL3IMAGE_PNG ON)
 
+if (ANDROID)
+    set(EXTERNAL_DIR "../../external/")
+else()
+    set(EXTERNAL_DIR "../external/")
+endif()
+
 execute_process (
-    COMMAND bash -c "pushd ../external &&
+    COMMAND bash -c "pushd "${EXTERNAL_DIR}" &&
                      git submodule update --init SDL_image imgui  SDL
                      cd ../external/SDL_image/external/ &&
                      git submodule update --init libpng &&
