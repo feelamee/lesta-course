@@ -85,8 +85,7 @@ main()
             ImGui::End();
         }
 
-        eng->renderUI();
-        eng->swap_buffers();
+        eng->render();
     }
 
     return exit_code;

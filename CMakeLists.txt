@@ -3,6 +3,7 @@ project(lesta-course)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(SDL_TESTS OFF)
 set(BUILD_SDL3 ON)
 set(BUILD_GLAD ON)
 
@@ -10,6 +11,7 @@ option(BUILD_NANO "enable building of nano engine" ON)
 
 
 if (BUILD_NANO OR BUILD_ALL)
+    set(BUILD_SDL3IMAGE ON)
 add_subdirectory(${CMAKE_SOURCE_DIR}/nano)
 endif()
 

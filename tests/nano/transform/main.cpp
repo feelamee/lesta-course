@@ -93,6 +93,8 @@ main()
             }
         }
 
+        eng->new_frame();
+
         if (is_rotate)
         {
             auto time =
@@ -101,7 +103,7 @@ main()
         }
 
         s.draw({ program });
-        eng->swap_buffers();
+        eng->render();
     }
 
     return EXIT_SUCCESS;
