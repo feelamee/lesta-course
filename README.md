@@ -38,7 +38,7 @@
     cmake --build . -j4
 
 ##### run Tetris Windows build using wine
-    
+    WINEPATH="/usr/x86_64-w64-mingw32/bin/;`pwd`/nano/lib/SDL;`pwd`/nano/lib/SDL_image;`pwd`/nano" ./tetris.exe
 
 ##### build Tetris for Android
     git clone https://github.com/hiebyshek/lesta-course
@@ -47,3 +47,5 @@
     android-studio ./
 Build project (Ctrl + F9)\
 Replace $HOME/Android/Sdk with your android sdk dir if need
+
+##### Linux, Windows, Android builds [here](https://drive.google.com/drive/folders/1xkTbF4SSuveb6KFR9aPRghVcRd26LTmm?usp=sharing)
