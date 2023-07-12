@@ -242,7 +242,13 @@ load(const std::filesystem::path& fn, soundbuf& buf)
     uint8_t* soundbuf_data{ nullptr };
     std::uint32_t soundbuf_len{ 0 };
     SDL_AudioSpec* res =
-        SDL_LoadWAV(fn.string().c_str(), &spec, &soundbuf_data, &soundbuf_len);
+        // SDL_LoadWAV(fn.string().c_str(), &spec, &soundbuf_data,
+        // &soundbuf_len);
+        SDL_LoadWAV_RW(SDL_RWFromFile(fn.string().c_str(), "rb"),
+                       SDL_TRUE,
+                       &spec,
+                       &soundbuf_data,
+                       &soundbuf_len);
     ASSERT_SDL_ERROR(nullptr != res, err_t::incorrect_file_structure);
 
     audio_spec soundbuf_spec;
