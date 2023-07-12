@@ -37,10 +37,13 @@
     x86_64-w64-mingw32-cmake ..
     cmake --build . -j4
 
+##### run Tetris Windows build using wine
+    
+
 ##### build Tetris for Android
     git clone https://github.com/hiebyshek/lesta-course
     cd lesta-course/tetris/android-project
     echo "sdk.dir=$HOME/Android/Sdk" > local.properties
     android-studio ./
 Build project (Ctrl + F9)\
-Replace $HOME/Android/Sdk witch your android sdk dir if need
+Replace $HOME/Android/Sdk with your android sdk dir if need
