@@ -7,3 +7,4 @@ specification.html
 local.properties
 .*
 Debug*/
+compile_commands.json
